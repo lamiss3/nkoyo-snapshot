@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790083680767,
+      "tag": "0000_create_readiness_snapshot_schema",
+      "breakpoints": true
+    }
+  ]
+}
