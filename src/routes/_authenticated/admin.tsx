@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, Loader2 } from "lucide-react";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { Logo } from "@/components/brand/Logo";
 import { AssessmentLogPanel } from "@/components/snapshot/AssessmentLogPanel";
@@ -9,6 +10,9 @@ import { dimensions, questions } from "@/config/questions";
 import { questionPatterns } from "@/config/results";
 import { problemById } from "@/assessment-v2/problem-bank";
 import type { ProblemId } from "@/assessment-v2/types";
+import type { TraceDatabase } from "@/assessment-v2/trace-types";
+
+const traceDb = supabase as unknown as SupabaseClient<TraceDatabase>;
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -75,9 +79,21 @@ function download(filename: string, content: string) {
 function AdminPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = Route.useRouteContext();
+  const accessQuery = useQuery({
+    queryKey: ["admin", "access", user.id],
+    refetchInterval: 10000,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
+      if (error) throw error;
+      return data?.some((entry) => entry.role === "admin" || entry.role === "staff") ?? false;
+    },
+  });
+  const accessAllowed = accessQuery.data === true && !accessQuery.error;
 
   const sessionsQuery = useQuery({
     queryKey: ["admin", "sessions"],
+    enabled: accessAllowed,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("assessment_sessions")
@@ -91,6 +107,7 @@ function AdminPage() {
 
   const leadsQuery = useQuery({
     queryKey: ["admin", "leads"],
+    enabled: accessAllowed,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("leads")
@@ -106,6 +123,7 @@ function AdminPage() {
 
   const eventsQuery = useQuery({
     queryKey: ["admin", "events"],
+    enabled: accessAllowed,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("snapshot_events")
@@ -116,8 +134,19 @@ function AdminPage() {
     },
   });
 
-  const loading = sessionsQuery.isLoading || leadsQuery.isLoading || eventsQuery.isLoading;
-  const error = sessionsQuery.error ?? leadsQuery.error ?? eventsQuery.error;
+  const adaptiveStartsQuery = useQuery({
+    queryKey: ["admin", "adaptive-start-count"],
+    enabled: accessAllowed,
+    queryFn: async () => {
+      const { count, error } = await traceDb.from("adaptive_assessment_traces")
+        .select("session_id", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  const loading = accessQuery.isPending || (accessAllowed && (sessionsQuery.isLoading || leadsQuery.isLoading || eventsQuery.isLoading || adaptiveStartsQuery.isLoading));
+  const error = accessQuery.error ?? (accessAllowed ? sessionsQuery.error ?? leadsQuery.error ?? eventsQuery.error ?? adaptiveStartsQuery.error : null);
 
   const sessions = sessionsQuery.data ?? [];
   const leads = leadsQuery.data ?? [];
@@ -129,7 +158,7 @@ function AdminPage() {
   };
 
   const completions = sessions.filter((s) => s.completed_at).length;
-  const starts = events.filter((e) => e.event_type === "snapshot_started").length;
+  const starts = events.filter((e) => e.event_type === "snapshot_started").length + (adaptiveStartsQuery.data ?? 0);
   const bookingClicks = events.filter((e) => e.event_type === "booking_cta_click").length;
   const optIns = leads.filter((l) => l.marketing_consent).length;
 
@@ -175,6 +204,19 @@ function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-5 py-10">
+        {!accessQuery.isPending && !accessQuery.error && !accessAllowed && (
+          <section role="status" className="card-elevated p-7">
+            <h1 className="text-2xl font-black">Your account is created. Dashboard access is pending.</h1>
+            <p className="mt-3 text-sm text-muted-foreground">Signed in as {user.email ?? "your account"}.</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              An administrator needs to grant this account the staff or admin role before you can read assessment records.
+              Signing up does not grant that permission. Your assessments may already be saved; they are hidden until access is granted.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">Share your account email with the administrator. This page checks access every 10 seconds.</p>
+            <button type="button" onClick={() => void accessQuery.refetch()} disabled={accessQuery.isFetching}
+              className="mt-5 rounded-full border border-border px-5 py-2 text-sm font-semibold disabled:opacity-50">Check access</button>
+          </section>
+        )}
         {loading && (
           <div className="flex items-center gap-3 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> Loading dashboard…
@@ -191,7 +233,7 @@ function AdminPage() {
           </div>
         )}
 
-        {!loading && !error && (
+        {accessAllowed && !loading && !error && (
           <>
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {stats.map((stat) => (
@@ -313,7 +355,7 @@ function AdminPage() {
             </section>
           </>
         )}
-        <AssessmentLogPanel />
+        {accessAllowed && !error && <AssessmentLogPanel />}
       </main>
     </div>
   );
