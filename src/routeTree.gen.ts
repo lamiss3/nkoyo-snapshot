@@ -17,6 +17,7 @@ import { Route as ResultsRouteImport } from './routes/results'
 import { Route as SnapshotRouteImport } from './routes/snapshot'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiEmailJobsRouteImport } from './routes/api.email-jobs'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiEmailJobsRoute = ApiEmailJobsRouteImport.update({
+  id: '/api/email-jobs',
+  path: '/api/email-jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/api/email-jobs': typeof ApiEmailJobsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/api/email-jobs': typeof ApiEmailJobsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,14 +94,29 @@ export interface FileRoutesById {
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/api/email-jobs': typeof ApiEmailJobsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/privacy' | '/results' | '/snapshot' | '/terms' | '/admin'
+    | '/'
+    | '/auth'
+    | '/privacy'
+    | '/results'
+    | '/snapshot'
+    | '/terms'
+    | '/admin'
+    | '/api/email-jobs'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/privacy' | '/results' | '/snapshot' | '/terms' | '/admin'
+    | '/'
+    | '/auth'
+    | '/privacy'
+    | '/results'
+    | '/snapshot'
+    | '/terms'
+    | '/admin'
+    | '/api/email-jobs'
   id:
     | '__root__'
     | '/'
@@ -104,6 +127,7 @@ export interface FileRouteTypes {
     | '/snapshot'
     | '/terms'
     | '/_authenticated/admin'
+    | '/api/email-jobs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,6 +138,7 @@ export interface RootRouteChildren {
   ResultsRoute: typeof ResultsRoute
   SnapshotRoute: typeof SnapshotRoute
   TermsRoute: typeof TermsRoute
+  ApiEmailJobsRoute: typeof ApiEmailJobsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -174,6 +199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/email-jobs': {
+      id: '/api/email-jobs'
+      path: '/api/email-jobs'
+      fullPath: '/api/email-jobs'
+      preLoaderRoute: typeof ApiEmailJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -196,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResultsRoute: ResultsRoute,
   SnapshotRoute: SnapshotRoute,
   TermsRoute: TermsRoute,
+  ApiEmailJobsRoute: ApiEmailJobsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

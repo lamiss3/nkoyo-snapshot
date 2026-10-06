@@ -42,6 +42,7 @@ function PrivacyPage() {
               If you choose to request follow-up, we store the email address you provide and link it to your Snapshot. Marketing follow-up requires
               separate, explicit consent that is never pre-selected. You can use your results and the
               booking link without providing any details.
+              If you request a detailed report, your saved answers and result are also sent to Gemini to prepare personalized email drafts. Staff can review these drafts and their source answers in the private Admin panel. The optional follow-up consists of four further emails about your Snapshot; declining it does not prevent requesting the report.
             </p>
           </section>
           <section>
@@ -50,6 +51,7 @@ function PrivacyPage() {
               {brand.emailDeliveryConfigured
                 ? "Email is delivered through our configured provider."
                 : "An email provider is not connected yet. No automated emails are sent from this tool today."}
+              When Kit is connected, approved email drafts and the intended recipient's email address can be uploaded to Kit for delivery preparation. Follow-up messages are only included when separately requested. Delivery is not activated during this preparation stage.
             </p>
           </section>
           <section>

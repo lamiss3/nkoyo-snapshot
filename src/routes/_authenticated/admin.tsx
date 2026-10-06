@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { Logo } from "@/components/brand/Logo";
 import { AssessmentLogPanel } from "@/components/snapshot/AssessmentLogPanel";
+import { EmailJourneyPanel } from "@/components/snapshot/EmailJourneyPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { dimensions, questions } from "@/config/questions";
 import { questionPatterns } from "@/config/results";
@@ -356,6 +357,7 @@ function AdminPage() {
           </>
         )}
         {accessAllowed && !error && <AssessmentLogPanel />}
+        {accessAllowed && !error && <EmailJourneyPanel />}
       </main>
     </div>
   );

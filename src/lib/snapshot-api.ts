@@ -1,8 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Answers, DeepDiveAnswers } from "./snapshot-engine";
-import { buildAdaptivePresentation } from "@/assessment-v2/result-content";
 import type { AssessmentSession } from "@/assessment-v2/types";
-import type { Json } from "@/integrations/supabase/types";
+import { requestPersonalizedEmails, prepareOwnedEmailDrafts } from "@/assessment-v2/email-actions";
 
 export async function recordCompletedSnapshot(input: {
   sessionKey: string;
@@ -61,35 +60,22 @@ export async function submitLead(input: LeadInput) {
   if (error) throw error;
 }
 
-/** Save a requested adaptive report and its email address under one session key.
- * Email delivery is not configured; this function does not send a message. */
+/** Save contact + durable job atomically, then request a first preparation attempt. */
 export async function submitAdaptiveReportRequest(input: {
   session: AssessmentSession;
   email: string;
   marketingConsent: boolean;
 }) {
-  const { session } = input;
-  if (session.stage !== "complete" || !session.result) throw new Error("Finish the assessment before requesting a report.");
-
-  const presentation = buildAdaptivePresentation(session);
-  const asJson = (value: object): Json => JSON.parse(JSON.stringify(value)) as Json;
-  const { error: snapshotError } = await supabase.from("assessment_sessions").insert({
-    session_key: session.id,
-    completed_at: session.result.generatedAt,
-    answers: asJson({ version: session.version, questions: session.questions, responses: session.answers }),
-    followup_answers: asJson({ report: presentation, result: session.result }),
-    result_patterns: session.result.priority,
-    summary_key: session.result.priority[0] ?? null,
+  const sessionId = input.session.id,
+    traceToken = input.session.traceToken;
+  if (!traceToken) throw new Error("A saved assessment is required for an email report.");
+  const saved = await requestPersonalizedEmails({
+    data: { sessionId, traceToken, email: input.email, consent: input.marketingConsent },
   });
-  // A retry may follow a lead insert failure. The completed report is already saved then.
-  if (snapshotError && snapshotError.code !== "23505") throw snapshotError;
-
-  const { error: leadError } = await supabase.from("leads").insert({
-    session_key: session.id,
-    first_name: "",
-    email: input.email,
-    marketing_consent: input.marketingConsent,
-    marketing_consent_at: input.marketingConsent ? new Date().toISOString() : null,
+  // The persisted queue survives a closed browser or interrupted request. Recovery runs
+  // via the protected worker when scheduled; staff can retry in Admin. No unawaited server work.
+  void prepareOwnedEmailDrafts({ data: { sessionId, traceToken } }).catch(() => {
+    /* saved job remains queued */
   });
-  if (leadError) throw leadError;
+  return saved;
 }

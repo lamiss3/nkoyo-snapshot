@@ -1,0 +1,96 @@
+# Nkoyo — five personalized assessment emails
+
+## The chosen design
+
+All five emails are written for the individual using the actual questions and answers from their completed assessment. The earlier topic-sequence approach is an alternative, not the current design. Topic IDs remain useful metadata, but the content comes from the person's examples and constraints.
+
+| Email | Target timing | Personalization |
+|---|---|---|
+| 1: detailed report | Immediately after generation/review is ready | Explain the result in more depth than the MVP, using their concrete examples, topic evidence, the three Cs, uncertainty and a suggested seven-day plan |
+| 2: awareness | Day 2 | Connect the primary issue to a specific situation they described; explain what to notice in everyday work |
+| 3: understanding | Day 4 | Use their examples to explain a possible mechanism; address a relevant question they wrote and distinguish other explanations |
+| 4: action | Day 7 | Propose one practical experiment adapted to their stated constraints, a possible owner to agree, and a progress check |
+| 5: secondary issue | Day 10 | Explore the secondary issue through relevant answers and its possible connection to the primary; if no secondary is established, write a personalized check-in |
+
+The follow-ups must not assume someone replied or took the previous action. An email reply is not automatically part of the evidence source. Using new replies would require a separate reply-capture integration and explicit generation rules.
+
+## Example of relevance
+
+Suppose the respondent says two coordinator posts are vacant, the same three colleagues absorb that work, and their reports are delayed. Their primary topic is vacancies and recurring overload; their secondary topic is demand exceeding capacity.
+
+- Email 1 explains how those observations support the result and which facts remain unclear.
+- Email 2 calls attention to the repeated redistribution of work and the delayed reports.
+- Email 3 explores how keeping the same commitments after losing staff can create a backlog, without declaring this the verified root cause.
+- Email 4 suggests mapping the duties absorbed by the three colleagues and agreeing one task to pause or reassign, with a review of delays after seven days.
+- Email 5 uses their stated referral/intake mismatch to explore demand, rather than repeating the staffing advice.
+
+This is an illustration of the writing approach, not a real respondent's record.
+
+## What Gemini receives and produces
+
+Input: actual question text, selected option text, written answers, authoritative primary/secondary topics, evidence labels, whether priorities are joint, relative three-C emphasis and practical topic guidance. No contact email or browser capability token is sent in this brief.
+
+Output: five distinct subjects, preview texts and complete email bodies, written together to avoid repetition. Every email has staff-only question references so its use of evidence can be reviewed. The recipient sees natural-language references to their situation, not question IDs or model logs.
+
+- Jev and the existing result logic determine the topics; Gemini writes the content.
+- Every email must include an evidence reference when responses exist. A valid reference alone does not prove the prose is accurate: staff review still checks the claims.
+- Unclear answers produce a clearer evidence-gathering prompt, not invented facts.
+- “Possible” stays tentative; joint priorities remain joint even if one is introduced later.
+- Suggested owners, time commitments and resources are proposals, not assumed facts.
+- Generate and save all five once. Sending later uses the saved version rather than rewriting the advice on each delivery day.
+
+## Kit delivery
+
+For this design, the server prepares **five individual broadcasts per respondent**, containing the saved complete HTML bodies. No full report or long email body needs to live in a Kit custom field. The existing draft builder sets `public: false`, an explicit private tag filter, and `send_at: null` for review.
+
+Before scheduling, the server must verify the dedicated session/contact tag contains exactly the intended active subscriber, with no extra pages or other members. Kit's API currently supports tag/segment targeting and can default to all subscribers when a filter is omitted. It is not safe to rely on a shared primary-topic tag for an individually generated email.
+
+After review and verification, the delivery worker schedules the first message as soon as ready and the later messages for days 2, 4, 7 and 10 from the agreed journey start. Record separate states for draft, scheduled, sending, delivered, failed and cancelled; a successful API request is not proof of delivery. Keep recipient tags stable until all relevant messages finish. Preserve Kit's unsubscribe/address footer and never reactivate an unsubscribed contact automatically.
+
+Kit broadcasts are a subscriber email mechanism rather than a transactional send-to-any-address API. Report-only requests and unsubscribed contacts need an appropriate separate report delivery route if Kit will not deliver to them.
+
+## Consent, storage and retries
+
+The report request permits Email 1 for that request. Emails 2–5 require the separate follow-up opt-in. Proposed unchecked checkbox:
+
+> Send me four personalized follow-up emails over the next 10 days, with explanations and practical steps based on my Snapshot. I can unsubscribe at any time.
+
+Store each journey under its assessment ID, contact reference and content version. Store model request/response, source question IDs, review state, planned send times, Kit broadcast IDs and delivery events. Private assessment text remains protected by staff access policies.
+
+Each message has a unique job key: assessment ID + contact + content version + email number. Do not retry an uncertain broadcast creation blindly; first reconcile the stored provider ID/status. Retakes need an explicit policy: finish the earlier journey, or cancel its pending messages before starting the new one. A new assessment must not accidentally change the content of an older scheduled message.
+
+## Implemented preparation and current limits
+
+- `src/assessment-v2/email-journey.server.ts`: server-only Gemini writer; exact model-call logging through the required recorder; validates topics, five slots, references, plain text and lengths.
+- `src/assessment-v2/email-journey.ts`: authoritative brief, consent eligibility, safe HTML/plain text rendering, agreed day offsets, and draft-only Kit request payloads.
+- `tests/assessment-v2-email-journey.test.mjs`: checks evidence-linked generation, invalid references/topics, consent, private filters, draft-only publication settings and HTML/Liquid escaping.
+- `verification/preview-email-journey.mjs`: synthetic preview, with no real contacts or sending.
+
+Report requests now go through a server endpoint that verifies the session capability, loads the canonical completed assessment, and atomically saves the contact plus one durable preparation job. Retries cannot create duplicate jobs or substitute a different recipient. A first generation attempt starts from the browser after capture; closing the browser does not delete the saved job. A lease and lock token prevent concurrent or late generation workers from replacing saved drafts. Three automatic worker attempts are permitted; staff can retry failed jobs explicitly.
+
+Admin now includes **Personalized email journeys**: email/session lookup, status, consent, five readable drafts, evidence references, Markdown export, retry, staff approval and a Kit private-draft upload action. Each Gemini call is saved in the assessment model log. Kit requests/responses are recorded in private email events. Staff/admin access is checked on every management call and private tables enforce the same roles through RLS. Generation errors do not change a completed assessment into an error state.
+
+The Kit adapter upserts a contact without reactivating an unsubscribed contact, creates a session-specific private tag, checks all tag members and pagination before every broadcast, and creates only private **unscheduled** drafts. Report-only requests upload Email 1; separately opted-in requests upload all five. A durable in-progress marker and saved provider IDs prevent blind retries after an uncertain network outcome. Reconciliation currently requires checking Kit and correcting state through a server operator; there is no automatic reset button. Configure a verified sender and a Classic template ID. Test mode accepts only explicitly allowlisted email addresses, so a personal test account cannot receive ordinary respondents.
+
+**Delivery and scheduling are not activated.** The day offsets are planned metadata, not scheduled sends. There are no delivery claims, automatic retake cancellation, webhooks, or automatic scheduling yet. Validate private broadcast scheduling and unsubscribe behavior in the real Kit account before implementing activation. Kit's update documentation describes publication differently from its create endpoint; do not assume a scheduling update preserves privacy without testing. Existing captures are not silently enrolled in the new sequence.
+
+Recovery endpoint: `GET /api/email-jobs`, protected by a server-only `CRON_SECRET` of at least 32 random characters. One call claims one eligible job. Configure a durable scheduler before relying on recovery after browser closure. No cron is enabled by this commit. Vercel Hobby allows a daily cron; Pro permits more frequent runs. For Hobby, add `{ "path": "/api/email-jobs", "schedule": "0 8 * * *" }` under `crons` in `vercel.json` after setting the secret; this is a limited backup, not a high-volume queue. A production queue should drain batches with bounded concurrency and alert on backlog. Admin retries work without the scheduler.
+
+Server-only settings are documented in `.env.example`: `EMAIL_GEMINI_MODEL`, `CRON_SECRET`, `KIT_API_KEY`, `KIT_SENDER_EMAIL`, `KIT_CLASSIC_TEMPLATE_ID`, `KIT_MODE` (default test), and `KIT_TEST_EMAILS`. Never use a `VITE_` prefix for these. Missing Kit configuration disables its Admin action. Seven focused tests and the TypeScript and production build checks pass. A live synthetic queue test verified idempotent capture, recipient immutability, anonymous denial and lease fencing; Gemini returned HTTP 503, which was saved as a retryable job with a linked failed model call.
+
+Implementation files: `email-actions.ts` (public/staff boundaries), `email-jobs.server.ts` (canonical data and worker), `email-job-policy.server.ts` (capability and cron verification), `kit-client.server.ts` / `kit-jobs.server.ts` (private drafts), `EmailJourneyPanel.tsx`, and migration `0002_personalized_email_journeys.sql`.
+
+### First content drafts
+
+Gemini subsequently returned a first pass for all five synthetic-example emails. The generated report was below the draft length limit, so the call remained a failed validation in the model log and was not approved for automatic delivery. The five messages were then expanded and edited in Codex into review drafts: 449 words for the report, and 163, 171, 175 and 189 words for the follow-ups. The actual question references were checked; all content remains marked as a synthetic example. These are content drafts, not delivered emails or a connected production workflow.
+
+Review artifacts are saved under `output/email-journey/` in the chat workspace:
+
+- `nkoyo-first-five-email-drafts.md`: complete copy and staff evidence references.
+- `nkoyo-first-five-email-drafts.html`: readable customer-email preview.
+- `nkoyo-first-five-email-drafts.json`: structured editorial draft for later integration.
+
+## Official Kit references
+
+- [Create or schedule a broadcast with its complete HTML body](https://developers.kit.com/api-reference/broadcasts/create-a-broadcast)
+- [Read all subscribers belonging to a tag](https://developers.kit.com/api-reference/tags/list-subscribers-for-a-tag)
