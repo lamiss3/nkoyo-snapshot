@@ -5,6 +5,8 @@ import { Download, Loader2, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import type { TraceDatabase, TraceEventRow, ModelCallRow } from "@/assessment-v2/trace-types";
+import { buildSessionReport, sessionReportMarkdown } from "@/assessment-v2/session-report";
+import { AssessmentSessionReport } from "./AssessmentSessionReport";
 
 const db = supabase as unknown as SupabaseClient<TraceDatabase>;
 const buttonClass = "inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold disabled:opacity-50";
@@ -27,6 +29,15 @@ function exportJson(sessionId: string, data: unknown) {
   URL.revokeObjectURL(url);
 }
 
+function exportMarkdown(sessionId: string, content: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: "text/markdown;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `nkoyo-assessment-${sessionId}.md`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export function AssessmentLogPanel() {
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -35,6 +46,7 @@ export function AssessmentLogPanel() {
   const [searchError, setSearchError] = useState("");
   const sessions = useQuery({
     queryKey: ["admin", "assessment-traces", filter],
+    refetchInterval: 10000,
     queryFn: async () => {
       let query = db.from("adaptive_assessment_traces").select(sessionFields).order("updated_at", { ascending: false }).limit(100);
       if (filter) query = query.eq("session_id", filter);
@@ -46,6 +58,7 @@ export function AssessmentLogPanel() {
   const detail = useQuery({
     queryKey: ["admin", "assessment-trace", selectedId],
     enabled: Boolean(selectedId),
+    refetchInterval: 10000,
     queryFn: async () => {
       const id = selectedId!;
       const { data: session, error } = await db.from("adaptive_assessment_traces")
@@ -67,16 +80,26 @@ export function AssessmentLogPanel() {
         calls.push(...(result.data ?? []));
         if ((result.data?.length ?? 0) < 500) break;
       }
-      return { session, events, calls };
+      const contacts = [];
+      for (let offset = 0; ; offset += 500) {
+        const result = await db.from("leads")
+          .select("email, first_name, organization, role_title, challenge, marketing_consent, created_at")
+          .eq("session_key", id).order("created_at", { ascending: false }).order("id").range(offset, offset + 499);
+        if (result.error) throw result.error;
+        contacts.push(...(result.data ?? []));
+        if ((result.data?.length ?? 0) < 500) break;
+      }
+      return { session, events, calls, contacts };
     },
   });
   const snapshot = detail.data?.session.snapshot;
   const result = snapshot && typeof snapshot === "object" && !Array.isArray(snapshot) ? snapshot['result'] : null;
+  const report = detail.data ? buildSessionReport(detail.data) : null;
 
   return <section className="mt-10 card-elevated p-5 sm:p-7" aria-labelledby="assessment-logs-heading">
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div><h2 id="assessment-logs-heading" className="text-xl font-black">Assessment logs</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Private session histories, including incomplete assessments, model calls and results.</p></div>
+      <div><h2 id="assessment-logs-heading" className="text-xl font-black">Assessment reports and logs</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Open a session for a readable report of the answers, Jev evaluations, Gemini questions and result. Refreshes every 10 seconds while this page is open.</p></div>
       <button type="button" className={buttonClass} onClick={() => void queryClient.invalidateQueries({ queryKey: ["admin"] })}><RefreshCw className="h-4 w-4" /> Refresh logs</button>
     </div>
     <form className="mt-5 flex flex-wrap gap-3" onSubmit={(event) => {
@@ -102,11 +125,15 @@ export function AssessmentLogPanel() {
     </div>}
     {selectedId && <div className="mt-8 border-t border-border pt-6">
       <div className="flex flex-wrap items-center justify-between gap-3"><h3 className="break-all text-lg font-black">Assessment {selectedId}</h3>
-        <button type="button" className={buttonClass} disabled={!detail.data || detail.isFetching} onClick={() => exportJson(selectedId, detail.data)}><Download className="h-4 w-4" /> Export full JSON</button></div>
+        <button type="button" className={buttonClass} disabled={!report || detail.isFetching || Boolean(detail.error)} onClick={() => report && exportMarkdown(selectedId, sessionReportMarkdown(report))}><Download className="h-4 w-4" /> Download Markdown</button></div>
       {detail.isLoading && <p className="mt-4 text-sm">Loading full history…</p>}
       {detail.error && <p role="alert" className="mt-4 text-sm text-destructive">We could not load this assessment’s history. Try refreshing the logs.</p>}
       {detail.data && <>
         <p className="mt-3 text-sm text-muted-foreground">{detail.data.events.length} events · {detail.data.calls.length} model calls · Started {date(detail.data.session.created_at)}</p>
+        <p className="mt-2 text-sm text-muted-foreground">For Notion: import the downloaded .md file using Notion’s Markdown import. Imported copies will not sync automatically.</p>
+        {report && <AssessmentSessionReport report={report} />}
+        <details className="mt-6 rounded-2xl border border-border p-4"><summary className="cursor-pointer font-semibold">Technical logs and full JSON export</summary>
+        <button type="button" className={`${buttonClass} mt-4`} disabled={detail.isFetching || Boolean(detail.error)} onClick={() => exportJson(selectedId, detail.data)}><Download className="h-4 w-4" /> Export full JSON</button>
         {detail.data.session.last_error && <JsonDetails title="Latest assessment error" value={detail.data.session.last_error} />}
         <JsonDetails title="Questions, answers and saved state" value={snapshot} />
         {result && <JsonDetails title="Final result and scoring" value={result as Json} />}
@@ -127,6 +154,7 @@ export function AssessmentLogPanel() {
           <p className="mt-1 text-xs text-muted-foreground">{date(event.recorded_at)} · {event.source}{event.attempt_id ? ` · Attempt ${event.attempt_id}` : ""}</p>
           <JsonDetails title="Event details" value={event.payload} />
         </li>)}</ol>
+        </details>
       </>}
     </div>}
   </section>;
