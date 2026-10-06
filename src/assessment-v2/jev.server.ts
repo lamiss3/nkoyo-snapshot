@@ -1,5 +1,6 @@
 import { problemById } from "./problem-bank.ts";
 import type { Answer, AssessmentQuestion, EvidenceChoice, EvaluationRequest, ProblemEvaluation, ProblemEvaluator } from "./types.ts";
+import { recordedModelCall, type ModelCallRecorder } from "./provider-trace.server.ts";
 
 const choices: Record<EvidenceChoice, string> = {
   insufficient_information: "The respondent has not supplied enough relevant evidence to judge whether this problem is present. Do not treat silence or uncertainty as a negative answer.",
@@ -33,6 +34,7 @@ export function createJevEvaluator(config: {
   apiKey: string;
   model?: string;
   fetcher?: typeof fetch;
+  trace?: ModelCallRecorder;
 }): ProblemEvaluator {
   const fetcher = config.fetcher ?? fetch;
   const model = config.model ?? "jev-latest";
@@ -62,37 +64,46 @@ export function createJevEvaluator(config: {
         }
       }
 
+      const body = {
+        model,
+        state: {
+          assessmentVersion: "adaptive-v1",
+          round: request.round,
+          respondentAnswers: responseSummary(request.questions, request.answers),
+        },
+        questions,
+      };
+      return recordedModelCall({ provider: "jev", operation: request.round, configured_model: model, request: body }, config.trace, async (capture) => {
       const response = await fetcher("https://api.typesafe.ai/v1/systemone", {
         method: "POST",
         headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          state: {
-            assessmentVersion: "adaptive-v1",
-            round: request.round,
-            respondentAnswers: responseSummary(request.questions, request.answers),
-          },
-          questions,
-        }),
+        body: JSON.stringify(body),
         signal: AbortSignal.timeout(30000),
       });
+      await capture(response);
       if (!response.ok) throw new Error(`Jev request failed (${response.status})`);
       const payload = await response.json() as JevResponse;
       const evaluations: ProblemEvaluation[] = request.problemIds.map((id) => {
         const answer = payload.answers?.[id];
         if (!answer || answer.type !== "choice" || !(answer.choice in choices)) throw new Error(`Jev returned an invalid choice for ${id}`);
         const probabilities = Object.fromEntries(Object.keys(choices).map((choice) => [choice, answer.probabilities?.[choice]])) as Record<EvidenceChoice, number>;
+        const values = Object.values(probabilities);
+        if (values.some((value) => !Number.isFinite(value) || value < 0 || value > 1) || Math.abs(values.reduce((a, b) => a + b, 0) - 1) > 0.05) {
+          throw new Error(`Jev returned invalid evidence probabilities for ${id}`);
+        }
         const evaluation: ProblemEvaluation = { problemId: id, choice: answer.choice as EvidenceChoice, probabilities };
         if (request.round === "final") {
           const impact = payload.answers?.[`${id}_impact`];
           const urgency = payload.answers?.[`${id}_urgency`];
           if (impact?.type !== "score" || urgency?.type !== "score") throw new Error(`Jev returned invalid final signals for ${id}`);
+          if ([impact.score, urgency.score].some((score) => !Number.isFinite(score) || score < 0 || score > 4)) throw new Error(`Jev returned out-of-range final signals for ${id}`);
           evaluation.impact = impact.score / 4;
           evaluation.urgency = urgency.score / 4;
         }
         return evaluation;
       });
       return { round: request.round, model: payload.model ?? model, rubricVersion: "evidence-rubric-v1", evaluations };
+      });
     },
   };
 }

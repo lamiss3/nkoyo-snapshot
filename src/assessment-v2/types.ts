@@ -116,6 +116,8 @@ export interface AssessmentEvent {
 
 export interface AssessmentSession {
   id: string;
+  /** Browser capability for writing this session's private server log; never logged. */
+  traceToken?: string;
   version: "adaptive-v1";
   stage: Stage;
   questions: AssessmentQuestion[];

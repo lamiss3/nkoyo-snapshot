@@ -33,7 +33,7 @@ function PrivacyPage() {
           <section>
             <h2 className="text-xl font-extrabold text-foreground">What we collect</h2>
             <p className="mt-2">
-              Your answers, written responses, and assessment decisions are saved in this browser so a refresh does not lose progress. If you submit the detailed-report request, your email and completed assessment are also saved together in the site's database for follow-up. Answers are sent to Jev for topic evaluation and may be sent to Gemini for question wording. Please avoid names and confidential details.
+              Your answers, written responses, and assessment decisions are saved in this browser so a refresh does not lose progress. When server logging is enabled, progress is also stored in the site's private database, including unfinished assessments, questions and answers, assessment steps, model inputs and outputs, errors, and results. Authorized Nkoyo administrators and staff can review these records to understand and improve the assessment. If you submit the detailed-report request, your email is linked to your completed assessment for follow-up. Answers are sent to Jev for topic evaluation and may be sent to Gemini for question wording. Please avoid names and confidential details.
             </p>
           </section>
           <section>

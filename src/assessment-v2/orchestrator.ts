@@ -16,6 +16,7 @@ export function createAssessmentSession(id = crypto.randomUUID()): AssessmentSes
   const timestamp = now();
   return {
     id,
+    traceToken: crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", ""),
     version: "adaptive-v1",
     stage: "opening",
     questions: [...openingQuestions],
@@ -243,6 +244,7 @@ async function generateSafely<T extends AssessmentQuestion | [AssessmentQuestion
     if (valid) return generated as T;
     throw new Error("Question provider returned an invalid question");
   } catch (error) {
+    if (error instanceof Error && error.name === "AssessmentLogError") throw error;
     log(session, "generation_failed", { stage, reason: error instanceof Error ? error.message : "Unknown error" });
     return fallback();
   }

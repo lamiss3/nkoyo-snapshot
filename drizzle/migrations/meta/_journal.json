@@ -8,6 +8,13 @@
       "when": 1790083680767,
       "tag": "0000_create_readiness_snapshot_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791288000000,
+      "tag": "0001_adaptive_assessment_logging",
+      "breakpoints": false
     }
   ]
 }

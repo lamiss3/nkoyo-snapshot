@@ -16,7 +16,7 @@ const dimensions: { id: DimensionId; name: string; prompt: string }[] = [
   { id: "compliance", name: "Compliance", prompt: "Are responsibilities, safeguards, and requirements clear in practice?" },
 ];
 
-export function AdaptiveResultView({ session, onRestart }: { session: AssessmentSession; onRestart: () => void }) {
+export function AdaptiveResultView({ session, onRestart, restartError, restarting }: { session: AssessmentSession; onRestart: () => void; restartError?: string; restarting?: boolean }) {
   const result = session.result;
   if (!result) return null;
   const presentation = buildAdaptivePresentation(session);
@@ -100,9 +100,10 @@ export function AdaptiveResultView({ session, onRestart }: { session: Assessment
       <AdaptiveEmailCapture session={session} />
 
       <div className="no-print mt-10 flex flex-wrap items-center gap-5 text-sm">
-        <button type="button" onClick={onRestart} className="inline-flex items-center gap-2 font-semibold underline underline-offset-4 hover:text-magenta"><RotateCcw className="h-4 w-4" /> Start a new snapshot</button>
+        <button type="button" onClick={onRestart} disabled={restarting} className="inline-flex items-center gap-2 font-semibold underline underline-offset-4 hover:text-magenta disabled:opacity-50"><RotateCcw className="h-4 w-4" /> {restarting ? "Saving…" : "Start a new snapshot"}</button>
         <Link to="/" className="font-semibold underline underline-offset-4 hover:text-magenta">Back to home</Link>
       </div>
+      {restartError && <p role="alert" className="mt-3 text-sm text-destructive">{restartError}</p>}
     </main>
     <SiteFooter />
   </div>;

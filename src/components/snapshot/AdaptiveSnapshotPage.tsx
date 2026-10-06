@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Loader2, RotateCcw } from "lucide-react";
 
 import { Logo } from "@/components/brand/Logo";
 import { AdaptiveResultView } from "@/components/snapshot/AdaptiveResultView";
-import { advanceAdaptiveAssessment } from "@/assessment-v2/actions";
+import { advanceAdaptiveAssessment, checkpointAdaptiveAssessment } from "@/assessment-v2/actions";
 import { createAssessmentSession, questionsForStage, submitAssessmentAnswer } from "@/assessment-v2/orchestrator";
 import type { AssessmentSession } from "@/assessment-v2/types";
 
@@ -18,10 +18,12 @@ function save(session: AssessmentSession) {
 
 export function AdaptiveSnapshotPage() {
   const advanceOnServer = useServerFn(advanceAdaptiveAssessment);
+  const checkpointOnServer = useServerFn(checkpointAdaptiveAssessment);
   const [session, setSession] = useState<AssessmentSession | null>(null);
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [syncError, setSyncError] = useState(false);
 
   useEffect(() => {
     let loaded: AssessmentSession | null = null;
@@ -33,9 +35,22 @@ export function AdaptiveSnapshotPage() {
       }
     } catch { /* begin a fresh session */ }
     const current = loaded ?? createAssessmentSession();
+    current.traceToken ??= crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", "");
+    // Previous builds added events on every keystroke. Keep a bounded local history.
+    current.events = current.events.slice(-128);
     setSession(current);
     save(current);
   }, []);
+
+  useEffect(() => {
+    if (!session || busy) return;
+    const visibleQuestion = questionsForStage(session)[index]?.id;
+    const timer = window.setTimeout(() => {
+      void checkpointOnServer({ data: { session, action: "progress_saved", ...(visibleQuestion ? { questionId: visibleQuestion } : {}) } })
+        .then(() => setSyncError(false)).catch(() => setSyncError(true));
+    }, 800);
+    return () => window.clearTimeout(timer);
+  }, [session, index, busy, checkpointOnServer]);
 
   if (!session) return <div className="flex min-h-dvh items-center justify-center bg-blush"><Loader2 className="h-6 w-6 animate-spin text-magenta" aria-label="Loading" /></div>;
 
@@ -57,13 +72,15 @@ export function AdaptiveSnapshotPage() {
     if (!question) return;
     try {
       const next = submitAssessmentAnswer(session, { questionId: question.id, optionIds, text });
+      // Drafts are synced; answer-submitted events are recorded when Next is pressed.
+      next.events = session.events;
       setSession(next);
       save(next);
       setError("");
     } catch (cause) {
       // Permit an incomplete draft while it is being typed or deselected.
       if (!text.trim() || optionIds.length === 0) {
-        const next = { ...session, answers: [...session.answers.filter((item) => item.questionId !== question.id), { questionId: question.id, optionIds, text: "", submittedAt: new Date().toISOString() }] };
+        const next = { ...session, updatedAt: new Date().toISOString(), answers: [...session.answers.filter((item) => item.questionId !== question.id), { questionId: question.id, optionIds, text: "", submittedAt: new Date().toISOString() }] };
         setSession(next);
         save(next);
         return;
@@ -74,12 +91,18 @@ export function AdaptiveSnapshotPage() {
 
   const goForward = async () => {
     if (!question || !canContinue || busy) return;
+    setBusy(true);
     try {
       const confirmed = submitAssessmentAnswer(session, { questionId: question.id, optionIds: selected, text: written });
       setSession(confirmed);
       save(confirmed);
-      if (!lastInStage) { setIndex(index + 1); return; }
-      setBusy(true);
+      if (!lastInStage) {
+        await checkpointOnServer({ data: { session: confirmed, questionId: question.id, action: "answer_confirmed" } });
+        setSyncError(false);
+        setIndex(index + 1);
+        setError("");
+        return;
+      }
       const next = await advanceOnServer({ data: confirmed });
       setSession(next);
       save(next);
@@ -90,15 +113,22 @@ export function AdaptiveSnapshotPage() {
     } finally { setBusy(false); }
   };
 
-  const restart = () => {
-    const fresh = createAssessmentSession();
-    setSession(fresh);
-    save(fresh);
-    setIndex(0);
-    setError("");
+  const restart = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await checkpointOnServer({ data: { session, action: "session_restarted" } });
+      const fresh = createAssessmentSession();
+      setSession(fresh);
+      save(fresh);
+      setIndex(0);
+      setError("");
+      setSyncError(false);
+    } catch { setError("We could not save this assessment before restarting. Please try again."); }
+    finally { setBusy(false); }
   };
 
-  if (session.stage === "complete" && session.result) return <AdaptiveResultView session={session} onRestart={restart} />;
+  if (session.stage === "complete" && session.result) return <AdaptiveResultView session={session} onRestart={restart} restartError={error} restarting={busy} />;
 
   return <div className="flex min-h-dvh flex-col bg-blush">
     <header className="border-b border-border/60 bg-background/90 backdrop-blur">
@@ -111,6 +141,7 @@ export function AdaptiveSnapshotPage() {
       <div className="mb-7 rounded-2xl border border-magenta/20 bg-card px-5 py-4 text-sm">
         <strong>Institutional Readiness Snapshot</strong> · {import.meta.env.DEV && latestModel ? localRules ? "Local rules demo: Jev is unavailable or not configured." : `Topic evaluation: ${latestModel}.` : "The first four questions build the opening picture."} {session.stage !== "complete" && "Progress saves on this device."}
       </div>
+      {syncError && <p role="status" className="mb-5 text-sm text-muted-foreground">Your latest changes are saved on this device. Online saving failed; pressing Next will retry.</p>}
       {question ? <>
         <div className="mb-7"><div className="flex justify-between gap-3"><p className="eyebrow text-magenta">{stageLabel[session.stage]}</p><p className="text-sm font-semibold text-muted-foreground">Question {questionNumber} of up to 11</p></div><div role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Assessment progress" className="mt-3 h-3 overflow-hidden rounded-full bg-blush-deep"><div className="h-full bg-lime" style={{ width: `${Math.max(progress, 3)}%` }} /></div></div>
         <section className="card-elevated p-7 sm:p-10">
@@ -131,7 +162,7 @@ export function AdaptiveSnapshotPage() {
         </section>
         {error && <p role="alert" className="mt-5 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-900">{error}</p>}
         <div className="mt-8 flex justify-between gap-4"><button type="button" onClick={() => setIndex(Math.max(0, index - 1))} disabled={index === 0 || busy} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold disabled:opacity-40"><ArrowLeft className="h-4 w-4" /> Back</button><button type="button" onClick={() => void goForward()} disabled={!canContinue || busy} className="inline-flex items-center gap-2 rounded-full bg-magenta px-7 py-3 font-bold text-primary-foreground disabled:opacity-50">{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Evaluating</> : <>{lastInStage ? "Continue" : "Next"}<ArrowRight className="h-4 w-4" /></>}</button></div>
-        <p className="mt-8 text-center text-sm text-muted-foreground">Earlier stages are locked once you continue. Restart to change those answers. <Link to="/privacy" className="underline">Privacy details</Link></p>
+        <p className="mt-8 text-center text-sm text-muted-foreground">Earlier stages are locked once you continue. Restart to change those answers. Assessment activity may be saved for private review by Nkoyo. <Link to="/privacy" className="underline">Privacy details</Link></p>
       </> : null}
     </main>
   </div>;

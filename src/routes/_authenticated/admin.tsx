@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, Loader2 } from "lucide-react";
 
 import { Logo } from "@/components/brand/Logo";
+import { AssessmentLogPanel } from "@/components/snapshot/AssessmentLogPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { dimensions, questions } from "@/config/questions";
 import { questionPatterns } from "@/config/results";
@@ -312,6 +313,7 @@ function AdminPage() {
             </section>
           </>
         )}
+        <AssessmentLogPanel />
       </main>
     </div>
   );
