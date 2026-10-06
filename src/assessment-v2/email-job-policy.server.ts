@@ -1,5 +1,20 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
+export function assertFixedEmailTestAllowed(
+  mode: string | undefined,
+  email: string,
+  allowlist: string | undefined,
+) {
+  const allowed = (allowlist ?? "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+  if (mode !== "test" || !allowed.includes(email.toLowerCase()))
+    throw new Error(
+      "Fixed email tests require Kit test mode and an explicitly allowed test address.",
+    );
+}
+
 export function verifyEmailCapability(token: string, savedHash: string) {
   if (!/^[a-f0-9]{64}$/.test(token) || !/^[a-f0-9]{64}$/.test(savedHash))
     throw new Error("Invalid report request.");

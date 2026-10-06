@@ -25,6 +25,7 @@ export interface EmailJourney {
   sessionId: string;
   generatedAt: string;
   model: string;
+  source?: "fixed_test";
   primaryId: ProblemId | null;
   secondaryId: ProblemId | null;
   jointPriority: boolean;

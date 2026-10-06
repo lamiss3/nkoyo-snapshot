@@ -39,7 +39,30 @@ export const getEmailJourneys = createServerFn({ method: "POST" })
       ),
       kitMode: process.env["KIT_MODE"] === "production" ? "production" : "test",
       deliveryEnabled: false,
+      fixedTestEnabled:
+        process.env["KIT_MODE"] === "test" && Boolean(process.env["KIT_TEST_EMAILS"]),
     };
+  });
+export const prepareFixedTestEmails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) =>
+    z
+      .object({
+        sessionId: z.string().uuid(),
+        email: z
+          .string()
+          .trim()
+          .email()
+          .max(255)
+          .transform((value) => value.toLowerCase()),
+      })
+      .strict()
+      .parse(data),
+  )
+  .handler(async ({ context, data }) => {
+    const jobs = await import("./email-jobs.server");
+    await jobs.requireEmailStaff(context.supabase, context.userId);
+    return jobs.createFixedTestEmailJob(data.sessionId, data.email, context.userId);
   });
 export const manageEmailJourney = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

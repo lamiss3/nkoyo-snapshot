@@ -9,6 +9,41 @@ import {
   kitJourneyDrafts,
 } from "../src/assessment-v2/email-journey.ts";
 import { createGeminiEmailJourneyWriter } from "../src/assessment-v2/email-journey.server.ts";
+import { fixedTestEmailJourney } from "../src/assessment-v2/email-journey-fixed.ts";
+import { assertFixedEmailTestAllowed } from "../src/assessment-v2/email-job-policy.server.ts";
+
+test("fixed drafts retain saved topics and answer evidence with honest provenance, including uncertain results", () => {
+  const value = session(),
+    draft = fixedTestEmailJourney(value);
+  assert.equal(draft.source, "fixed_test");
+  assert.equal(draft.model, "fixed-test-v1 (no Gemini)");
+  assert.equal(draft.sessionId, value.id);
+  assert.equal(draft.jointPriority, true);
+  assert.deepEqual(
+    draft.emails.map((email) => email.focusId),
+    ["P03", "P03", "P03", "P03", "P04"],
+  );
+  assert.ok(draft.emails.every((email) => email.subject.startsWith("[TEST — FIXED]")));
+  assert.ok(JSON.stringify(draft).includes("approvals waited two weeks"));
+  assert.ok(!JSON.stringify(draft).includes("private-capability"));
+  assert.ok(draft.emails[0].sections.some((section) => section.sourceQuestionIds.includes("q4")));
+  assert.equal(kitJourneyDrafts(draft, 22, true).length, 5);
+  assert.equal(kitJourneyDrafts(draft, 22, false).length, 1);
+  value.result.problems = [];
+  value.result.priority = [];
+  value.answers = [];
+  const uncertain = fixedTestEmailJourney(value);
+  assert.equal(uncertain.primaryId, null);
+  assert.equal(uncertain.secondaryId, null);
+  assert.ok(JSON.stringify(uncertain).includes("No second issue identified"));
+});
+test("fixed test mode cannot address ordinary contacts or run in production", () => {
+  assertFixedEmailTestAllowed("test", "Test@EXAMPLE.com", " test@example.com ");
+  for (const mode of [undefined, "production", "other"])
+    assert.throws(() => assertFixedEmailTestAllowed(mode, "test@example.com", "test@example.com"));
+  assert.throws(() => assertFixedEmailTestAllowed("test", "other@example.com", "test@example.com"));
+  assert.throws(() => assertFixedEmailTestAllowed("test", "test@example.com", ""));
+});
 
 function session() {
   const value = createAssessmentSession("synthetic-email-example");

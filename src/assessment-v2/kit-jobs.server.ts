@@ -2,6 +2,7 @@ import { emailDb, asEmailJson } from "./email-jobs.server";
 import { prepareKitDrafts } from "./kit-client.server";
 import type { EmailJourney } from "./email-journey";
 import type { KitDraftState } from "./email-job-types";
+import { assertFixedEmailTestAllowed } from "./email-job-policy.server";
 
 export async function prepareKitJob(id: string, actorId: string) {
   const apiKey = process.env["KIT_API_KEY"],
@@ -14,6 +15,8 @@ export async function prepareKitJob(id: string, actorId: string) {
   const job = found.data;
   if (job.status !== "draft" || !job.content || !job.approved_at)
     throw new Error("Review and approve the drafts first.");
+  if ((job.content as unknown as EmailJourney).source === "fixed_test")
+    assertFixedEmailTestAllowed(process.env["KIT_MODE"], job.email, process.env["KIT_TEST_EMAILS"]);
   // The personal Creator test account may receive only explicitly allowed test addresses.
   if (process.env["KIT_MODE"] !== "production") {
     const allowed = (process.env["KIT_TEST_EMAILS"] ?? "")

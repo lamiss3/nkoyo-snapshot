@@ -4,7 +4,12 @@ import type { Database, Json } from "../integrations/supabase/types";
 import type { EmailDatabase, EmailJob, EmailJobView } from "./email-job-types";
 import type { AssessmentSession } from "./types";
 import { validateAssessmentSession } from "./session-validation";
-import { verifyEmailCapability, safeJobError } from "./email-job-policy.server";
+import {
+  verifyEmailCapability,
+  safeJobError,
+  assertFixedEmailTestAllowed,
+} from "./email-job-policy.server";
+import { fixedTestEmailJourney } from "./email-journey-fixed";
 import { createGeminiEmailJourneyWriter } from "./email-journey.server";
 import { AssessmentTrace } from "./trace-runtime.server";
 import { supabaseTraceStore } from "./logging.server";
@@ -68,7 +73,35 @@ export async function processOwnedEmail(input: { sessionId: string; traceToken: 
   if (!job.data) throw new Error("Report request not found.");
   return processEmailJob(job.data.id);
 }
+export async function createFixedTestEmailJob(sessionId: string, email: string, actorId: string) {
+  assertFixedEmailTestAllowed(process.env["KIT_MODE"], email, process.env["KIT_TEST_EMAILS"]);
+  await completedSession(sessionId);
+  const queued = await emailDb.rpc("enqueue_email_journey", {
+    p_session: sessionId,
+    p_email: email,
+    p_consent: true,
+  });
+  checked(queued.error);
+  const found = await emailDb.from("email_journeys").select("*").eq("id", queued.data!).single();
+  checked(found.error);
+  if (!found.data || !found.data.followup_consent)
+    throw new Error(
+      "Use a test assessment whose request includes all five emails. Existing consent is not changed.",
+    );
+  if (found.data.content) {
+    if ((found.data.content as unknown as { source?: string }).source !== "fixed_test")
+      throw new Error("Existing email content cannot be replaced with test templates.");
+    return { jobId: found.data.id, processed: false, status: "draft" };
+  }
+  return {
+    jobId: found.data.id,
+    ...(await processEmailJobWithWriter(found.data.id, true, actorId)),
+  };
+}
 export async function processEmailJob(id?: string, retry = false) {
+  return processEmailJobWithWriter(id, retry);
+}
+async function processEmailJobWithWriter(id?: string, retry = false, fixedTestActor?: string) {
   const claimed = await emailDb.rpc("claim_email_journey", {
     ...(id ? { p_id: id } : {}),
     p_retry: retry,
@@ -78,19 +111,39 @@ export async function processEmailJob(id?: string, retry = false) {
   if (!job) return { processed: false };
   try {
     const session = await completedSession(job.session_id);
-    const trace = new AssessmentTrace(
-      supabaseTraceStore(emailDb as unknown as SupabaseClient<TraceDatabase>),
-      session,
-      ["GEMINI_API_KEY", "JEV_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "KIT_API_KEY"].map(
-        (key) => process.env[key] ?? "",
-      ),
-    );
-    const writer = createGeminiEmailJourneyWriter({
-      apiKey: process.env["GEMINI_API_KEY"] ?? "",
-      model: process.env["EMAIL_GEMINI_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-3.6-flash",
-      trace: trace.recorder(job.lock_token!),
-    });
-    const content = await writer.generate(session);
+    let content;
+    if (fixedTestActor) {
+      assertFixedEmailTestAllowed(
+        process.env["KIT_MODE"],
+        job.email,
+        process.env["KIT_TEST_EMAILS"],
+      );
+      content = fixedTestEmailJourney(session);
+      const event = await emailDb
+        .from("email_journey_events")
+        .insert({
+          journey_id: job.id,
+          event_type: "fixed_test_drafts_prepared",
+          actor_id: fixedTestActor,
+          details: asEmailJson({ source: "fixed_test", noModelCall: true, content }),
+        });
+      checked(event.error);
+    } else {
+      const trace = new AssessmentTrace(
+        supabaseTraceStore(emailDb as unknown as SupabaseClient<TraceDatabase>),
+        session,
+        ["GEMINI_API_KEY", "JEV_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "KIT_API_KEY"].map(
+          (key) => process.env[key] ?? "",
+        ),
+      );
+      const writer = createGeminiEmailJourneyWriter({
+        apiKey: process.env["GEMINI_API_KEY"] ?? "",
+        model:
+          process.env["EMAIL_GEMINI_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-3.6-flash",
+        trace: trace.recorder(job.lock_token!),
+      });
+      content = await writer.generate(session);
+    }
     const saved = await emailDb.rpc("finish_email_journey", {
       p_id: job.id,
       p_lock: job.lock_token!,

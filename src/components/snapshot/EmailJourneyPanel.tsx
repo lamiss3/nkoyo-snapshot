@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getEmailJourneys, manageEmailJourney } from "@/assessment-v2/email-actions";
+import {
+  getEmailJourneys,
+  manageEmailJourney,
+  prepareFixedTestEmails,
+} from "@/assessment-v2/email-actions";
 import {
   emailDayOffsets,
   emailJourneyMarkdown,
@@ -18,6 +22,9 @@ export function EmailJourneyPanel() {
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [testSession, setTestSession] = useState("");
+  const [testEmail, setTestEmail] = useState("");
+  const [testAgreed, setTestAgreed] = useState(false);
   const query = useQuery({
     queryKey: ["admin-email-journeys"],
     queryFn: () => getEmailJourneys(),
@@ -53,6 +60,21 @@ export function EmailJourneyPanel() {
     link.click();
     URL.revokeObjectURL(url);
   };
+  const prepareTest = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const result = await prepareFixedTestEmails({
+        data: { sessionId: testSession.trim(), email: testEmail },
+      });
+      setSelected(result.jobId);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not prepare the fixed test.");
+    } finally {
+      await cache.invalidateQueries({ queryKey: ["admin-email-journeys"] });
+      setBusy(false);
+    }
+  };
   return (
     <section className="card-elevated mt-10 p-6 sm:p-9" aria-labelledby="email-journeys-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -86,6 +108,52 @@ export function EmailJourneyPanel() {
         <p role="alert" className="mt-4 text-destructive">
           {error}
         </p>
+      )}
+      {query.data?.fixedTestEnabled && (
+        <details className="mt-5 rounded-xl border border-border p-4">
+          <summary className="cursor-pointer font-bold">Test with fixed emails (no Gemini)</summary>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Use a completed test assessment and your allowed test address. This saves five clearly
+            marked template drafts using the assessment's topics and an answer excerpt. Review them
+            below, then upload to Kit. Nothing is sent.
+          </p>
+          <label className="mt-4 block text-sm font-semibold" htmlFor="fixed-email-assessment">
+            Completed test assessment ID
+          </label>
+          <input
+            id="fixed-email-assessment"
+            value={testSession}
+            onChange={(event) => setTestSession(event.target.value)}
+            className="mt-2 w-full rounded-xl border border-input bg-card p-3"
+          />
+          <label className="mt-4 block text-sm font-semibold" htmlFor="fixed-email-address">
+            Allowed test email
+          </label>
+          <input
+            id="fixed-email-address"
+            type="email"
+            value={testEmail}
+            onChange={(event) => setTestEmail(event.target.value)}
+            className="mt-2 w-full rounded-xl border border-input bg-card p-3"
+          />
+          <label className="mt-4 flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={testAgreed}
+              onChange={(event) => setTestAgreed(event.target.checked)}
+              className="mt-1"
+            />
+            Prepare all five test drafts for this address. I understand this creates an email
+            request and does not send email.
+          </label>
+          <button
+            className={`${button} mt-4`}
+            disabled={busy || !testAgreed || !testSession.trim() || !testEmail.trim()}
+            onClick={() => void prepareTest()}
+          >
+            {busy ? "Preparing…" : "Prepare fixed test drafts"}
+          </button>
+        </details>
       )}
       <label className="mt-5 block text-sm font-semibold" htmlFor="email-journey-search">
         Find by email or assessment ID (latest 100 requests)
@@ -132,6 +200,11 @@ export function EmailJourneyPanel() {
       {job && (
         <div className="mt-7 rounded-2xl border border-border p-4 sm:p-6">
           <h3 className="text-xl font-black break-all">Email journey for {job.email}</h3>
+          {job.content?.source === "fixed_test" && (
+            <p className="mt-3 rounded-xl bg-muted p-3 font-bold">
+              Fixed template test — Gemini was not called.
+            </p>
+          )}
           <p className="mt-2 text-sm">Assessment {job.session_id}</p>
           <p className="mt-2 text-sm">
             Generation attempts: {job.attempts}.{" "}
