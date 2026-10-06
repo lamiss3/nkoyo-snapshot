@@ -36,15 +36,28 @@ export async function prepareKitDrafts(config: {
   journey: EmailJourney;
   state: KitDraftState;
   fetcher?: typeof fetch;
+  pause?: (milliseconds: number) => Promise<void>;
   save: (state: KitDraftState) => Promise<void>;
   audit: (event: string, details: unknown) => Promise<void>;
 }) {
   if (config.state.status === "drafts_ready") return config.state;
-  if (config.state.status === "preparing" || config.state.status === "reconcile")
+  if (
+    config.state.pendingNumber ||
+    config.state.status === "preparing" ||
+    config.state.status === "reconcile"
+  )
     throw new Error(
       "A previous Kit attempt needs reconciliation. Check Kit before creating more drafts.",
     );
-  const state: KitDraftState = { status: "preparing", messages: [] };
+  const resume = config.state.status === "awaiting_recipient";
+  if (resume) {
+    providerId(config.state.subscriberId);
+    providerId(config.state.tagId);
+  }
+  const state: KitDraftState = resume
+    ? { ...config.state, status: "preparing", messages: [...(config.state.messages ?? [])] }
+    : { status: "preparing", messages: [] };
+  delete state.error;
   // This durable marker precedes any provider side effect.
   await config.save(state);
   const api = async <T>(path: string, method: string, body?: unknown): Promise<T> => {
@@ -61,32 +74,54 @@ export async function prepareKitDrafts(config: {
     return payload as T;
   };
   try {
-    const contact = await api<{ subscriber: Subscriber }>("subscribers", "POST", {
-      email_address: config.email,
-    });
-    const subscriber = contact.subscriber;
-    state.subscriberId = providerId(subscriber?.id);
-    if (
-      subscriber.email_address.toLowerCase() !== config.email.toLowerCase() ||
-      subscriber.state !== "active"
-    )
-      throw new Error(
-        "Kit contact is not active. Existing unsubscribed contacts are not reactivated.",
-      );
-    await config.save(state);
-    const tag = await api<{ tag: { id: number } }>("tags", "POST", {
-      name: `nkoyo-private-${config.journey.sessionId}`,
-    });
-    state.tagId = providerId(tag.tag?.id);
-    await config.save(state);
-    await api(`tags/${state.tagId}/subscribers/${state.subscriberId}`, "POST", {});
-    for (const draft of kitJourneyDrafts(config.journey, state.tagId, config.consent)) {
+    if (!resume) {
+      const contact = await api<{ subscriber: Subscriber }>("subscribers", "POST", {
+        email_address: config.email,
+      });
+      const subscriber = contact.subscriber;
+      state.subscriberId = providerId(subscriber?.id);
+      if (
+        subscriber.email_address.toLowerCase() !== config.email.toLowerCase() ||
+        subscriber.state !== "active"
+      )
+        throw new Error(
+          "Kit contact is not active. Existing unsubscribed contacts are not reactivated.",
+        );
+      await config.save(state);
+      const tag = await api<{ tag: { id: number } }>("tags", "POST", {
+        name: `nkoyo-private-${config.journey.sessionId}`,
+      });
+      state.tagId = providerId(tag.tag?.id);
+      await config.save(state);
+      await api(`tags/${state.tagId}/subscribers/${state.subscriberId}`, "POST", {});
+    }
+    for (const draft of kitJourneyDrafts(config.journey, providerId(state.tagId), config.consent)) {
+      if (state.messages!.some((message) => message.number === draft.emailNumber)) continue;
       // Recheck membership before EVERY personalized body is uploaded.
-      const members = await api<{
-        subscribers: Subscriber[];
-        pagination: { has_next_page: boolean };
-      }>(`tags/${state.tagId}/subscribers?status=all&per_page=2`, "GET");
-      assertSingleKitRecipient(members, state.subscriberId, config.email);
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const members = await api<{
+          subscribers: Subscriber[];
+          pagination: { has_next_page: boolean };
+        }>(`tags/${state.tagId}/subscribers?status=all&per_page=2`, "GET");
+        // Kit acknowledges tagging before its subscriber index is updated.
+        // Retry only an explicitly empty, complete page; other mismatches fail closed.
+        if (members.subscribers?.length === 0 && members.pagination?.has_next_page === false) {
+          if (attempt < 4) {
+            await (
+              config.pause ??
+              ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)))
+            )(Math.min(500 * 2 ** attempt, 2000));
+            continue;
+          }
+          state.status = "awaiting_recipient";
+          state.error =
+            "Kit is still indexing the contact's tag. Remaining drafts are paused. Wait a few minutes, then retry recipient verification.";
+          await config.save(state);
+          return state;
+        }
+        assertSingleKitRecipient(members, providerId(state.subscriberId), config.email);
+        break;
+      }
       state.pendingNumber = draft.emailNumber;
       await config.save(state);
       const result = await api<{

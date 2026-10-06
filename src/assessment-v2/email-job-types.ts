@@ -23,7 +23,7 @@ export type EmailJob = {
   updated_at: string;
 };
 export interface KitDraftState {
-  status?: "preparing" | "drafts_ready" | "reconcile";
+  status?: "preparing" | "awaiting_recipient" | "drafts_ready" | "reconcile";
   subscriberId?: number;
   tagId?: number;
   messages?: { number: number; broadcastId: number }[];

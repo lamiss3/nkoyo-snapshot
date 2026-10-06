@@ -56,6 +56,7 @@ function fixture(consent, fetcher) {
       journey,
       state: {},
       fetcher,
+      pause: async () => {},
       save: async (state) => saves.push(structuredClone(state)),
       audit: async (type, details) => audits.push({ type, details }),
     },
@@ -111,7 +112,7 @@ test("extra, inactive or unverified recipients prevent uploading personalized br
     valid = provider(requests),
     f = fixture(true, async (url, init) =>
       url.includes("status=all")
-        ? Response.json({ ...membership, subscribers: [] })
+        ? Response.json({ ...membership, subscribers: [subscriber, { ...subscriber, id: 12 }] })
         : valid(url, init),
     );
   await assert.rejects(prepareKitDrafts(f.config), /recipient verification/);
@@ -132,4 +133,47 @@ test("uncertain broadcast POST is marked for reconciliation and never blindly re
   assert.equal(state.pendingNumber, 1);
   await assert.rejects(prepareKitDrafts({ ...f.config, state }), /needs reconciliation/);
   assert.equal(requests.filter((row) => row.path === "subscribers").length, 1);
+});
+
+test("Kit tag indexing can catch up through bounded reads, without loosening recipient checks", async () => {
+  const requests = [],
+    valid = provider(requests);
+  let reads = 0,
+    pauses = 0;
+  const f = fixture(false, async (url, init) => {
+    if (url.includes("status=all") && reads++ === 0)
+      return Response.json({ ...membership, subscribers: [] });
+    return valid(url, init);
+  });
+  f.config.pause = async () => {
+    pauses++;
+  };
+  const result = await prepareKitDrafts(f.config);
+  assert.equal(result.messages.length, 1);
+  assert.equal(pauses, 1);
+  assert.equal(reads, 2);
+});
+
+test("empty Kit index pauses durably and resumes without recreating resources or confirmed drafts", async () => {
+  const requests = [],
+    valid = provider(requests);
+  let ready = false,
+    reads = 0;
+  const f = fixture(true, async (url, init) => {
+    if (url.includes("status=all") && !ready && ++reads > 1)
+      return Response.json({ ...membership, subscribers: [] });
+    return valid(url, init);
+  });
+  const pending = await prepareKitDrafts(f.config);
+  assert.equal(pending.status, "awaiting_recipient");
+  assert.equal(pending.messages.length, 1);
+  assert.ok(!pending.pendingNumber);
+  ready = true;
+  const completed = await prepareKitDrafts({ ...f.config, state: pending });
+  assert.equal(completed.status, "drafts_ready");
+  assert.equal(completed.messages.length, 5);
+  assert.equal(requests.filter((row) => row.path === "subscribers").length, 1);
+  assert.equal(requests.filter((row) => row.path === "tags").length, 1);
+  assert.equal(requests.filter((row) => row.path === "broadcasts").length, 5);
+  assert.equal(new Set(completed.messages.map((message) => message.number)).size, 5);
 });

@@ -172,11 +172,13 @@ export function EmailJourneyPanel() {
                     busy ||
                     !job.approved_at ||
                     !query.data?.kitConfigured ||
-                    Boolean(job.kit_state.status)
+                    Boolean(job.kit_state.status && job.kit_state.status !== "awaiting_recipient")
                   }
                   onClick={() => void act(job.id, "kit_drafts")}
                 >
-                  Create private drafts in Kit
+                  {job.kit_state.status === "awaiting_recipient"
+                    ? "Retry Kit recipient verification"
+                    : "Create private drafts in Kit"}
                 </button>
               </>
             )}
@@ -196,8 +198,9 @@ export function EmailJourneyPanel() {
                 </p>
               ))}
               <p className="mt-2 text-xs">
-                An interrupted upload must be checked in Kit before another attempt, to avoid
-                duplicate broadcasts.
+                {job.kit_state.status === "awaiting_recipient"
+                  ? "Kit can take up to five minutes to list a newly tagged contact. Retrying this check reuses confirmed drafts."
+                  : "An interrupted upload must be checked in Kit before another attempt, to avoid duplicate broadcasts."}
               </p>
             </div>
           )}

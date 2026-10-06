@@ -25,7 +25,7 @@ export async function prepareKitJob(id: string, actorId: string) {
   }
   const oldState = job.kit_state as unknown as KitDraftState;
   if (oldState.status === "drafts_ready") return { prepared: true };
-  if (oldState.status)
+  if (oldState.status && oldState.status !== "awaiting_recipient")
     throw new Error("The Kit attempt needs reconciliation in Kit before retrying.");
   // Compare-and-swap the initial state: only one staff request can own provider mutations.
   const token = crypto.randomUUID();
@@ -54,7 +54,7 @@ export async function prepareKitJob(id: string, actorId: string) {
       throw new Error("Could not save the Kit progress.");
   };
   try {
-    await prepareKitDrafts({
+    const result = await prepareKitDrafts({
       apiKey,
       sender,
       templateId,
@@ -64,18 +64,16 @@ export async function prepareKitJob(id: string, actorId: string) {
       state: oldState,
       save,
       audit: async (event, details) => {
-        const result = await emailDb
-          .from("email_journey_events")
-          .insert({
-            journey_id: id,
-            event_type: event,
-            actor_id: actorId,
-            details: asEmailJson(details),
-          });
+        const result = await emailDb.from("email_journey_events").insert({
+          journey_id: id,
+          event_type: event,
+          actor_id: actorId,
+          details: asEmailJson(details),
+        });
         if (result.error) throw new Error("Could not save the Kit audit record.");
       },
     });
-    return { prepared: true };
+    return { prepared: result.status === "drafts_ready" };
   } finally {
     await emailDb
       .from("email_journeys")
