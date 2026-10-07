@@ -130,6 +130,8 @@ An empty Kit tag index pauses and resumes without recreating confirmed resources
 
 The authorized real assessment test saved five Gemini emails and scheduled five private broadcasts: report on 7 October, then 9, 11, 14 and 17 October. Kit confirmed the report completed and the later four scheduled. These are live scheduled sends, unlike the earlier fixed test previews. Future dates have not elapsed. The connected personal Gmail sender is being used at the user's request; earlier previews landed in Spam, so inbox placement still needs work before moving to Nkoyo's verified sender.
 
+The live report was confirmed in the authorized recipient's Gmail Inbox. Gmail displayed a sender verification warning for the personal Gmail address sent through Kit. This single receipt does not establish inbox placement for other recipients; switching to Nkoyo's verified sending domain remains necessary before relying on deliverability.
+
 A retake creates a separate journey only after another explicit request. It does not modify or cancel already scheduled broadcasts. Turning the global automation flag off stops new preparation, but does not cancel messages already scheduled in Kit; cancel those in Kit if required.
 
 Fourteen focused email tests cover consent, private targeting, scheduling offsets, second-precision provider timestamps, idempotence, safe index resumption and rejection of uncertain settings. TypeScript and the production build are checked before deployment. Browser capture and background scheduling are verified separately; successful API creation alone is never called inbox delivery.

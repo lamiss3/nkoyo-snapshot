@@ -190,7 +190,7 @@ export function EmailJourneyPanel() {
             >
               <span className="block font-bold break-all">{item.email}</span>
               <span className="mt-1 block text-sm">
-                {item.status.replaceAll("_", " ")} ·{" "}
+                {(item.kit_state.status || item.status).replaceAll("_", " ")} ·{" "}
                 {item.followup_consent ? "All five requested" : "Report only"} ·{" "}
                 {date(item.created_at)}
               </span>
