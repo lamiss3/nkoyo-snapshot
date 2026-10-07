@@ -29,6 +29,15 @@ export interface KitDraftState {
   messages?: { number: number; broadcastId: number }[];
   pendingNumber?: number;
   error?: string;
+  testPreviews?: {
+    number: number;
+    broadcastId: number;
+    recipient: string;
+    verifiedAt: string;
+    receivedAt?: string;
+    mailbox?: "spam" | "inbox";
+    verificationSource: string;
+  }[];
 }
 export type EmailJobView = Omit<EmailJob, "lock_token" | "content" | "kit_state"> & {
   content: EmailJourney | null;

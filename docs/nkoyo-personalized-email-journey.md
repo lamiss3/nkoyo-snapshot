@@ -4,13 +4,13 @@
 
 All five emails are written for the individual using the actual questions and answers from their completed assessment. The earlier topic-sequence approach is an alternative, not the current design. Topic IDs remain useful metadata, but the content comes from the person's examples and constraints.
 
-| Email | Target timing | Personalization |
-|---|---|---|
-| 1: detailed report | Immediately after generation/review is ready | Explain the result in more depth than the MVP, using their concrete examples, topic evidence, the three Cs, uncertainty and a suggested seven-day plan |
-| 2: awareness | Day 2 | Connect the primary issue to a specific situation they described; explain what to notice in everyday work |
-| 3: understanding | Day 4 | Use their examples to explain a possible mechanism; address a relevant question they wrote and distinguish other explanations |
-| 4: action | Day 7 | Propose one practical experiment adapted to their stated constraints, a possible owner to agree, and a progress check |
-| 5: secondary issue | Day 10 | Explore the secondary issue through relevant answers and its possible connection to the primary; if no secondary is established, write a personalized check-in |
+| Email              | Target timing                                | Personalization                                                                                                                                                |
+| ------------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1: detailed report | Immediately after generation/review is ready | Explain the result in more depth than the MVP, using their concrete examples, topic evidence, the three Cs, uncertainty and a suggested seven-day plan         |
+| 2: awareness       | Day 2                                        | Connect the primary issue to a specific situation they described; explain what to notice in everyday work                                                      |
+| 3: understanding   | Day 4                                        | Use their examples to explain a possible mechanism; address a relevant question they wrote and distinguish other explanations                                  |
+| 4: action          | Day 7                                        | Propose one practical experiment adapted to their stated constraints, a possible owner to agree, and a progress check                                          |
+| 5: secondary issue | Day 10                                       | Explore the secondary issue through relevant answers and its possible connection to the primary; if no secondary is established, write a personalized check-in |
 
 The follow-ups must not assume someone replied or took the previous action. An email reply is not automatically part of the evidence source. Using new replies would require a separate reply-capture integration and explicit generation rules.
 
@@ -101,6 +101,16 @@ Review artifacts are saved under `output/email-journey/` in the chat workspace:
 - `nkoyo-first-five-email-drafts.md`: complete copy and staff evidence references.
 - `nkoyo-first-five-email-drafts.html`: readable customer-email preview.
 - `nkoyo-first-five-email-drafts.json`: structured editorial draft for later integration.
+
+### Fixed flow and preview delivery verified on 6 October 2026
+
+The live staff Admin prepared five fixed-template emails from one completed test assessment, saved them through the durable queue, accepted staff approval and uploaded all five through the website's Kit adapter. Repeating preparation reused the existing journey. Private events confirm one capture, one fixed preparation, five broadcast creations and zero Gemini email-writing calls. Kit's API confirmed all five broadcasts remained private and unscheduled.
+
+With the user's explicit approval, all five were sent manually using Kit's **Send test email / Send preview** controls. Kit displayed **Sent** for each. A focused Gmail search confirmed receipt of all five, all labeled **Spam**. The journey now preserves these manual preview confirmations, recipient, broadcast IDs, verification times and mailbox outcome in its private provider state and audit event; Admin displays the counts and outcome. These are test previews, not launched broadcasts or proof of automatic delivery.
+
+The immediate/day 2/day 4/day 7/day 10 schedule remains inactive. Gemini generation is still a separate pending live test. Fixed templates are an explicit staff test action, not an automatic fallback for visitors. Before launch, use Nkoyo's verified sending domain and retest inbox placement; the current Gmail sender and sending to that same account can contribute to Spam placement according to [Kit's deliverability guidance](https://help.kit.com/en/articles/3372365-why-are-my-emails-going-to-spam). This is a possible contributor, not a verified diagnosis of these messages.
+
+Local verification artifacts contain the saved five-email Markdown, API verification summary, Kit preview receipts and Gmail/Kit screenshots. The equivalent Markdown artifact was checked for all five messages; an in-app browser download event was not confirmed, so browser export remains unverified in that browser.
 
 ## Official Kit references
 

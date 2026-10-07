@@ -270,6 +270,25 @@ export function EmailJourneyPanel() {
                   Email {message.number}: broadcast {message.broadcastId} — draft, not sent
                 </p>
               ))}
+              {Boolean(job.kit_state.testPreviews?.length) && (
+                <div className="mt-3 border-t border-border pt-3 text-sm">
+                  <p className="font-bold">
+                    Test previews: {job.kit_state.testPreviews!.length} sent through Kit's preview
+                    control.
+                  </p>
+                  <p>
+                    {job.kit_state.testPreviews!.filter((preview) => preview.receivedAt).length}{" "}
+                    confirmed received in Gmail.{" "}
+                    {job.kit_state.testPreviews!.some((preview) => preview.mailbox === "spam")
+                      ? "These test messages landed in Spam; inbox placement needs further work."
+                      : ""}
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Manually verified test previews. The broadcasts remain unscheduled; visitor
+                    delivery is not activated.
+                  </p>
+                </div>
+              )}
               <p className="mt-2 text-xs">
                 {job.kit_state.status === "awaiting_recipient"
                   ? "Kit can take up to five minutes to list a newly tagged contact. Retrying this check reuses confirmed drafts."
