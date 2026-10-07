@@ -72,6 +72,9 @@ export function AdaptiveSnapshotPage() {
     if (!question) return;
     try {
       const next = submitAssessmentAnswer(session, { questionId: question.id, optionIds, text });
+      // Keep the exact draft while typing: trimming a trailing space here joins
+      // the next word to the previous one in the controlled textarea.
+      next.answers = next.answers.map((item) => item.questionId === question.id ? { ...item, text } : item);
       // Drafts are synced; answer-submitted events are recorded when Next is pressed.
       next.events = session.events;
       setSession(next);
@@ -80,7 +83,7 @@ export function AdaptiveSnapshotPage() {
     } catch (cause) {
       // Permit an incomplete draft while it is being typed or deselected.
       if (!text.trim() || optionIds.length === 0) {
-        const next = { ...session, updatedAt: new Date().toISOString(), answers: [...session.answers.filter((item) => item.questionId !== question.id), { questionId: question.id, optionIds, text: "", submittedAt: new Date().toISOString() }] };
+        const next = { ...session, updatedAt: new Date().toISOString(), answers: [...session.answers.filter((item) => item.questionId !== question.id), { questionId: question.id, optionIds, text, submittedAt: new Date().toISOString() }] };
         setSession(next);
         save(next);
         return;
