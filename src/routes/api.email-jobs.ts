@@ -8,8 +8,9 @@ export const Route = createFileRoute("/api/email-jobs")({
         if (!cronAuthorized(request.headers.get("authorization"), process.env["CRON_SECRET"]))
           return new Response("Unauthorized", { status: 401 });
         try {
-          const { processEmailJob } = await import("../assessment-v2/email-jobs.server");
-          const result = await processEmailJob();
+          const { runAutomaticEmailWorker } =
+            await import("../assessment-v2/email-automation.server");
+          const result = await runAutomaticEmailWorker();
           return Response.json(result, { headers: { "Cache-Control": "no-store" } });
         } catch {
           return new Response("Email worker failed", {

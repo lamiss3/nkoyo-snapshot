@@ -87,11 +87,14 @@ export function EmailJourneyPanel() {
       </div>
       <p className="mt-3 text-muted-foreground">
         Review five emails based on each person’s saved answers. Planned timing: report, then days
-        2, 4, 7 and 10. Sending is not activated.
+        2, 4, 7 and 10.{" "}
+        {query.data?.deliveryEnabled
+          ? "New requests are automatically prepared and scheduled according to consent. Earlier review drafts are not enrolled."
+          : "Sending is not activated."}
       </p>
       <p className="mt-2 text-sm text-muted-foreground">
         {query.data?.kitConfigured
-          ? `Kit connected in ${query.data.kitMode} mode. Uploads create private, unscheduled drafts.`
+          ? `Kit connected in ${query.data.kitMode} mode. ${query.data.deliveryEnabled ? "Automatic emails remain private and target one verified contact." : "Uploads create private, unscheduled drafts."}`
           : "Kit credentials are not connected yet. You can generate, review and export drafts here."}
       </p>
       {query.isPending && (
@@ -207,6 +210,11 @@ export function EmailJourneyPanel() {
           )}
           <p className="mt-2 text-sm">Assessment {job.session_id}</p>
           <p className="mt-2 text-sm">
+            {job.automation_enabled
+              ? "Automatic delivery request — no staff approval needed after content validation."
+              : "Review-only request — not automatically enrolled."}
+          </p>
+          <p className="mt-2 text-sm">
             Generation attempts: {job.attempts}.{" "}
             {job.locked_until && Date.parse(job.locked_until) > Date.now()
               ? "Preparation in progress."
@@ -234,7 +242,7 @@ export function EmailJourneyPanel() {
                 </button>
                 <button
                   className={button}
-                  disabled={busy || Boolean(job.approved_at)}
+                  disabled={busy || Boolean(job.approved_at) || job.automation_enabled}
                   onClick={() => void act(job.id, "approve")}
                 >
                   {job.approved_at ? "Drafts approved" : "Approve reviewed drafts"}
@@ -243,6 +251,7 @@ export function EmailJourneyPanel() {
                   className={button}
                   disabled={
                     busy ||
+                    job.automation_enabled ||
                     !job.approved_at ||
                     !query.data?.kitConfigured ||
                     Boolean(job.kit_state.status && job.kit_state.status !== "awaiting_recipient")
@@ -267,7 +276,10 @@ export function EmailJourneyPanel() {
               {job.kit_state.error && <p className="mt-2 text-sm">{job.kit_state.error}</p>}
               {job.kit_state.messages?.map((message) => (
                 <p key={message.number} className="text-sm">
-                  Email {message.number}: broadcast {message.broadcastId} — draft, not sent
+                  Email {message.number}: broadcast {message.broadcastId} —{" "}
+                  {message.sendAt
+                    ? `scheduled for ${date(message.sendAt)}${message.providerStatus ? ` · Kit: ${message.providerStatus}` : ""}`
+                    : "draft, not sent"}
                 </p>
               ))}
               {Boolean(job.kit_state.testPreviews?.length) && (
@@ -284,8 +296,7 @@ export function EmailJourneyPanel() {
                       : ""}
                   </p>
                   <p className="mt-1 text-xs">
-                    Manually verified test previews. The broadcasts remain unscheduled; visitor
-                    delivery is not activated.
+                    Manually verified test previews. These fixed test broadcasts remain unscheduled.
                   </p>
                 </div>
               )}
@@ -324,7 +335,16 @@ export function EmailJourneyPanel() {
                       Email {email.number} ·{" "}
                       {email.number === 1 ? "Report" : `Day ${emailDayOffsets[email.number - 1]}`} ·{" "}
                       {eligibleJourneyEmails(job.followup_consent).includes(email.number)
-                        ? "Requested — not sent"
+                        ? job.kit_state.messages?.find((message) => message.number === email.number)
+                            ?.sendAt
+                          ? job.kit_state.messages?.find(
+                              (message) => message.number === email.number,
+                            )?.providerStatus === "completed"
+                            ? "Kit: completed"
+                            : "Scheduled in Kit"
+                          : job.automation_enabled
+                            ? "Requested — preparation pending"
+                            : "Requested — not sent"
                         : "Not opted in — will not be uploaded"}
                     </summary>
                     <p className="mt-4 font-bold">Subject: {email.subject}</p>

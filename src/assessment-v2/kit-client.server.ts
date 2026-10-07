@@ -1,4 +1,4 @@
-import { kitJourneyDrafts, type EmailJourney } from "./email-journey.ts";
+import { kitJourneyDrafts, emailDayOffsets, type EmailJourney } from "./email-journey.ts";
 import type { KitDraftState } from "./email-job-types";
 
 type Subscriber = { id: number; email_address: string; state: string };
@@ -26,7 +26,7 @@ export function assertSingleKitRecipient(
   }
 }
 
-/** Creates unscheduled PRIVATE drafts only. An uncertain POST is never retried. */
+/** Creates private drafts or private scheduled emails. Uncertain writes require reconciliation. */
 export async function prepareKitDrafts(config: {
   apiKey: string;
   sender: string;
@@ -35,12 +35,22 @@ export async function prepareKitDrafts(config: {
   consent: boolean;
   journey: EmailJourney;
   state: KitDraftState;
+  schedule?: boolean;
+  now?: () => number;
   fetcher?: typeof fetch;
   pause?: (milliseconds: number) => Promise<void>;
   save: (state: KitDraftState) => Promise<void>;
   audit: (event: string, details: unknown) => Promise<void>;
 }) {
-  if (config.state.status === "drafts_ready") return config.state;
+  if (config.schedule && config.journey.source === "fixed_test")
+    throw new Error("Fixed test templates cannot be automatically sent.");
+  if (config.state.status === "scheduled" || config.state.status === "completed")
+    return config.state;
+  if (config.state.status === "drafts_ready") {
+    if (config.schedule)
+      throw new Error("Existing review drafts cannot be automatically enrolled.");
+    return config.state;
+  }
   if (
     config.state.pendingNumber ||
     config.state.status === "preparing" ||
@@ -57,7 +67,12 @@ export async function prepareKitDrafts(config: {
   const state: KitDraftState = resume
     ? { ...config.state, status: "preparing", messages: [...(config.state.messages ?? [])] }
     : { status: "preparing", messages: [] };
+  if (config.schedule && !state.scheduleStart)
+    state.scheduleStart = new Date(
+      Math.ceil(((config.now ?? Date.now)() + 120000) / 1000) * 1000,
+    ).toISOString();
   delete state.error;
+  const deadline = Date.now() + 150000;
   // This durable marker precedes any provider side effect.
   await config.save(state);
   const api = async <T>(path: string, method: string, body?: unknown): Promise<T> => {
@@ -66,7 +81,7 @@ export async function prepareKitDrafts(config: {
       method,
       headers: { "X-Kit-Api-Key": config.apiKey, "Content-Type": "application/json" },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-      signal: AbortSignal.timeout(20000),
+      signal: AbortSignal.timeout(Math.max(1, Math.min(20000, deadline - Date.now()))),
     });
     const payload: unknown = await response.json();
     await config.audit("kit_response", { path, httpStatus: response.status, body: payload });
@@ -97,6 +112,12 @@ export async function prepareKitDrafts(config: {
     }
     for (const draft of kitJourneyDrafts(config.journey, providerId(state.tagId), config.consent)) {
       if (state.messages!.some((message) => message.number === draft.emailNumber)) continue;
+      // Resume on the next worker tick before a slow batch can outlive its lease.
+      if (config.schedule && Date.now() > deadline - 45000) {
+        state.status = "awaiting_recipient";
+        await config.save(state);
+        return state;
+      }
       // Recheck membership before EVERY personalized body is uploaded.
       for (let attempt = 0; attempt < 5; attempt++) {
         const members = await api<{
@@ -122,26 +143,51 @@ export async function prepareKitDrafts(config: {
         assertSingleKitRecipient(members, providerId(state.subscriberId), config.email);
         break;
       }
+      // Anchor all days to the report, allowing a short provider preparation window.
+      if (
+        config.schedule &&
+        !state.messages!.length &&
+        Date.parse(state.scheduleStart!) < (config.now ?? Date.now)() + 60000
+      )
+        state.scheduleStart = new Date(
+          Math.ceil(((config.now ?? Date.now)() + 120000) / 1000) * 1000,
+        ).toISOString();
+      const sendAt = config.schedule
+        ? new Date(
+            Date.parse(state.scheduleStart!) + emailDayOffsets[draft.emailNumber - 1]! * 86400000,
+          ).toISOString()
+        : null;
       state.pendingNumber = draft.emailNumber;
       await config.save(state);
       const result = await api<{
-        broadcast: { id: number; public: boolean; send_at: string | null };
+        broadcast: { id: number; public: boolean; send_at: string | null; status?: string };
       }>("broadcasts", "POST", {
         ...draft.payload,
+        send_at: sendAt,
         email_address: config.sender,
         email_template_id: config.templateId,
       });
       const broadcast = result.broadcast;
       // Keep the ID even if Kit's sending fields do not match; staff must reconcile it.
-      state.messages!.push({ number: draft.emailNumber, broadcastId: providerId(broadcast?.id) });
+      state.messages!.push({
+        number: draft.emailNumber,
+        broadcastId: providerId(broadcast?.id),
+        ...(sendAt ? { sendAt, providerStatus: broadcast.status ?? "scheduled" } : {}),
+      });
       delete state.pendingNumber;
       await config.save(state);
-      if (broadcast.public !== false || broadcast.send_at !== null)
+      if (
+        broadcast.public !== false ||
+        (sendAt
+          ? Math.floor(Date.parse(broadcast.send_at ?? "") / 1000) !==
+            Math.floor(Date.parse(sendAt) / 1000)
+          : broadcast.send_at !== null)
+      )
         throw new Error(
-          "Kit did not confirm an unscheduled private draft. Review this broadcast in Kit.",
+          "Kit did not confirm the requested private sending settings. Review this broadcast in Kit.",
         );
     }
-    state.status = "drafts_ready";
+    state.status = config.schedule ? "scheduled" : "drafts_ready";
     await config.save(state);
     return state;
   } catch (error) {

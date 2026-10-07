@@ -9,7 +9,8 @@ export const Route = createFileRoute("/privacy")({
       { title: "Privacy (draft) | Institutional Readiness Snapshot" },
       {
         name: "description",
-        content: "Draft privacy information for the Institutional Readiness Snapshot, pending legal review.",
+        content:
+          "Draft privacy information for the Institutional Readiness Snapshot, pending legal review.",
       },
       { property: "og:title", content: "Privacy (draft)" },
       { property: "og:description", content: "Draft privacy information pending legal review." },
@@ -33,25 +34,38 @@ function PrivacyPage() {
           <section>
             <h2 className="text-xl font-extrabold text-foreground">What we collect</h2>
             <p className="mt-2">
-              Your answers, written responses, and assessment decisions are saved in this browser so a refresh does not lose progress. When server logging is enabled, progress is also stored in the site's private database, including unfinished assessments, questions and answers, assessment steps, model inputs and outputs, errors, and results. Authorized Nkoyo administrators and staff can review these records to understand and improve the assessment. If you submit the detailed-report request, your email is linked to your completed assessment for follow-up. Answers are sent to Jev for topic evaluation and may be sent to Gemini for question wording. Please avoid names and confidential details.
+              Your answers, written responses, and assessment decisions are saved in this browser so
+              a refresh does not lose progress. When server logging is enabled, progress is also
+              stored in the site's private database, including unfinished assessments, questions and
+              answers, assessment steps, model inputs and outputs, errors, and results. Authorized
+              Nkoyo administrators and staff can review these records to understand and improve the
+              assessment. If you submit the detailed-report request, your email is linked to your
+              completed assessment for follow-up. Answers are sent to Jev for topic evaluation and
+              may be sent to Gemini for question wording. Please avoid names and confidential
+              details.
             </p>
           </section>
           <section>
             <h2 className="text-xl font-extrabold text-foreground">If you share your details</h2>
             <p className="mt-2">
-              If you choose to request follow-up, we store the email address you provide and link it to your Snapshot. Marketing follow-up requires
-              separate, explicit consent that is never pre-selected. You can use your results and the
-              booking link without providing any details.
-              If you request a detailed report, your saved answers and result are also sent to Gemini to prepare personalized email drafts. Staff can review these drafts and their source answers in the private Admin panel. The optional follow-up consists of four further emails about your Snapshot; declining it does not prevent requesting the report.
+              If you choose to request follow-up, we store the email address you provide and link it
+              to your Snapshot. Marketing follow-up requires separate, explicit consent that is
+              never pre-selected. You can use your results and the booking link without providing
+              any details. If you request a detailed report, your saved answers and result are also
+              sent to Gemini to prepare personalized email drafts. Staff can review these drafts and
+              their source answers in the private Admin panel. The optional follow-up consists of
+              four further emails about your Snapshot; declining it does not prevent requesting the
+              report.
             </p>
           </section>
           <section>
             <h2 className="text-xl font-extrabold text-foreground">Email</h2>
             <p className="mt-2">
-              {brand.emailDeliveryConfigured
-                ? "Email is delivered through our configured provider."
-                : "An email provider is not connected yet. No automated emails are sent from this tool today."}
-              When Kit is connected, approved email drafts and the intended recipient's email address can be uploaded to Kit for delivery preparation. Follow-up messages are only included when separately requested. Delivery is not activated during this preparation stage.
+              Kit is the configured email provider. When automatic delivery is enabled, your email
+              address and personalized email content are sent to Kit to deliver the requested
+              report. If you separately opt in, four follow-up emails are scheduled for days 2, 4, 7
+              and 10 after the report. The follow-ups include an unsubscribe link. Earlier
+              review-only requests are not automatically enrolled.
             </p>
           </section>
           <section>

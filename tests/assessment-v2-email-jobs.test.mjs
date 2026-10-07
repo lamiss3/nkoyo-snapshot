@@ -177,3 +177,114 @@ test("empty Kit index pauses durably and resumes without recreating resources or
   assert.equal(requests.filter((row) => row.path === "broadcasts").length, 5);
   assert.equal(new Set(completed.messages.map((message) => message.number)).size, 5);
 });
+
+test("automatic Kit scheduling keeps consent and private targeting and resumes without duplicate sends", async () => {
+  for (const consent of [true, false]) {
+    const requests = [],
+      valid = provider(requests);
+    const f = fixture(consent, async (url, init) => {
+      if (url.endsWith("/broadcasts")) {
+        const body = JSON.parse(init.body);
+        requests.push({ path: "broadcasts", method: init.method, body });
+        return Response.json({
+          broadcast: {
+            id: 1000 + requests.length,
+            public: false,
+            send_at: body.send_at,
+            status: "scheduled",
+          },
+        });
+      }
+      return valid(url, init);
+    });
+    const now = Date.parse("2026-10-07T12:00:00Z");
+    const config = { ...f.config, schedule: true, now: () => now };
+    const state = await prepareKitDrafts(config);
+    assert.equal(state.status, "scheduled");
+    const posts = requests.filter((r) => r.path === "broadcasts");
+    assert.equal(posts.length, consent ? 5 : 1);
+    posts.forEach((post, index) => {
+      assert.equal(post.body.public, false);
+      assert.deepEqual(post.body.subscriber_filter, [{ all: [{ type: "tag", ids: [22] }] }]);
+      assert.equal(
+        Date.parse(post.body.send_at),
+        now + 120000 + [0, 2, 4, 7, 10][index] * 86400000,
+      );
+      assert.equal(state.messages[index].sendAt, post.body.send_at);
+    });
+    const count = requests.length;
+    await prepareKitDrafts({ ...config, state });
+    assert.equal(requests.length, count);
+    await assert.rejects(
+      prepareKitDrafts({ ...config, journey: { ...journey, source: "fixed_test" }, state: {} }),
+      /cannot be automatically sent/,
+    );
+    await assert.rejects(
+      prepareKitDrafts({ ...config, state: { status: "drafts_ready" } }),
+      /cannot be automatically enrolled/,
+    );
+  }
+});
+
+test("Kit's second-precision timestamps do not falsely reject a confirmed private schedule", async () => {
+  const requests = [],
+    valid = provider(requests);
+  const f = fixture(false, async (url, init) =>
+    url.endsWith("/broadcasts")
+      ? Response.json({
+          broadcast: {
+            id: 400,
+            public: false,
+            send_at: JSON.parse(init.body).send_at.replace(/\.\d{3}Z$/, "Z"),
+            status: "scheduled",
+          },
+        })
+      : valid(url, init),
+  );
+  const state = await prepareKitDrafts({
+    ...f.config,
+    schedule: true,
+    now: () => Date.parse("2026-10-07T12:00:00.215Z"),
+  });
+  assert.equal(state.status, "scheduled");
+  assert.equal(state.messages.length, 1);
+});
+
+test("index delays preserve the same automatic schedule and confirmed IDs; privacy mismatch stops the worker", async () => {
+  const requests = [],
+    valid = provider(requests);
+  let ready = false;
+  const f = fixture(true, async (url, init) => {
+    if (url.includes("status=all") && !ready)
+      return Response.json({ ...membership, subscribers: [] });
+    if (url.endsWith("/broadcasts")) {
+      const body = JSON.parse(init.body);
+      requests.push({ path: "broadcasts", body });
+      return Response.json({
+        broadcast: { id: 200 + requests.length, public: false, send_at: body.send_at },
+      });
+    }
+    return valid(url, init);
+  });
+  const config = { ...f.config, schedule: true, now: () => Date.parse("2026-10-07T12:00:00Z") };
+  const pending = await prepareKitDrafts(config);
+  assert.equal(pending.status, "awaiting_recipient");
+  ready = true;
+  const saved = await prepareKitDrafts({ ...config, state: pending });
+  assert.equal(saved.status, "scheduled");
+  assert.equal(saved.messages.length, 5);
+  assert.equal(requests.filter((r) => r.path === "subscribers").length, 1);
+  const bad = fixture(false, async (url, init) =>
+    url.endsWith("/broadcasts")
+      ? Response.json({
+          broadcast: { id: 999, public: true, send_at: JSON.parse(init.body).send_at },
+        })
+      : valid(url, init),
+  );
+  await assert.rejects(
+    prepareKitDrafts({ ...bad.config, schedule: true }),
+    /requested private sending settings/,
+  );
+  assert.equal(bad.saves.at(-1).status, "reconcile");
+  assert.equal(bad.saves.at(-1).messages[0].broadcastId, 999);
+});

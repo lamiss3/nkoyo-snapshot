@@ -6,6 +6,9 @@ const owner = z.object({
   sessionId: z.string().uuid(),
   traceToken: z.string().regex(/^[a-f0-9]{64}$/),
 });
+export const getEmailDeliveryStatus = createServerFn({ method: "GET" }).handler(async () => ({
+  automatic: process.env["EMAIL_AUTOMATION_ENABLED"] === "true",
+}));
 export const requestPersonalizedEmails = createServerFn({ method: "POST" })
   .validator((data: unknown) =>
     owner
@@ -38,7 +41,7 @@ export const getEmailJourneys = createServerFn({ method: "POST" })
         process.env["KIT_CLASSIC_TEMPLATE_ID"],
       ),
       kitMode: process.env["KIT_MODE"] === "production" ? "production" : "test",
-      deliveryEnabled: false,
+      deliveryEnabled: process.env["EMAIL_AUTOMATION_ENABLED"] === "true",
       fixedTestEnabled:
         process.env["KIT_MODE"] === "test" && Boolean(process.env["KIT_TEST_EMAILS"]),
     };

@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { Loader2, Mail } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
+import { getEmailDeliveryStatus } from "@/assessment-v2/email-actions";
 
 import type { AssessmentSession } from "@/assessment-v2/types";
 import { brand } from "@/config/brand";
@@ -14,11 +16,20 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [savedAutomatic, setSavedAutomatic] = useState(false);
+  const delivery = useQuery({
+    queryKey: ["email-delivery-status"],
+    queryFn: () => getEmailDeliveryStatus(),
+  });
   const savedKey = `nkoyo-adaptive-report-request:${session.id}`;
 
   useEffect(() => {
     try {
-      if (window.localStorage.getItem(savedKey) === "saved") setStatus("saved");
+      const stored = window.localStorage.getItem(savedKey);
+      if (stored === "saved" || stored === "saved:automatic") {
+        setSavedAutomatic(stored === "saved:automatic");
+        setStatus("saved");
+      }
     } catch {
       /* the form still works when local storage is unavailable */
     }
@@ -35,16 +46,17 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
     setMessage("");
     setStatus("saving");
     try {
-      await submitAdaptiveReportRequest({
+      const saved = await submitAdaptiveReportRequest({
         session,
         email: parsed.data.toLowerCase(),
         marketingConsent,
       });
       try {
-        window.localStorage.setItem(savedKey, "saved");
+        window.localStorage.setItem(savedKey, saved.automatic ? "saved:automatic" : "saved");
       } catch {
         /* optional */
       }
+      setSavedAutomatic(saved.automatic);
       setStatus("saved");
     } catch {
       setMessage("We could not save your request. Please try again.");
@@ -57,8 +69,18 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
       <section className="no-print mt-8 card-elevated p-8" role="status">
         <h2 className="text-2xl font-black">Your request is saved</h2>
         <p className="mt-3 text-muted-foreground">
-          Your detailed report is queued for preparation and review. Email delivery is being set up,
-          so no report has been sent yet.
+          {savedAutomatic ? (
+            <>
+              Your detailed report is queued for preparation. If you requested follow-ups, they will
+              follow on days 2, 4, 7 and 10 after the report. Preparation can take longer when the
+              writing service is busy. Please check your Spam folder as well.
+            </>
+          ) : (
+            <>
+              Your report request is saved for preparation and review. This earlier request has not
+              been enrolled in automatic delivery.
+            </>
+          )}
         </p>
       </section>
     );
@@ -75,8 +97,8 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
         </h2>
       </div>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Request a fuller report based on your Snapshot answers, with practical next steps. Email
-        delivery is being set up; we’ll save your request and prepare your report for review. Your
+        Request a fuller report based on your Snapshot answers, with practical next steps.{" "}
+        {!delivery.data?.automatic && "We’ll save your request for preparation and review. "}Your
         results above remain available without sharing an email.
       </p>
 
@@ -108,7 +130,7 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
             className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-navy px-7 font-bold text-navy-foreground hover:bg-navy/90 disabled:opacity-60"
           >
             {status === "saving" && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}{" "}
-            Save my request
+            {delivery.data?.automatic ? "Email my report" : "Save my request"}
           </button>
         </div>
         {message && (

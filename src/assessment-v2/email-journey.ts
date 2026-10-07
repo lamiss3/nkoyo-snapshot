@@ -163,9 +163,9 @@ export function kitJourneyDrafts(
 const markdownText = (value: string) => value.replace(/[\\`*_{}\[\]<>#]/g, "\\$&");
 export function emailJourneyMarkdown(journey: EmailJourney): string {
   return [
-    "# Nkoyo — five-email journey draft",
+    "# Nkoyo — five-email journey",
     "",
-    "Draft for review. No emails have been sent.",
+    "Saved email content. Check the staff Admin for consent, scheduling and provider status.",
     "",
     `Session: ${markdownText(journey.sessionId)}`,
     `Generated: ${markdownText(journey.generatedAt)}`,

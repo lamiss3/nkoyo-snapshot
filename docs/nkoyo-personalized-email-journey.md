@@ -59,7 +59,7 @@ Store each journey under its assessment ID, contact reference and content versio
 
 Each message has a unique job key: assessment ID + contact + content version + email number. Do not retry an uncertain broadcast creation blindly; first reconcile the stored provider ID/status. Retakes need an explicit policy: finish the earlier journey, or cancel its pending messages before starting the new one. A new assessment must not accidentally change the content of an older scheduled message.
 
-## Implemented preparation and current limits
+## Initial preparation release (historical)
 
 - `src/assessment-v2/email-journey.server.ts`: server-only Gemini writer; exact model-call logging through the required recorder; validates topics, five slots, references, plain text and lengths.
 - `src/assessment-v2/email-journey.ts`: authoritative brief, consent eligibility, safe HTML/plain text rendering, agreed day offsets, and draft-only Kit request payloads.
@@ -113,6 +113,34 @@ The immediate/day 2/day 4/day 7/day 10 schedule remains inactive. Gemini generat
 Local verification artifacts contain the saved five-email Markdown, API verification summary, Kit preview receipts and Gmail/Kit screenshots. The equivalent Markdown artifact was checked for all five messages; an in-app browser download event was not confirmed, so browser export remains unverified in that browser.
 
 ## Official Kit references
+
+## Automatic delivery — 7 October 2026
+
+New report requests now use a durable automatic journey. Email 1 is authorized by the report request; Emails 2–5 require the separate unchecked follow-up opt-in. Earlier review requests and fixed test templates remain excluded. Recipient and consent cannot be silently changed by retries.
+
+The working email writer is `gemini-3.5-flash-lite`: both synthetic generation and a genuine saved completed assessment produced five validated emails. Attempts with Gemini 3.6 Flash and 3.5 Flash returned high-demand 503 responses; 2.5 Flash returned 404 for this key. The selected model generates all five together once, with saved input/output and evidence references. It does not replace Jev's topic evaluation.
+
+The Kit adapter schedules private broadcasts through POST with `public: false`, an explicit session-specific tag containing exactly one verified active recipient, and an exact `send_at`. The report has a short preparation buffer; the four subsequent messages are anchored to that report's scheduled time at days 2, 4, 7 and 10. Existing unsubscribed contacts are not reactivated. A report-only request schedules one broadcast. Kit retains its unsubscribe/footer mechanism.
+
+Production settings: `EMAIL_AUTOMATION_ENABLED=true`, `EMAIL_GEMINI_MODEL=gemini-3.5-flash-lite`, `KIT_MODE=production`, the existing server-only Kit settings and a random `CRON_SECRET`. Preview automation stays disabled. Migration `0003_automatic_email_delivery.sql` adds per-request eligibility and eight bounded generation attempts with increasing delays. Old rows default to `automation_enabled=false`; they are not bulk enrolled.
+
+`drizzle/operational/nkoyo_email_worker.sql` installs the named Supabase Cron worker every minute. Store the matching production credential in Vault as `nkoyo_email_worker` first, deploy the worker, then run this operational SQL. The scheduled HTTP call reads its credential from Vault and invokes the protected `GET /api/email-jobs`. No service-role key or cron secret is committed. Recovery survives browser closure; each tick performs a bounded generation or Kit stage plus a periodic provider status check. Server duration is configured to 300 seconds and provider uploads have a shorter time budget than their lease.
+
+An empty Kit tag index pauses and resumes without recreating confirmed resources. Unknown write outcomes, privacy mismatches and expired upload leases are marked for reconciliation instead of risking duplicate sends. Admin shows saved content, consent, broadcast IDs, scheduled dates and provider status; private audit records retain each API request/response and error. Kit's `completed` state is a provider send status, not evidence of inbox placement. There are no delivery webhooks or automatic operator alerts yet; inspect Admin for failures.
+
+The authorized real assessment test saved five Gemini emails and scheduled five private broadcasts: report on 7 October, then 9, 11, 14 and 17 October. Kit confirmed the report completed and the later four scheduled. These are live scheduled sends, unlike the earlier fixed test previews. Future dates have not elapsed. The connected personal Gmail sender is being used at the user's request; earlier previews landed in Spam, so inbox placement still needs work before moving to Nkoyo's verified sender.
+
+A retake creates a separate journey only after another explicit request. It does not modify or cancel already scheduled broadcasts. Turning the global automation flag off stops new preparation, but does not cancel messages already scheduled in Kit; cancel those in Kit if required.
+
+Fourteen focused email tests cover consent, private targeting, scheduling offsets, second-precision provider timestamps, idempotence, safe index resumption and rejection of uncertain settings. TypeScript and the production build are checked before deployment. Browser capture and background scheduling are verified separately; successful API creation alone is never called inbox delivery.
+
+### Current operating references
+
+- [Supabase Cron](https://supabase.com/docs/guides/cron)
+- [Vault-backed scheduled HTTP calls](https://supabase.com/docs/guides/functions/schedule-functions)
+- [Kit broadcast status](https://developers.kit.com/api-reference/broadcasts/get-a-broadcast)
+
+### Kit API references
 
 - [Eventual consistency and tag indexing](https://developers.kit.com/api-reference/eventual-consistency)
 

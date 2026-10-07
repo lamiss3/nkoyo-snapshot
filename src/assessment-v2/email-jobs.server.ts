@@ -58,9 +58,20 @@ export async function captureEmailRequest(input: {
     p_session: input.sessionId,
     p_email: input.email,
     p_consent: input.consent,
+    p_automate: process.env["EMAIL_AUTOMATION_ENABLED"] === "true",
   });
   checked(queued.error);
-  return { jobId: queued.data!, saved: true };
+  const persisted = await emailDb
+    .from("email_journeys")
+    .select("automation_enabled")
+    .eq("id", queued.data!)
+    .single();
+  checked(persisted.error);
+  return {
+    jobId: queued.data!,
+    saved: true,
+    automatic: persisted.data?.automation_enabled === true,
+  };
 }
 export async function processOwnedEmail(input: { sessionId: string; traceToken: string }) {
   await completedSession(input.sessionId, input.traceToken);
@@ -71,7 +82,11 @@ export async function processOwnedEmail(input: { sessionId: string; traceToken: 
     .single();
   checked(job.error);
   if (!job.data) throw new Error("Report request not found.");
-  return processEmailJob(job.data.id);
+  const result = await processEmailJob(job.data.id);
+  // Persistent worker also resumes this stage if this request is interrupted.
+  if (process.env["EMAIL_AUTOMATION_ENABLED"] === "true")
+    await (await import("./email-automation.server")).processAutomaticKitJob(job.data.id);
+  return result;
 }
 export async function createFixedTestEmailJob(sessionId: string, email: string, actorId: string) {
   assertFixedEmailTestAllowed(process.env["KIT_MODE"], email, process.env["KIT_TEST_EMAILS"]);
@@ -119,14 +134,12 @@ async function processEmailJobWithWriter(id?: string, retry = false, fixedTestAc
         process.env["KIT_TEST_EMAILS"],
       );
       content = fixedTestEmailJourney(session);
-      const event = await emailDb
-        .from("email_journey_events")
-        .insert({
-          journey_id: job.id,
-          event_type: "fixed_test_drafts_prepared",
-          actor_id: fixedTestActor,
-          details: asEmailJson({ source: "fixed_test", noModelCall: true, content }),
-        });
+      const event = await emailDb.from("email_journey_events").insert({
+        journey_id: job.id,
+        event_type: "fixed_test_drafts_prepared",
+        actor_id: fixedTestActor,
+        details: asEmailJson({ source: "fixed_test", noModelCall: true, content }),
+      });
       checked(event.error);
     } else {
       const trace = new AssessmentTrace(

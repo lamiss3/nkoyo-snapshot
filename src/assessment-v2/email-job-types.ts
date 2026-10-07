@@ -9,6 +9,7 @@ export type EmailJob = {
   email: string;
   followup_consent: boolean;
   consent_version: string;
+  automation_enabled: boolean;
   status: "queued" | "generating" | "draft" | "failed" | "cancelled";
   attempts: number;
   next_attempt_at: string;
@@ -23,10 +24,12 @@ export type EmailJob = {
   updated_at: string;
 };
 export interface KitDraftState {
-  status?: "preparing" | "awaiting_recipient" | "drafts_ready" | "reconcile";
+  status?:
+    "preparing" | "awaiting_recipient" | "drafts_ready" | "scheduled" | "completed" | "reconcile";
   subscriberId?: number;
   tagId?: number;
-  messages?: { number: number; broadcastId: number }[];
+  messages?: { number: number; broadcastId: number; sendAt?: string; providerStatus?: string }[];
+  scheduleStart?: string;
   pendingNumber?: number;
   error?: string;
   testPreviews?: {
@@ -59,7 +62,7 @@ export type EmailDatabase = Omit<TraceDatabase, "public"> & {
     };
     Functions: TraceDatabase["public"]["Functions"] & {
       enqueue_email_journey: {
-        Args: { p_session: string; p_email: string; p_consent: boolean };
+        Args: { p_session: string; p_email: string; p_consent: boolean; p_automate?: boolean };
         Returns: string;
       };
       claim_email_journey: { Args: { p_id?: string; p_retry?: boolean }; Returns: EmailJob[] };

@@ -4,7 +4,7 @@ import type { EmailJourney } from "./email-journey";
 import type { KitDraftState } from "./email-job-types";
 import { assertFixedEmailTestAllowed } from "./email-job-policy.server";
 
-export async function prepareKitJob(id: string, actorId: string) {
+export async function prepareKitJob(id: string, actorId: string | null, automatic = false) {
   const apiKey = process.env["KIT_API_KEY"],
     sender = process.env["KIT_SENDER_EMAIL"];
   const templateId = Number(process.env["KIT_CLASSIC_TEMPLATE_ID"]);
@@ -13,8 +13,10 @@ export async function prepareKitJob(id: string, actorId: string) {
   const found = await emailDb.from("email_journeys").select("*").eq("id", id).single();
   if (found.error || !found.data) throw new Error("Email journey not found.");
   const job = found.data;
-  if (job.status !== "draft" || !job.content || !job.approved_at)
+  if (job.status !== "draft" || !job.content || (!automatic && !job.approved_at))
     throw new Error("Review and approve the drafts first.");
+  if (automatic && (!job.automation_enabled || process.env["EMAIL_AUTOMATION_ENABLED"] !== "true"))
+    throw new Error("Automatic delivery is not enabled for this request.");
   if ((job.content as unknown as EmailJourney).source === "fixed_test")
     assertFixedEmailTestAllowed(process.env["KIT_MODE"], job.email, process.env["KIT_TEST_EMAILS"]);
   // The personal Creator test account may receive only explicitly allowed test addresses.
@@ -27,7 +29,12 @@ export async function prepareKitJob(id: string, actorId: string) {
       throw new Error("This contact is not an allowed Kit test recipient.");
   }
   const oldState = job.kit_state as unknown as KitDraftState;
-  if (oldState.status === "drafts_ready") return { prepared: true };
+  if (
+    oldState.status === "scheduled" ||
+    oldState.status === "completed" ||
+    (!automatic && oldState.status === "drafts_ready")
+  )
+    return { prepared: true };
   if (oldState.status && oldState.status !== "awaiting_recipient")
     throw new Error("The Kit attempt needs reconciliation in Kit before retrying.");
   // Compare-and-swap the initial state: only one staff request can own provider mutations.
@@ -42,6 +49,7 @@ export async function prepareKitJob(id: string, actorId: string) {
     })
     .eq("id", id)
     .is("lock_token", null)
+    .eq("status", "draft")
     .eq("kit_state", JSON.stringify(job.kit_state))
     .select("id");
   if (claimed.error || claimed.data?.length !== 1)
@@ -65,6 +73,7 @@ export async function prepareKitJob(id: string, actorId: string) {
       consent: job.followup_consent,
       journey: job.content as unknown as EmailJourney,
       state: oldState,
+      schedule: automatic,
       save,
       audit: async (event, details) => {
         const result = await emailDb.from("email_journey_events").insert({
@@ -76,7 +85,16 @@ export async function prepareKitJob(id: string, actorId: string) {
         if (result.error) throw new Error("Could not save the Kit audit record.");
       },
     });
-    return { prepared: result.status === "drafts_ready" };
+    await emailDb
+      .from("email_journeys")
+      .update({
+        next_attempt_at: new Date(
+          Date.now() + (result.status === "scheduled" ? 1800000 : 60000),
+        ).toISOString(),
+      })
+      .eq("id", id)
+      .eq("lock_token", token);
+    return { prepared: result.status === "drafts_ready" || result.status === "scheduled" };
   } finally {
     await emailDb
       .from("email_journeys")

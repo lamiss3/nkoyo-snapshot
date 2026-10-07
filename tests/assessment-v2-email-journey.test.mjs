@@ -171,7 +171,8 @@ test("Gemini receives real evidence without credentials and records the complete
   assert.equal(records[0].operation, "email_journey");
   assert.equal(records[1].status, "succeeded");
   assert.equal(records[1].output.emails.length, 5);
-  assert.ok(emailJourneyMarkdown(result).includes("No emails have been sent"));
+  assert.ok(emailJourneyMarkdown(result).includes("Check the staff Admin"));
+  assert.ok(!emailJourneyMarkdown(result).includes("No emails have been sent"));
   const drafts = kitJourneyDrafts(result, 123, true);
   assert.deepEqual(
     drafts.map((draft) => draft.dayOffset),
