@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { Logo } from "@/components/brand/Logo";
 import { AssessmentLogPanel } from "@/components/snapshot/AssessmentLogPanel";
+import { StaffAccountPanel } from "@/components/snapshot/StaffAccountPanel";
 import { EmailJourneyPanel } from "@/components/snapshot/EmailJourneyPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { dimensions, questions } from "@/config/questions";
@@ -62,9 +63,10 @@ function toCsv(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return "";
   const headers = Object.keys(rows[0]!);
   const escape = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
-  return [headers.join(","), ...rows.map((row) => headers.map((h) => escape(row[h])).join(","))].join(
-    "\n",
-  );
+  return [
+    headers.join(","),
+    ...rows.map((row) => headers.map((h) => escape(row[h])).join(",")),
+  ].join("\n");
 }
 
 function download(filename: string, content: string) {
@@ -85,12 +87,18 @@ function AdminPage() {
     queryKey: ["admin", "access", user.id],
     refetchInterval: 10000,
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
       if (error) throw error;
-      return data?.some((entry) => entry.role === "admin" || entry.role === "staff") ?? false;
+      return data?.map((entry) => entry.role) ?? [];
     },
   });
-  const accessAllowed = accessQuery.data === true && !accessQuery.error;
+  const accessAllowed =
+    Boolean(accessQuery.data?.some((role) => role === "admin" || role === "staff")) &&
+    !accessQuery.error;
+  const manageAccounts = accessQuery.data?.includes("admin") && !accessQuery.error;
 
   const sessionsQuery = useQuery({
     queryKey: ["admin", "sessions"],
@@ -139,15 +147,26 @@ function AdminPage() {
     queryKey: ["admin", "adaptive-start-count"],
     enabled: accessAllowed,
     queryFn: async () => {
-      const { count, error } = await traceDb.from("adaptive_assessment_traces")
+      const { count, error } = await traceDb
+        .from("adaptive_assessment_traces")
         .select("session_id", { count: "exact", head: true });
       if (error) throw error;
       return count ?? 0;
     },
   });
 
-  const loading = accessQuery.isPending || (accessAllowed && (sessionsQuery.isLoading || leadsQuery.isLoading || eventsQuery.isLoading || adaptiveStartsQuery.isLoading));
-  const error = accessQuery.error ?? (accessAllowed ? sessionsQuery.error ?? leadsQuery.error ?? eventsQuery.error ?? adaptiveStartsQuery.error : null);
+  const loading =
+    accessQuery.isPending ||
+    (accessAllowed &&
+      (sessionsQuery.isLoading ||
+        leadsQuery.isLoading ||
+        eventsQuery.isLoading ||
+        adaptiveStartsQuery.isLoading));
+  const error =
+    accessQuery.error ??
+    (accessAllowed
+      ? (sessionsQuery.error ?? leadsQuery.error ?? eventsQuery.error ?? adaptiveStartsQuery.error)
+      : null);
 
   const sessions = sessionsQuery.data ?? [];
   const leads = leadsQuery.data ?? [];
@@ -159,13 +178,17 @@ function AdminPage() {
   };
 
   const completions = sessions.filter((s) => s.completed_at).length;
-  const starts = events.filter((e) => e.event_type === "snapshot_started").length + (adaptiveStartsQuery.data ?? 0);
+  const starts =
+    events.filter((e) => e.event_type === "snapshot_started").length +
+    (adaptiveStartsQuery.data ?? 0);
   const bookingClicks = events.filter((e) => e.event_type === "booking_cta_click").length;
   const optIns = leads.filter((l) => l.marketing_consent).length;
 
   const patternCounts = new Map<string, number>();
   for (const session of sessions) {
-    const keys = Array.isArray(session.result_patterns) ? (session.result_patterns as string[]) : [];
+    const keys = Array.isArray(session.result_patterns)
+      ? (session.result_patterns as string[])
+      : [];
     for (const key of keys) patternCounts.set(key, (patternCounts.get(key) ?? 0) + 1);
   }
   const topPatterns = [...patternCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
@@ -194,28 +217,49 @@ function AdminPage() {
               Snapshot admin
             </span>
           </div>
-          <button
-            type="button"
-            onClick={signOut}
-            className="shrink-0 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            {manageAccounts && (
+              <a href="#staff-accounts" className="text-sm font-bold underline underline-offset-4">
+                Staff accounts
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={signOut}
+              className="shrink-0 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-5 py-10">
         {!accessQuery.isPending && !accessQuery.error && !accessAllowed && (
           <section role="status" className="card-elevated p-7">
-            <h1 className="text-2xl font-black">Your account is created. Dashboard access is pending.</h1>
-            <p className="mt-3 text-sm text-muted-foreground">Signed in as {user.email ?? "your account"}.</p>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              An administrator needs to grant this account the staff or admin role before you can read assessment records.
-              Signing up does not grant that permission. Your assessments may already be saved; they are hidden until access is granted.
+            <h1 className="text-2xl font-black">
+              Your account is created. Dashboard access is pending.
+            </h1>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Signed in as {user.email ?? "your account"}.
             </p>
-            <p className="mt-3 text-sm text-muted-foreground">Share your account email with the administrator. This page checks access every 10 seconds.</p>
-            <button type="button" onClick={() => void accessQuery.refetch()} disabled={accessQuery.isFetching}
-              className="mt-5 rounded-full border border-border px-5 py-2 text-sm font-semibold disabled:opacity-50">Check access</button>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              An administrator needs to grant this account the staff or admin role before you can
+              read assessment records. An account alone does not grant that permission. Your
+              assessments may already be saved; they are hidden until access is granted.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Share your account email with the administrator. This page checks access every 10
+              seconds.
+            </p>
+            <button
+              type="button"
+              onClick={() => void accessQuery.refetch()}
+              disabled={accessQuery.isFetching}
+              className="mt-5 rounded-full border border-border px-5 py-2 text-sm font-semibold disabled:opacity-50"
+            >
+              Check access
+            </button>
           </section>
         )}
         {loading && (
@@ -311,9 +355,7 @@ function AdminPage() {
                           <td className="py-2 pr-4">
                             {lead.marketing_consent ? "Opted in" : "No"}
                           </td>
-                          <td className="py-2">
-                            {new Date(lead.created_at).toLocaleDateString()}
-                          </td>
+                          <td className="py-2">{new Date(lead.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -358,6 +400,7 @@ function AdminPage() {
         )}
         {accessAllowed && !error && <AssessmentLogPanel />}
         {accessAllowed && !error && <EmailJourneyPanel />}
+        {manageAccounts && <StaffAccountPanel currentUserId={user.id} />}
       </main>
     </div>
   );

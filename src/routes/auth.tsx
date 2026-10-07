@@ -21,11 +21,9 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,28 +36,6 @@ function AuthPage() {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setNotice(null);
-
-    if (mode === "signup") {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin + "/auth" },
-      });
-      setLoading(false);
-      if (signUpError) {
-        setError(signUpError.message);
-        return;
-      }
-      if (!data.session) {
-        setNotice(
-          "Check your email to confirm this account. Once confirmed, an administrator still needs to grant dashboard access.",
-        );
-        return;
-      }
-      void navigate({ to: "/admin", replace: true });
-      return;
-    }
 
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
@@ -77,12 +53,10 @@ function AuthPage() {
     <div className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-blush px-5 py-16">
       <Logo />
       <form onSubmit={onSubmit} className="card-elevated w-full max-w-md p-8">
-        <h1 className="text-2xl font-black">
-          {mode === "signin" ? "Staff sign in" : "Create a staff account"}
-        </h1>
+        <h1 className="text-2xl font-black">Staff sign in</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Private dashboard for {`Iban Ison Solutions`} staff. Dashboard access is granted by an
-          administrator after the account exists.
+          Private dashboard for Iban Ison Solutions staff. Contact your administrator if you need an
+          account.
         </p>
 
         <div className="mt-6">
@@ -119,33 +93,13 @@ function AuthPage() {
             {error}
           </p>
         )}
-        {notice && (
-          <p role="status" className="mt-4 text-sm text-muted-foreground">
-            {notice}
-          </p>
-        )}
-
         <button
           type="submit"
           disabled={loading}
           className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-magenta font-bold text-primary-foreground disabled:opacity-60"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-          {mode === "signin" ? "Sign in" : "Create account"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "signin" ? "signup" : "signin");
-            setError(null);
-            setNotice(null);
-          }}
-          className="mt-4 w-full text-sm font-semibold underline underline-offset-4"
-        >
-          {mode === "signin"
-            ? "Need a staff account? Create one"
-            : "Already have an account? Sign in"}
+          Sign in
         </button>
       </form>
     </div>
