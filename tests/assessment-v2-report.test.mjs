@@ -34,7 +34,7 @@ const writerFetch = async (_, init) => {
 
 test("full readable report follows the three phases, real inputs, all outputs and email", async () => {
   const store = new Store();
-  let session = createAssessmentSession();
+  let session = createAssessmentSession(undefined, "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["decisions", "authority"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["escalate"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["delay"] });
@@ -70,7 +70,7 @@ test("full readable report follows the three phases, real inputs, all outputs an
 
 test("draft edits are current, earlier model inputs remain unchanged, and Markdown is escaped", async () => {
   const store = new Store();
-  let session = createAssessmentSession();
+  let session = createAssessmentSession(undefined, "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["decisions"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["escalate"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["delay"] });
@@ -96,7 +96,7 @@ test("draft edits are current, earlier model inputs remain unchanged, and Markdo
 });
 
 test("early completion and fixed backups never claim nonexistent model generations", async () => {
-  let session = createAssessmentSession();
+  let session = createAssessmentSession(undefined, "adaptive-v1");
   for (const question of questionsForStage(session)) session = submitAssessmentAnswer(session, question.kind === "text" ? { questionId: question.id, text: "No difficulty observed." } : { questionId: question.id, optionIds: [question.options.at(-1).id] });
   session = await advanceAssessment(session, { evaluator: { evaluate: async (request) => ({ round: request.round, model: "synthetic-local", rubricVersion: "test", evaluations: request.problemIds.map((problemId) => ({ problemId, choice: "insufficient_information", probabilities: { insufficient_information: 1, supported: 0, possible: 0, contradicted: 0 } })) }) } });
   const store = new Store();

@@ -75,6 +75,8 @@ export function emailJourneyBrief(session: AssessmentSession) {
           return option ? [option.text] : [];
         }) ?? [],
       writtenAnswer: answer.text ?? "",
+      answerMode: questions.get(answer.questionId)?.answerMode ?? "direct_response",
+      skipped: answer.skipped ?? false,
     })),
     slots: emailPurposes.map((purpose, index) => ({
       number: index + 1,

@@ -4,7 +4,7 @@ import { createAssessmentSession } from "../src/assessment-v2/orchestrator.ts";
 import { buildAdaptivePresentation } from "../src/assessment-v2/result-content.ts";
 
 test("result copy names the primary and related topics and preserves respondent evidence", () => {
-  const session = createAssessmentSession("presentation");
+  const session = createAssessmentSession("presentation", "adaptive-v1");
   session.answers = [
     { questionId: "q4", text: "Staff covered vacant roles and demand grew.", submittedAt: "2026-01-01T00:00:00Z" },
     { questionId: "probe_p10", optionIds: ["option_4"], submittedAt: "2026-01-01T00:00:00Z" },
@@ -26,7 +26,7 @@ test("result copy names the primary and related topics and preserves respondent 
 });
 
 test("inconclusive result offers evidence-gathering next steps", () => {
-  const session = createAssessmentSession("inconclusive");
+  const session = createAssessmentSession("inconclusive", "adaptive-v1");
   session.result = { problems: [], priority: [], threeCShare: { culture: 0, capacity: 0, compliance: 0 }, generatedAt: "2026-01-01T00:00:00Z" };
   const presentation = buildAdaptivePresentation(session);
   assert.equal(presentation.insights.length, 0);

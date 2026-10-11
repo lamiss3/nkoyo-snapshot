@@ -31,7 +31,7 @@ const evaluator = {
 };
 
 test("moves through four opening questions, four fixed probes, and three written questions", async () => {
-  let session = createAssessmentSession("test-session");
+  let session = createAssessmentSession("test-session", "adaptive-v1");
   assert.deepEqual(questionsForStage(session).map((question) => question.id), ["q1", "q2", "q3", "q4"]);
   assert.throws(() => submitAssessmentAnswer(session, { questionId: "q5", optionIds: ["option_1"] }));
 
@@ -81,7 +81,7 @@ test("does not force a problem when all evaluations contradict the catalog", asy
       };
     },
   };
-  let session = createAssessmentSession("no-signal");
+  let session = createAssessmentSession("no-signal", "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["none"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["agreed_process"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["little_impact"] });
@@ -103,7 +103,7 @@ test("does not pick arbitrary topics when every problem lacks evidence", async (
       };
     },
   };
-  let session = createAssessmentSession("uncertain");
+  let session = createAssessmentSession("uncertain", "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["unsure"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["unsure"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["unsure"] });
@@ -126,7 +126,7 @@ test("keeps one supported finding when no second finalist exists", async () => {
       };
     },
   };
-  let session = createAssessmentSession("single");
+  let session = createAssessmentSession("single", "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["workload"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["extra_work"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["service"] });

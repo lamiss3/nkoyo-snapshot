@@ -46,7 +46,7 @@ test("fixed test mode cannot address ordinary contacts or run in production", ()
 });
 
 function session() {
-  const value = createAssessmentSession("synthetic-email-example");
+  const value = createAssessmentSession("synthetic-email-example", "adaptive-v1");
   value.stage = "complete";
   value.answers = [
     {

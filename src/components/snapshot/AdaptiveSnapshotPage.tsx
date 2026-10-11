@@ -31,7 +31,7 @@ export function AdaptiveSnapshotPage() {
       const stored = window.localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored) as AssessmentSession;
-        if (parsed.version === "adaptive-v1" && Array.isArray(parsed.questions) && Array.isArray(parsed.answers)) loaded = parsed;
+        if (["adaptive-v1", "adaptive-v2"].includes(parsed.version) && Array.isArray(parsed.questions) && Array.isArray(parsed.answers)) loaded = parsed;
       }
     } catch { /* begin a fresh session */ }
     const current = loaded ?? createAssessmentSession();
@@ -59,12 +59,13 @@ export function AdaptiveSnapshotPage() {
   const answer = question ? session.answers.find((item) => item.questionId === question.id) : undefined;
   const selected = answer?.optionIds ?? [];
   const written = answer?.text ?? "";
-  const needsOther = selected.includes("other");
-  const canContinue = question?.kind === "text" ? written.trim().length > 0 : selected.length > 0 && (!needsOther || written.trim().length > 0);
+  const needsOther = session.version === "adaptive-v1" && selected.includes("other");
+  const canContinue = question?.kind === "text" ? written.trim().length > 0 || !!question.optional : selected.length > 0 && (!needsOther || written.trim().length > 0);
   const answeredCount = session.answers.length;
-  const progress = session.stage === "complete" ? 100 : Math.round((answeredCount / 11) * 100);
+  const maximumQuestions = session.version === "adaptive-v2" ? 16 : 11;
+  const progress = session.stage === "complete" ? 100 : Math.round((answeredCount / maximumQuestions) * 100);
   const lastInStage = index >= currentQuestions.length - 1;
-  const questionNumber = question ? session.questions.findIndex((item) => item.id === question.id) + 1 : 11;
+  const questionNumber = question ? session.questions.findIndex((item) => item.id === question.id) + 1 : maximumQuestions;
   const latestModel = [...session.evaluations].reverse().find((item) => item.round === "final")?.model ?? session.evaluations.at(-1)?.model;
   const localRules = latestModel === "local-rules-demo";
 
@@ -92,16 +93,18 @@ export function AdaptiveSnapshotPage() {
     }
   };
 
-  const goForward = async () => {
+  const goForward = async (skip = false) => {
     if (!question || !canContinue || busy) return;
     setBusy(true);
     try {
-      const confirmed = submitAssessmentAnswer(session, { questionId: question.id, optionIds: selected, text: written });
+      const confirmed = submitAssessmentAnswer(session, { questionId: question.id, optionIds: skip ? [] : selected, text: skip ? "" : written, ...(skip ? {skipped:true}: {}) });
       setSession(confirmed);
       save(confirmed);
       if (!lastInStage) {
-        await checkpointOnServer({ data: { session: confirmed, questionId: question.id, action: "answer_confirmed" } });
-        setSyncError(false);
+        // Local saving is immediate. Do not hold the next choice screen open
+        // while a background checkpoint travels to the server.
+        void checkpointOnServer({ data: { session: confirmed, questionId: question.id, action: "answer_confirmed" } })
+          .then(() => setSyncError(false)).catch(() => setSyncError(true));
         setIndex(index + 1);
         setError("");
         return;
@@ -142,11 +145,11 @@ export function AdaptiveSnapshotPage() {
     </header>
     <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-10">
       <div className="mb-7 rounded-2xl border border-magenta/20 bg-card px-5 py-4 text-sm">
-        <strong>Institutional Readiness Snapshot</strong> · {import.meta.env.DEV && latestModel ? localRules ? "Local rules demo: Jev is unavailable or not configured." : `Topic evaluation: ${latestModel}.` : "The first four questions build the opening picture."} {session.stage !== "complete" && "Progress saves on this device."}
+        <strong>Institutional Readiness Snapshot</strong> · {import.meta.env.DEV && latestModel ? localRules ? "Local rules demo: Jev is unavailable or not configured." : `Topic evaluation: ${latestModel}.` : session.version === "adaptive-v2" ? "Choose what fits. Writing at the end is optional." : "The first four questions build the opening picture."} {session.stage !== "complete" && "Progress saves on this device."}
       </div>
       {syncError && <p role="status" className="mb-5 text-sm text-muted-foreground">Your latest changes are saved on this device. Online saving failed; pressing Next will retry.</p>}
       {question ? <>
-        <div className="mb-7"><div className="flex justify-between gap-3"><p className="eyebrow text-magenta">{stageLabel[session.stage]}</p><p className="text-sm font-semibold text-muted-foreground">Question {questionNumber} of up to 11</p></div><div role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Assessment progress" className="mt-3 h-3 overflow-hidden rounded-full bg-blush-deep"><div className="h-full bg-lime" style={{ width: `${Math.max(progress, 3)}%` }} /></div></div>
+        <div className="mb-7"><div className="flex justify-between gap-3"><p className="eyebrow text-magenta">{stageLabel[session.stage]}</p><p className="text-sm font-semibold text-muted-foreground">Question {questionNumber} of up to {maximumQuestions}{question.optional ? " · Optional" : ""}</p></div><div role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Assessment progress" className="mt-3 h-3 overflow-hidden rounded-full bg-blush-deep"><div className="h-full bg-lime" style={{ width: `${Math.max(progress, 3)}%` }} /></div></div>
         <section className="card-elevated p-7 sm:p-10">
           <h1 className="text-2xl font-black leading-snug sm:text-3xl">{question.text}</h1>
           {question.helper && <p className="mt-3 text-sm text-muted-foreground">{question.helper}</p>}
@@ -163,6 +166,7 @@ export function AdaptiveSnapshotPage() {
             }} className="mt-1 h-5 w-5 shrink-0 accent-[oklch(0.65_0.266_335.4)]" /><span className="font-medium">{option.text}</span></label>;
           })}</div>{needsOther && <div className="mt-4"><label htmlFor="other-detail" className="block text-sm font-semibold">Tell us briefly what you mean</label><textarea id="other-detail" value={written} onChange={(event) => updateAnswer(selected, event.target.value)} maxLength={500} rows={3} className="mt-2 w-full rounded-2xl border-2 border-border bg-card px-5 py-4 outline-none focus:border-magenta" /></div>}</fieldset>}
         </section>
+        {question.optional && <button type="button" disabled={busy} onClick={() => void goForward(true)} className="mt-5 font-semibold text-magenta underline underline-offset-4">Skip this question and see my result</button>}
         {error && <p role="alert" className="mt-5 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-900">{error}</p>}
         <div className="mt-8 flex justify-between gap-4"><button type="button" onClick={() => setIndex(Math.max(0, index - 1))} disabled={index === 0 || busy} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold disabled:opacity-40"><ArrowLeft className="h-4 w-4" /> Back</button><button type="button" onClick={() => void goForward()} disabled={!canContinue || busy} className="inline-flex items-center gap-2 rounded-full bg-magenta px-7 py-3 font-bold text-primary-foreground disabled:opacity-50">{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Evaluating</> : <>{lastInStage ? "Continue" : "Next"}<ArrowRight className="h-4 w-4" /></>}</button></div>
         <p className="mt-8 text-center text-sm text-muted-foreground">Earlier stages are locked once you continue. Restart to change those answers. Assessment activity may be saved for private review by Nkoyo. <Link to="/privacy" className="underline">Privacy details</Link></p>

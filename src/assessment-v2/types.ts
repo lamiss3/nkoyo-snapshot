@@ -28,6 +28,9 @@ export interface AssessmentQuestion {
   problemId?: ProblemId;
   source: "fixed" | "generated" | "fallback";
   model?: string;
+  /** Choosing a closest hypothetical example is not a report of a real event. */
+  answerMode?: "scenario_match";
+  optional?: boolean;
 }
 
 export interface Answer {
@@ -35,6 +38,7 @@ export interface Answer {
   optionIds?: string[];
   text?: string;
   submittedAt: string;
+  skipped?: boolean;
 }
 
 export interface ProblemDefinition {
@@ -57,6 +61,7 @@ export interface ProblemEvaluation {
 }
 
 export interface EvaluationRequest {
+  version?: AssessmentSession["version"];
   round: EvaluationRound;
   problemIds: readonly ProblemId[];
   questions: readonly AssessmentQuestion[];
@@ -82,6 +87,7 @@ export interface QuestionWriter {
 }
 
 export interface QuestionContext {
+  version?: AssessmentSession["version"];
   finalists: readonly [ProblemId, ProblemId];
   questions: readonly AssessmentQuestion[];
   answers: readonly Answer[];
@@ -118,7 +124,7 @@ export interface AssessmentSession {
   id: string;
   /** Browser capability for writing this session's private server log; never logged. */
   traceToken?: string;
-  version: "adaptive-v1";
+  version: "adaptive-v1" | "adaptive-v2";
   stage: Stage;
   questions: AssessmentQuestion[];
   answers: Answer[];

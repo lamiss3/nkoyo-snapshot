@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createJevEvaluator } from "../src/assessment-v2/jev.server.ts";
 import { createGeminiQuestionWriter } from "../src/assessment-v2/gemini.server.ts";
-import { openingQuestions } from "../src/assessment-v2/opening-questions.ts";
+import { legacyOpeningQuestions as openingQuestions } from "../src/assessment-v2/opening-questions.ts";
 
 test("Jev receives named problem choices and maps evidence and final signals", async () => {
   let requestBody;

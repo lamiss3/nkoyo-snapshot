@@ -1,10 +1,12 @@
 import { problemById } from "./problem-bank.ts";
 import type { AssessmentQuestion, QuestionContext, QuestionWriter } from "./types.ts";
+import { fallbackScenarioQuestion, optionalFinalQuestion } from "./scenario-questions.ts";
 
 /** Used only if a question-generation provider is unavailable or rejected.
  * These prompts do not pretend to interpret the respondent's free text. */
 export const fallbackQuestionWriter: QuestionWriter = {
-  async generateBridge(): Promise<AssessmentQuestion> {
+  async generateBridge(input: QuestionContext): Promise<AssessmentQuestion> {
+    if (input.version === "adaptive-v2") return fallbackScenarioQuestion(input, "q9");
     return {
       id: "q9",
       kind: "text",
@@ -15,6 +17,7 @@ export const fallbackQuestionWriter: QuestionWriter = {
   },
 
   async generateFinalists(input: QuestionContext): Promise<[AssessmentQuestion, AssessmentQuestion]> {
+    if (input.version === "adaptive-v2") return [fallbackScenarioQuestion(input,"q10"), optionalFinalQuestion(input)];
     const questions = input.finalists.map((id, index) => {
       const problem = problemById[id];
       return {

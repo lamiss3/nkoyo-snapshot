@@ -40,6 +40,7 @@ const heading = (text: string): ReportBlock => ({ kind: "heading", text });
 
 function answerText(question: AssessmentQuestion, answer?: Answer) {
   if (!answer) return "No answer saved yet.";
+  if (answer.skipped) return "Skipped by the respondent (optional). No written evidence supplied.";
   const selections = answer.optionIds?.map((id) => question.options?.find((option) => option.id === id)?.text ?? `Unrecognized saved choice: ${id}`) ?? [];
   return [...selections, ...(answer.text?.trim() ? [answer.text] : [])].join("\n") || "No answer saved yet.";
 }
@@ -64,8 +65,9 @@ function questions(blocks: ReportBlock[], chosen: AssessmentQuestion[], input: S
     blocks.push(heading(`Q${number}. ${question.text}`));
     blocks.push(p(question.source === "generated" ? `Written by Gemini (${question.model ?? "model not recorded"}).` : question.source === "fallback" ? "Fixed backup question; Gemini wording was not used." : "Fixed question from the assessment question bank."));
     if (question.problemId) blocks.push(p(`Topic explored: ${topic(question.problemId)}.`));
+    if (question.answerMode === "scenario_match") blocks.push(p("Hypothetical scenario match: a self-reported similarity, not a verified event."));
     if (question.options?.length) blocks.push({ kind: "details", title: `Available choices (${question.options.length})`, blocks: [list(question.options.map((option) => option.text))] });
-    const hasAnswer = Boolean(answer?.text?.trim() || answer?.optionIds?.length);
+    const hasAnswer = Boolean(answer?.skipped || answer?.text?.trim() || answer?.optionIds?.length);
     blocks.push(p(hasAnswer ? `Respondent answer — ${answerConfirmed(question.id, answer!, input) ? "confirmed" : "saved draft; not yet confirmed"}. Saved ${when(answer!.submittedAt)}.` : "Respondent answer — waiting."));
     blocks.push({ kind: "quote", text: answerText(question, answer) });
   }
@@ -152,22 +154,23 @@ export function buildSessionReport(input: SessionReportInput): SessionReport {
     const value = object(decision(round)?.payload)['problemIds'];
     return Array.isArray(value) ? value.filter((id) => typeof id === "string") as string[] : [];
   };
-  const opening: ReportBlock[] = [p("The first four fixed questions collect an opening picture. Jev checks all 20 topics. The rules rank supported or possible topics using supported + half of possible, followed by topics with too little information; ties use topic ID. Up to four are selected for fixed probes.")];
-  questions(opening, session.questions.slice(0, 4), input, session);
+  const openingCount = session.version === "adaptive-v2" ? 9 : 4;
+  const opening: ReportBlock[] = [p(`${session.version === "adaptive-v2" ? "Seven short choice screens collect the opening signals, followed by a matched consequence choice and a fixed hypothetical scenario selected from earlier answers." : "The first four fixed questions collect an opening picture."} Jev checks all 20 topics. The rules rank supported or possible topics using supported + half of possible, followed by topics with too little information; ties use topic ID. Up to four are selected for fixed probes.`)];
+  questions(opening, session.questions.slice(0, openingCount), input, session);
   modelSteps(opening, calls("jev", "initial"));
   const topFour = selected("initial");
   opening.push(p(topFour.length ? `Website decision: explore ${topFour.map(topic).join("; ")}.` : session.topFour.length ? `Topics recorded in saved session: ${session.topFour.map(topic).join("; ")}. Historical selection event was not recorded.` : "No next-topic selection recorded yet."));
-  sections.push({ title: "Phase 1 — Opening picture (Q1–Q4)", blocks: opening });
+  sections.push({ title: `Phase 1 — Opening picture (Q1–Q${openingCount})`, blocks: opening });
 
-  const probes = session.questions.filter((question) => question.problemId && question.source === "fixed");
+  const probes = session.questions.filter((question) => question.id.startsWith("probe_"));
   const validation: ReportBlock[] = [p("Four fixed probes normally test the selected topics. Jev then checks all 20 topics again using the accumulated answers. The same ranking rule selects up to two finalists. Their identities come from the website's rules, rather than Gemini.")];
   if (probes.length) questions(validation, probes, input, session); else validation.push(p("The probe questions have not been selected, or this assessment finished early."));
   modelSteps(validation, calls("jev", "validation"));
   const finalists = selected("validation");
   validation.push(p(finalists.length ? `Website decision: investigate ${finalists.map(topic).join("; ")}.` : session.finalists ? `Finalists recorded in saved session: ${session.finalists.map(topic).join("; ")}. Historical selection event was not recorded.` : "No finalist selection recorded yet."));
-  sections.push({ title: "Phase 2 — Check the likely issues (Q5–Q8)", blocks: validation });
+  sections.push({ title: `Phase 2 — Check the likely issues (Q${openingCount+1}–Q${openingCount+4})`, blocks: validation });
 
-  const deeper: ReportBlock[] = [p("Gemini writes Q9 to explore whether the two issues connect. After the answer, Jev reassesses those two topics. Gemini then writes Q10 and Q11 to explore each separately. After both answers, Jev assesses evidence, impact and urgency for the final result.")];
+  const deeper: ReportBlock[] = [p(session.version === "adaptive-v2" ? "Gemini writes two scenario-choice questions from all accumulated answers: first to distinguish or connect the finalists, then to clarify their explanations and impact. Jev reassesses the two topics after the first scenario. The final written question is optional; a skip supplies no extra evidence. Jev then applies its usual evidence, impact and urgency scoring. Scenario matches are similarities, not factual reports of the hypothetical events." : "Gemini writes Q9 to explore whether the two issues connect. After the answer, Jev reassesses those two topics. Gemini then writes Q10 and Q11 to explore each separately. After both answers, Jev assesses evidence, impact and urgency for the final result.")];
   modelSteps(deeper, calls("gemini", "bridge"));
   questions(deeper, session.questions.filter((question) => question.id === "q9"), input, session);
   modelSteps(deeper, calls("jev", "bridge"));
@@ -177,7 +180,7 @@ export function buildSessionReport(input: SessionReportInput): SessionReport {
   if (!session.questions.some((question) => question.id === "q9")) deeper.push(p("No deeper questions recorded. This phase may still be ahead, or the assessment may have finished early."));
   const fallbackEvents = input.events.filter((item) => item.event_type === "generation_failed");
   if (fallbackEvents.length) deeper.push(p(`${fallbackEvents.length} question-generation failure(s) were recorded. Questions labelled fixed backup use predefined wording.`));
-  sections.push({ title: "Phase 3 — Understand the connection and impact (Q9–Q11)", blocks: deeper });
+  sections.push({ title: `Phase 3 — Understand the connection and impact (Q${openingCount+5}–Q${openingCount+7})`, blocks: deeper });
 
   const result: ReportBlock[] = [];
   if (session.result) {

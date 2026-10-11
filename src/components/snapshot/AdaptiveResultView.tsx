@@ -48,8 +48,8 @@ export function AdaptiveResultView({ session, onRestart, restartError, restartin
       </section>}
 
       {presentation.context.length > 0 && <section className="mt-12">
-        <h2 className="text-2xl font-black">The situations you described</h2>
-        <p className="mt-2 text-sm text-muted-foreground">These are your words. They have not been independently verified.</p>
+        <h2 className="text-2xl font-black">{session.version === "adaptive-v2" ? "Your scenario matches and optional detail" : "The situations you described"}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{session.version === "adaptive-v2" ? "The scenarios are examples you selected as a close match. They are not verified events. Any written detail is in your own words." : "These are your words. They have not been independently verified."}</p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">{presentation.context.map((entry) => <article key={entry.id} className="rounded-2xl bg-card p-6 shadow-card print-plain"><h3 className="text-sm font-bold text-magenta">{entry.label}</h3><p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed">{entry.answer}</p></article>)}</div>
       </section>}
 
@@ -88,7 +88,7 @@ export function AdaptiveResultView({ session, onRestart, restartError, restartin
       <section className="mt-8 rounded-3xl border-2 border-lime bg-card p-8 print-plain">
         <p className="eyebrow text-magenta">Start here this week</p>
         <p className="mt-3 text-xl font-bold leading-snug">{presentation.startingAction}</p>
-        <p className="mt-3 text-sm text-muted-foreground">Use one of your examples above to make this step specific to your organization.</p>
+        <p className="mt-3 text-sm text-muted-foreground">{session.version === "adaptive-v2" ? "Start with a real example from your organization to make this step specific." : "Use one of your examples above to make this step specific to your organization."}</p>
       </section>
 
       <section className="no-print mt-12 card-elevated p-8 sm:p-10">

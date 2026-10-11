@@ -61,7 +61,7 @@ function probabilities(choice: EvidenceChoice, strength: number): Record<Evidenc
 
 function evaluateOne(id: ProblemId, request: EvaluationRequest): ProblemEvaluation {
   const choices = selected(request.answers);
-  const structured = choices.reduce((sum, option) => sum + (openingSignals[option]?.includes(id) ? 1 : 0), 0);
+  const structured = choices.reduce((sum, option) => sum + (openingSignals[option]?.includes(id) || option === `scenario_${id}` ? 1 : 0), 0);
   const written = request.answers.filter((answer) => ["q4", "q9", "q10", "q11"].includes(answer.questionId)).map((answer) => answer.text ?? "").join(" ").toLowerCase();
   const keyword = terms[id].some((term) => written.includes(term)) ? 1 : 0;
   const level = probeLevel(id, request.answers);

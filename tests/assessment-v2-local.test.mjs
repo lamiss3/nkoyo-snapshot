@@ -4,7 +4,7 @@ import { createAssessmentSession, submitAssessmentAnswer, advanceAssessment } fr
 import { localRuleEvaluator } from "../src/assessment-v2/local-evaluator.ts";
 
 test("local preview ranks related opening topics above unrelated exploratory probes", async () => {
-  let session = createAssessmentSession("local-routing");
+  let session = createAssessmentSession("local-routing", "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["decisions", "authority"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["escalate", "wait_for_authority"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["delay"] });

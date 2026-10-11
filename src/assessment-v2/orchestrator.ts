@@ -1,5 +1,6 @@
 import { fallbackQuestionWriter } from "./fallback-questions.ts";
-import { openingQuestions } from "./opening-questions.ts";
+import { openingQuestions, legacyOpeningQuestions } from "./opening-questions.ts";
+import { consequenceQuestion, openingScenarioQuestion } from "./scenario-questions.ts";
 import { problemBank, problemById } from "./problem-bank.ts";
 import { problemIds, type Answer, type AssessmentEvent, type AssessmentQuestion, type AssessmentResult, type AssessmentSession, type DimensionId, type EvaluationRecord, type EvaluationRound, type JsonValue, type ProblemEvaluation, type ProblemEvaluator, type ProblemId, type QuestionContext, type QuestionWriter, type ResultProblem, type Stage } from "./types.ts";
 
@@ -12,20 +13,20 @@ const now = () => new Date().toISOString();
 const evidenceChoices = ["insufficient_information", "contradicted", "possible", "supported"] as const;
 const dimensions: readonly DimensionId[] = ["culture", "capacity", "compliance"];
 
-export function createAssessmentSession(id = crypto.randomUUID()): AssessmentSession {
+export function createAssessmentSession(id = crypto.randomUUID(), version: AssessmentSession["version"] = "adaptive-v2"): AssessmentSession {
   const timestamp = now();
   return {
     id,
     traceToken: crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", ""),
-    version: "adaptive-v1",
+    version,
     stage: "opening",
-    questions: [...openingQuestions],
+    questions: version === "adaptive-v1" ? [...legacyOpeningQuestions] : [...openingQuestions, consequenceQuestion([]), openingScenarioQuestion([])],
     answers: [],
     evaluations: [],
     topFour: [],
     finalists: null,
     result: null,
-    events: [{ type: "started", at: timestamp, stage: "opening", details: { version: "adaptive-v1" } }],
+    events: [{ type: "started", at: timestamp, stage: "opening", details: { version } }],
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -34,7 +35,7 @@ export function createAssessmentSession(id = crypto.randomUUID()): AssessmentSes
 export function questionsForStage(session: AssessmentSession): AssessmentQuestion[] {
   if (session.stage === "complete") return [];
   const ids: Record<Exclude<Stage, "complete">, string[]> = {
-    opening: ["q1", "q2", "q3", "q4"],
+    opening: session.version === "adaptive-v1" ? ["q1", "q2", "q3", "q4"] : [...openingQuestions.map(q => q.id), "q3", "q4"],
     probes: session.topFour.map((id) => problemById[id].probe.id),
     bridge: ["q9"],
     finalists: ["q10", "q11"],
@@ -48,7 +49,7 @@ export function questionsForStage(session: AssessmentSession): AssessmentQuestio
 
 export function submitAssessmentAnswer(
   session: AssessmentSession,
-  input: Pick<Answer, "questionId" | "optionIds" | "text">,
+  input: Pick<Answer, "questionId" | "optionIds" | "text" | "skipped">,
 ): AssessmentSession {
   if (session.stage === "complete") throw new Error("This assessment is complete");
   const question = questionsForStage(session).find((item) => item.id === input.questionId);
@@ -56,8 +57,10 @@ export function submitAssessmentAnswer(
 
   const optionIds = input.optionIds ?? [];
   const text = input.text?.trim() ?? "";
+  const skipped = Boolean(question.optional && !text);
+  if (input.skipped && (!question.optional || text || optionIds.length)) throw new Error("Only the optional final answer can be skipped");
   if (question.kind === "text") {
-    if (!text || text.length > 1200 || optionIds.length) throw new Error("A written response of 1–1200 characters is required");
+    if ((!text && !skipped) || text.length > 1200 || optionIds.length) throw new Error("A written response of 1–1200 characters is required");
   } else {
     if (text.length > 500) throw new Error("Additional text is too long");
     if (optionIds.length < 1 || optionIds.length > (question.maxSelections ?? 1)) throw new Error("Select the allowed number of answers");
@@ -65,23 +68,36 @@ export function submitAssessmentAnswer(
     const allowed = new Set(question.options?.map((option) => option.id) ?? []);
     if (optionIds.some((id) => !allowed.has(id))) throw new Error("Unknown answer option");
     if (optionIds.length > 1 && optionIds.some((id) => id === "none" || id === "unsure")) throw new Error("This answer must be selected alone");
-    if (optionIds.includes("other") && !text) throw new Error("Describe the other answer briefly");
+    if (session.version === "adaptive-v1" && optionIds.includes("other") && !text) throw new Error("Describe the other answer briefly");
   }
 
   const revised = session.answers.some((answer) => answer.questionId === question.id);
   const answer: Answer = {
     questionId: question.id,
     submittedAt: now(),
+    ...(skipped ? { skipped: true } : {}),
     ...(question.kind === "text" ? { text } : { optionIds, ...(text ? { text } : {}) }),
   };
   const next = copySession(session);
   next.answers = [...next.answers.filter((item) => item.questionId !== question.id), answer];
-  log(next, "answer_submitted", { questionId: question.id, revised });
+  if (next.version === "adaptive-v2" && next.stage === "opening" && question.id !== "q4") {
+    const replacements = question.id === "q3" ? [openingScenarioQuestion(next.answers)] : [consequenceQuestion(next.answers.filter(a => a.questionId !== "q3")), openingScenarioQuestion(next.answers)];
+    for (const replacement of replacements) {
+      const previous = next.questions.find(q => q.id === replacement.id);
+      if (JSON.stringify(previous) !== JSON.stringify(replacement)) next.answers = next.answers.filter(a => a.questionId !== replacement.id);
+      next.questions = next.questions.map(q => q.id === replacement.id ? replacement : q);
+    }
+  }
+  log(next, "answer_submitted", { questionId: question.id, revised, ...(skipped ? { skipped:true } : {}) });
   return next;
 }
 
 export function stageIsComplete(session: AssessmentSession): boolean {
-  return questionsForStage(session).every((question) => session.answers.some((answer) => answer.questionId === question.id));
+  return questionsForStage(session).every((question) => {
+    const answer = session.answers.find(a => a.questionId === question.id);
+    if (!answer) return false;
+    try { submitAssessmentAnswer(session, answer); return true; } catch { return false; }
+  });
 }
 
 export async function advanceAssessment(
@@ -165,6 +181,7 @@ function requireFinalists(session: AssessmentSession): [ProblemId, ProblemId] {
 function questionContext(session: AssessmentSession): QuestionContext {
   return {
     finalists: requireFinalists(session),
+    version: session.version,
     questions: session.questions,
     answers: session.answers,
     evaluations: session.evaluations,
@@ -179,6 +196,7 @@ async function runEvaluation(
 ): Promise<EvaluationRecord> {
   const output = await evaluator.evaluate({
     round: roundName,
+    version: session.version,
     problemIds: ids,
     questions: session.questions,
     answers: session.answers,
@@ -224,9 +242,15 @@ function rankCandidates(evaluations: readonly ProblemEvaluation[]): ProblemEvalu
   return [...rank(eligible), ...rank(exploratory)];
 }
 
-function validGeneratedQuestion(question: AssessmentQuestion, id: string): boolean {
-  return question.id === id && question.kind === "text" && question.source === "generated" &&
-    question.text.trim().length >= 15 && question.text.length <= 300 && !question.options?.length;
+function validGeneratedQuestion(question: AssessmentQuestion, id: string, version: AssessmentSession["version"]): boolean {
+  if (version === "adaptive-v2") {
+    if (id === "q11") return question.id === id && question.kind === "text" && question.optional === true && !question.options?.length;
+    return question.id === id && question.kind === "single" && question.source === "generated" && question.answerMode === "scenario_match" &&
+      question.text.trim().length >= 15 && question.text.length <= 300 && !!question.options && question.options.length >= 3 && question.options.length <= 4 &&
+      question.options.at(-1)?.id === "none" && new Set(question.options.map(o => o.id)).size === question.options.length &&
+      question.options.every(o => typeof o.text === "string" && o.text.trim().length >= 10 && o.text.length <= 450);
+  }
+  return question.id === id && question.kind === "text" && question.source === "generated" && question.text.trim().length >= 15 && question.text.length <= 300 && !question.options?.length;
 }
 
 async function generateSafely<T extends AssessmentQuestion | [AssessmentQuestion, AssessmentQuestion]>(
@@ -238,8 +262,8 @@ async function generateSafely<T extends AssessmentQuestion | [AssessmentQuestion
   try {
     const generated = await generate();
     const valid = stage === "bridge"
-      ? generated && !Array.isArray(generated) && validGeneratedQuestion(generated, "q9")
-      : Array.isArray(generated) && generated.length === 2 && validGeneratedQuestion(generated[0]!, "q10") && validGeneratedQuestion(generated[1]!, "q11") &&
+      ? generated && !Array.isArray(generated) && validGeneratedQuestion(generated, "q9", session.version)
+      : Array.isArray(generated) && generated.length === 2 && validGeneratedQuestion(generated[0]!, "q10", session.version) && validGeneratedQuestion(generated[1]!, "q11", session.version) &&
         generated[0]!.problemId === session.finalists?.[0] && generated[1]!.problemId === session.finalists?.[1];
     if (valid) return generated as T;
     throw new Error("Question provider returned an invalid question");

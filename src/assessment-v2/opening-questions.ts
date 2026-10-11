@@ -2,7 +2,7 @@ import type { AssessmentQuestion } from "./types.ts";
 
 /** The same four questions appear for every respondent. Wording is a draft
  * from the assessment design discussion and needs respondent testing. */
-export const openingQuestions: readonly AssessmentQuestion[] = [
+export const legacyOpeningQuestions: readonly AssessmentQuestion[] = [
   {
     id: "q1",
     kind: "multiple",
@@ -73,4 +73,22 @@ export const openingQuestions: readonly AssessmentQuestion[] = [
     helper: "What happened, who was affected, and what changed or became harder? A few sentences are enough. Leave out names or confidential details.",
     source: "fixed",
   },
+];
+
+const options = (ids: string[], legacyId: string) => ids.map((id) => legacyOpeningQuestions.find((q) => q.id === legacyId)!.options!.find((o) => o.id === id)!);
+const shortQuestion = (id: string, text: string, ids: string[], legacyId: string): AssessmentQuestion => ({
+  id, text, kind: "multiple", maxSelections: 2, source: "fixed",
+  helper: "Choose up to two that fit the past three months.",
+  options: [...options(ids, legacyId), { id: "unsure", text: "None of these / I’m not sure." }],
+});
+
+/** Short screens retain the original signals; each has at most four choices. */
+export const openingQuestions: readonly AssessmentQuestion[] = [
+  shortQuestion("q1a", "Where does getting work moving become difficult?", ["decisions", "authority", "relationships"], "q1"),
+  shortQuestion("q1b", "Which pressures affect your people or workload?", ["values", "demand", "workload"], "q1"),
+  shortQuestion("q1c", "Which pressures affect keeping the organization running?", ["funding", "requirements", "key_person"], "q1"),
+  shortQuestion("q1d", "Which pressures affect putting plans into practice?", ["strategy", "technology", "other"], "q1"),
+  shortQuestion("q2a", "When pressure rises, what happens to decisions?", ["escalate", "wait_for_authority", "extra_checks"], "q2"),
+  shortQuestion("q2b", "When pressure rises, what happens to day-to-day work?", ["extra_work", "postpone", "key_person"], "q2"),
+  shortQuestion("q2c", "When pressure rises, how do people coordinate?", ["separate_ways", "agreed_process", "varies"], "q2"),
 ];

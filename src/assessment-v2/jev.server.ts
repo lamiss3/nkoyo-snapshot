@@ -24,7 +24,7 @@ function responseSummary(questions: readonly AssessmentQuestion[], answers: read
     const question = byId.get(answer.questionId);
     if (!question) return null;
     const selections = answer.optionIds?.map((id) => question.options?.find((option) => option.id === id)?.text).filter(Boolean) ?? [];
-    return { question: question.text, selectedAnswers: selections, writtenAnswer: answer.text ?? "" };
+    return { question: question.text, selectedAnswers: selections, writtenAnswer: answer.text ?? "", answerMode: question.answerMode ?? "direct_response", skipped: answer.skipped ?? false };
   }).filter(Boolean);
 }
 
@@ -47,7 +47,7 @@ export function createJevEvaluator(config: {
         const problem = problemById[id];
         questions[id] = {
           type: "choice",
-          instructions: `Assess whether the organizational problem "${problem.name}" is present in the respondent's account. Consider the problem-specific probe if answered. Use only respondent evidence, not general nonprofit prevalence.`,
+          instructions: `Assess whether the organizational problem "${problem.name}" is present in the respondent's account. Consider the problem-specific probe if answered. Use only respondent evidence, not general nonprofit prevalence. A scenario_match selection means the hypothetical example is the closest similarity, not a verified real event. None/unsure is lack of information, not proof that every issue is absent. A skipped optional answer supplies no evidence; do not penalize it or infer an event from it.`,
           criteria: choices,
         };
         if (request.round === "final") {
@@ -67,7 +67,7 @@ export function createJevEvaluator(config: {
       const body = {
         model,
         state: {
-          assessmentVersion: "adaptive-v1",
+          assessmentVersion: request.version ?? "adaptive-v1",
           round: request.round,
           respondentAnswers: responseSummary(request.questions, request.answers),
         },

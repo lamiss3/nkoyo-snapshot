@@ -28,7 +28,7 @@ class MemoryStore {
 }
 
 function opening() {
-  let session = createAssessmentSession();
+  let session = createAssessmentSession(undefined, "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["decisions", "authority"] });
   session = submitAssessmentAnswer(session, { questionId: "q2", optionIds: ["escalate"] });
   session = submitAssessmentAnswer(session, { questionId: "q3", optionIds: ["delay"] });
@@ -89,7 +89,7 @@ test("full assessment records provider bodies, all stages and result without an 
 
 test("unfinished progress and restart are persisted, while duplicate checkpoints are deduplicated", async () => {
   const store = new MemoryStore();
-  let session = createAssessmentSession();
+  let session = createAssessmentSession(undefined, "adaptive-v1");
   session = submitAssessmentAnswer(session, { questionId: "q1", optionIds: ["technology"] });
   const trace = new AssessmentTrace(store, session);
   await trace.checkpoint(session, "browser", "progress_saved", "q2");
@@ -105,7 +105,7 @@ test("unfinished progress and restart are persisted, while duplicate checkpoints
 
 test("a different browser capability cannot overwrite or attach calls to another session", async () => {
   const store = new MemoryStore();
-  const session = createAssessmentSession();
+  const session = createAssessmentSession(undefined, "adaptive-v1");
   await new AssessmentTrace(store, session).authorize();
   const intruder = { ...session, traceToken: "a".repeat(64) };
   await assert.rejects(() => new AssessmentTrace(store, intruder).checkpoint(intruder, "browser"), /belongs to another session/);

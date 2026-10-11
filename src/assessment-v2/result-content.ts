@@ -85,10 +85,11 @@ export function buildAdaptivePresentation(session: AssessmentSession): AdaptiveP
   const secondary = ordered[1];
   const contextIds = ["q4", "q9", "q10", "q11"];
   const context = contextIds.flatMap((id) => {
-    const answer = session.answers.find((item) => item.questionId === id)?.text?.trim();
-    if (!answer) return [];
+    const response = session.answers.find((item) => item.questionId === id);
     const question = session.questions.find((item) => item.id === id);
-    const label = id === "q4" ? "The situation you described" : id === "q9" ? "How the issues connect" : question?.problemId ? problemById[question.problemId].name : "A closer example";
+    const answer = response?.skipped ? "Optional written answer skipped." : response?.text?.trim() || response?.optionIds?.map(option => question?.options?.find(o => o.id === option)?.text).filter(Boolean).join(" ");
+    if (!answer) return [];
+    const label = question?.answerMode === "scenario_match" ? "The hypothetical example you matched" : id === "q4" ? "The situation you described" : id === "q9" ? "How the issues connect" : question?.problemId ? problemById[question.problemId].name : "A closer example";
     return [{ id, label, answer }];
   });
   const strongestDimension = (Object.entries(result.threeCShare) as [DimensionId, number][]).sort((a, b) => b[1] - a[1])[0];
