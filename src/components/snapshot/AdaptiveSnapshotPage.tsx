@@ -7,6 +7,7 @@ import { Logo } from "@/components/brand/Logo";
 import { AdaptiveResultView } from "@/components/snapshot/AdaptiveResultView";
 import { advanceAdaptiveAssessment, checkpointAdaptiveAssessment } from "@/assessment-v2/actions";
 import { createAssessmentSession, questionsForStage, submitAssessmentAnswer } from "@/assessment-v2/orchestrator";
+import { isOpeningQuestion } from "@/assessment-v2/opening-questions";
 import type { AssessmentSession } from "@/assessment-v2/types";
 
 const storageKey = "nkoyo-adaptive-preview-v1";
@@ -62,7 +63,7 @@ export function AdaptiveSnapshotPage() {
   const needsOther = session.version === "adaptive-v1" && selected.includes("other");
   const canContinue = question?.kind === "text" ? written.trim().length > 0 || !!question.optional : selected.length > 0 && (!needsOther || written.trim().length > 0);
   const answeredCount = session.answers.length;
-  const maximumQuestions = session.version === "adaptive-v2" ? 16 : 11;
+  const maximumQuestions = session.questions.filter(isOpeningQuestion).length + 7;
   const progress = session.stage === "complete" ? 100 : Math.round((answeredCount / maximumQuestions) * 100);
   const lastInStage = index >= currentQuestions.length - 1;
   const questionNumber = question ? session.questions.findIndex((item) => item.id === question.id) + 1 : maximumQuestions;

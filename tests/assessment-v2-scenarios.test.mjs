@@ -69,20 +69,23 @@ const payload = (question, scenarios) =>
 test("short screens cover original signals without requiring an Other text box", () => {
   const session = createAssessmentSession();
   assert.equal(session.version, "adaptive-v2");
-  assert.equal(questionsForStage(session).length, 9);
-  assert.ok(session.questions.every((q) => q.kind !== "text" && q.options.length <= 4));
+  assert.equal(openingQuestions.length, 5);
+  assert.equal(questionsForStage(session).length, 7);
+  assert.ok(openingQuestions.every((q) => q.options.length === 5));
+  assert.ok(session.questions.every((q) => q.kind !== "text" && q.options.length <= 5));
   for (const legacy of legacyOpeningQuestions.slice(0, 2)) {
     const short = openingQuestions
       .filter((q) => q.id.startsWith(legacy.id))
       .flatMap((q) => q.options.map((o) => o.id));
-    for (const option of legacy.options.filter((o) => !["none", "unsure"].includes(o.id)))
+    for (const option of legacy.options.filter((o) => !["none", "unsure", "varies"].includes(o.id)))
       assert.ok(short.includes(option.id));
   }
-  let value = submitAssessmentAnswer(session, { questionId: "q1d", optionIds: ["other"] });
+  assert.ok(openingQuestions.filter(q => q.id.startsWith("q2")).every(q => /It varies/.test(q.options.at(-1).text)));
+  let value = submitAssessmentAnswer(session, { questionId: "q1c", optionIds: ["other"] });
   assert.ok(value.answers.some((a) => a.optionIds.includes("other")));
   assert.throws(() =>
     submitAssessmentAnswer(value, {
-      questionId: "q1d",
+      questionId: "q1c",
       optionIds: ["strategy", "technology", "other"],
     }),
   );
@@ -106,6 +109,37 @@ test("fixed first scenarios depend on previous answers and offer a neutral escap
     JSON.stringify(session.questions.find((q) => q.id === "q4").options)
   )
     assert.ok(!session.answers.some((a) => a.questionId === "q4"));
+});
+test("saved seven-screen openings still require all their answers and retain report numbering", async () => {
+  let session = createAssessmentSession();
+  const groups = [
+    ["q1a", "q1", ["decisions", "authority", "relationships"]],
+    ["q1b", "q1", ["values", "demand", "workload"]],
+    ["q1c", "q1", ["funding", "requirements", "key_person"]],
+    ["q1d", "q1", ["strategy", "technology", "other"]],
+    ["q2a", "q2", ["escalate", "wait_for_authority", "extra_checks"]],
+    ["q2b", "q2", ["extra_work", "postpone", "key_person"]],
+    ["q2c", "q2", ["separate_ways", "agreed_process", "varies"]],
+  ];
+  session.questions = [
+    ...groups.map(([id, legacyId, ids]) => ({
+      ...legacyOpeningQuestions.find(q => q.id === legacyId), id,
+      options: [...ids.map(id => legacyOpeningQuestions.find(q => q.id === legacyId).options.find(o => o.id === id)), {id:"unsure", text:"None / unsure"}],
+    })),
+    ...session.questions.filter(q => q.id === "q3" || q.id === "q4"),
+  ];
+  assert.equal(questionsForStage(session).length, 9);
+  for (const q of questionsForStage(session).filter(q => q.id !== "q2c" && q.id !== "q3" && q.id !== "q4"))
+    session = submitAssessmentAnswer(session, {questionId:q.id, optionIds:[q.options[0].id]});
+  assert.equal(stageIsComplete(session), false);
+  session = submitAssessmentAnswer(session, {questionId:"q2c", optionIds:["separate_ways"]});
+  for (const id of ["q3", "q4"]) session = submitAssessmentAnswer(session, {questionId:id, optionIds:[session.questions.find(q=>q.id===id).options[0].id]});
+  assert.equal(stageIsComplete(session), true);
+  session = await advanceAssessment(session, {evaluator:evaluator([])});
+  assert.equal(session.stage,"probes");
+  const report = buildSessionReport({session:{session_id:session.id,snapshot:session,status:"active",stage:session.stage,created_at:session.createdAt,updated_at:session.updatedAt,completed_at:null,last_error:null}, events:[],calls:[],contacts:[]});
+  assert.equal(report.sections[1].title, "Phase 1 — Opening picture (Q1–Q9)");
+  assert.equal(report.sections[2].title, "Phase 2 — Check the likely issues (Q10–Q13)");
 });
 test("two Gemini scenarios see all accumulated choices; optional skip preserves usual Jev rounds and ranking", async () => {
   const providerInputs = [];
@@ -160,8 +194,8 @@ test("two Gemini scenarios see all accumulated choices; optional skip preserves 
       ["final", 2],
     ],
   );
-  assert.equal(session.questions.length, 16);
-  assert.equal(session.answers.length, 16);
+  assert.equal(session.questions.length, 14);
+  assert.equal(session.answers.length, 14);
   assert.equal(session.questions.filter((q) => q.kind === "text").length, 1);
   assert.equal(
     session.result.problems[0].prioritySignal,
@@ -189,7 +223,9 @@ test("two Gemini scenarios see all accumulated choices; optional skip preserves 
   const markdown = sessionReportMarkdown(report);
   assert.match(markdown, /Skipped by the respondent/);
   assert.match(markdown, /Hypothetical scenario match/);
-  assert.match(markdown, /Q16\./);
+  assert.match(markdown, /Q14\./);
+  assert.equal(report.sections[1].title, "Phase 1 — Opening picture (Q1–Q7)");
+  assert.equal(report.sections[2].title, "Phase 2 — Check the likely issues (Q8–Q11)");
   assert.equal(
     report.sections[2].blocks.filter((block) => block.kind === "heading").length,
     4,

@@ -1,5 +1,5 @@
 import { fallbackQuestionWriter } from "./fallback-questions.ts";
-import { openingQuestions, legacyOpeningQuestions } from "./opening-questions.ts";
+import { openingQuestions, legacyOpeningQuestions, isOpeningQuestion } from "./opening-questions.ts";
 import { consequenceQuestion, openingScenarioQuestion } from "./scenario-questions.ts";
 import { problemBank, problemById } from "./problem-bank.ts";
 import { problemIds, type Answer, type AssessmentEvent, type AssessmentQuestion, type AssessmentResult, type AssessmentSession, type DimensionId, type EvaluationRecord, type EvaluationRound, type JsonValue, type ProblemEvaluation, type ProblemEvaluator, type ProblemId, type QuestionContext, type QuestionWriter, type ResultProblem, type Stage } from "./types.ts";
@@ -35,7 +35,7 @@ export function createAssessmentSession(id = crypto.randomUUID(), version: Asses
 export function questionsForStage(session: AssessmentSession): AssessmentQuestion[] {
   if (session.stage === "complete") return [];
   const ids: Record<Exclude<Stage, "complete">, string[]> = {
-    opening: session.version === "adaptive-v1" ? ["q1", "q2", "q3", "q4"] : [...openingQuestions.map(q => q.id), "q3", "q4"],
+    opening: session.version === "adaptive-v1" ? ["q1", "q2", "q3", "q4"] : session.questions.filter(isOpeningQuestion).map(q => q.id),
     probes: session.topFour.map((id) => problemById[id].probe.id),
     bridge: ["q9"],
     finalists: ["q10", "q11"],

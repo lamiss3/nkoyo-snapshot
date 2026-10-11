@@ -2,9 +2,9 @@
 
 New assessments use `adaptive-v2`. Saved `adaptive-v1` assessments can still finish in their existing flow. Restart begins the new flow. Completed reports and email journeys remain readable.
 
-## Phase 1 — Opening picture (up to 9 short screens)
+## Phase 1 — Opening picture (up to 7 short screens)
 
-The former first question is split into four screens: decisions/authority/relationships; values/demand/workload; funding/requirements/key-person dependence; strategy/technology/other. The former second question is split into three screens: decisions under pressure; day-to-day work under pressure; coordination under pressure. Each screen offers three substantive choices plus “None of these / I’m not sure.” Respondents may choose up to two per screen; None/unsure must be chosen alone. Selecting Other does not open a text box.
+The former first question is split into three screens: decisions/authority/relationships/values; demand/workload/key-person dependence/funding; strategy/technology/requirements/other. The former second question is split into two screens: decisions and coordination under pressure; work and priorities under pressure. Each of these five screens offers four substantive choices plus a neutral choice. For pressure responses, “It varies” is grouped with None/unsure because it supplies no clear pattern. Respondents may choose up to two per screen; None/unsure must be chosen alone. Selecting Other does not open a text box. Earlier saved seven-screen opening layouts remain readable and can finish; Restart begins the shorter flow.
 
 A consequence screen offers three relevant consequences matched to earlier choices plus None/no clear impact/unsure. The former first written question becomes a fixed scenario-choice question: two or three observable examples from the 20-topic bank, ranked from the earlier selections, plus None/unsure. These routing weights select examples only; they do not set Jev scores. Returning to change an earlier choice updates dependent questions and clears a scenario answer if its available options have changed.
 
@@ -22,7 +22,7 @@ The same four topic-specific fixed probes are used, including their existing ans
 
 If Gemini fails or returns invalid scenario JSON, predefined scenario choices keep the journey moving. They are clearly labelled fixed backup questions. A failure never replaces these screens with a required text box.
 
-The longest normal flow has 16 short screens, with only the last offering a text box. Progress and question numbering reflect the actual flow.
+The longest new flow has 14 short screens, with only the last offering a text box. Progress and report numbering use the stored opening layout, so older 16-screen sessions still display correctly.
 
 Within a phase, Next saves on the device and moves immediately while the server checkpoint runs in the background. The complete confirmed answers are still submitted at the phase boundary before model evaluation. A saving failure is shown and retried; it does not erase local answers.
 

@@ -76,19 +76,21 @@ export const legacyOpeningQuestions: readonly AssessmentQuestion[] = [
 ];
 
 const options = (ids: string[], legacyId: string) => ids.map((id) => legacyOpeningQuestions.find((q) => q.id === legacyId)!.options!.find((o) => o.id === id)!);
-const shortQuestion = (id: string, text: string, ids: string[], legacyId: string): AssessmentQuestion => ({
+const shortQuestion = (id: string, text: string, ids: string[], legacyId: string, neutralText = "None of these / I’m not sure."): AssessmentQuestion => ({
   id, text, kind: "multiple", maxSelections: 2, source: "fixed",
   helper: "Choose up to two that fit the past three months.",
-  options: [...options(ids, legacyId), { id: "unsure", text: "None of these / I’m not sure." }],
+  options: [...options(ids, legacyId), { id: "unsure", text: neutralText }],
 });
 
-/** Short screens retain the original signals; each has at most four choices. */
+/** Five screens retain the substantive signals, with five choices per screen.
+ * An inconsistent response is grouped with the neutral unsure choice. */
 export const openingQuestions: readonly AssessmentQuestion[] = [
-  shortQuestion("q1a", "Where does getting work moving become difficult?", ["decisions", "authority", "relationships"], "q1"),
-  shortQuestion("q1b", "Which pressures affect your people or workload?", ["values", "demand", "workload"], "q1"),
-  shortQuestion("q1c", "Which pressures affect keeping the organization running?", ["funding", "requirements", "key_person"], "q1"),
-  shortQuestion("q1d", "Which pressures affect putting plans into practice?", ["strategy", "technology", "other"], "q1"),
-  shortQuestion("q2a", "When pressure rises, what happens to decisions?", ["escalate", "wait_for_authority", "extra_checks"], "q2"),
-  shortQuestion("q2b", "When pressure rises, what happens to day-to-day work?", ["extra_work", "postpone", "key_person"], "q2"),
-  shortQuestion("q2c", "When pressure rises, how do people coordinate?", ["separate_ways", "agreed_process", "varies"], "q2"),
+  shortQuestion("q1a", "Where does getting work moving become difficult?", ["decisions", "authority", "relationships", "values"], "q1"),
+  shortQuestion("q1b", "Which pressures affect your people and resources?", ["demand", "workload", "key_person", "funding"], "q1"),
+  shortQuestion("q1c", "Which pressures affect plans, tools or requirements?", ["strategy", "technology", "requirements", "other"], "q1"),
+  shortQuestion("q2a", "When pressure rises, what happens to decisions and coordination?", ["escalate", "wait_for_authority", "extra_checks", "separate_ways"], "q2", "It varies / none of these / I’m not sure."),
+  shortQuestion("q2b", "When pressure rises, what happens to work and priorities?", ["extra_work", "postpone", "key_person", "agreed_process"], "q2", "It varies / none of these / I’m not sure."),
 ];
+
+/** Use the stored opening layout so earlier seven-screen sessions can finish. */
+export const isOpeningQuestion = (question: AssessmentQuestion) => /^q[12][a-d]?$/.test(question.id) || question.id === "q3" || question.id === "q4";

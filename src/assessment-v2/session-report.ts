@@ -154,8 +154,8 @@ export function buildSessionReport(input: SessionReportInput): SessionReport {
     const value = object(decision(round)?.payload)['problemIds'];
     return Array.isArray(value) ? value.filter((id) => typeof id === "string") as string[] : [];
   };
-  const openingCount = session.version === "adaptive-v2" ? 9 : 4;
-  const opening: ReportBlock[] = [p(`${session.version === "adaptive-v2" ? "Seven short choice screens collect the opening signals, followed by a matched consequence choice and a fixed hypothetical scenario selected from earlier answers." : "The first four fixed questions collect an opening picture."} Jev checks all 20 topics. The rules rank supported or possible topics using supported + half of possible, followed by topics with too little information; ties use topic ID. Up to four are selected for fixed probes.`)];
+  const openingCount = session.questions.filter(question => /^q[12][a-d]?$/.test(question.id) || question.id === "q3" || question.id === "q4").length;
+  const opening: ReportBlock[] = [p(`${session.version === "adaptive-v2" ? `${openingCount - 2} short choice screens collect the opening signals, followed by a matched consequence choice and a fixed hypothetical scenario selected from earlier answers.` : "The first four fixed questions collect an opening picture."} Jev checks all 20 topics. The rules rank supported or possible topics using supported + half of possible, followed by topics with too little information; ties use topic ID. Up to four are selected for fixed probes.`)];
   questions(opening, session.questions.slice(0, openingCount), input, session);
   modelSteps(opening, calls("jev", "initial"));
   const topFour = selected("initial");
