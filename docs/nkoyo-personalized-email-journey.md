@@ -148,3 +148,25 @@ Fourteen focused email tests cover consent, private targeting, scheduling offset
 
 - [Create or schedule a broadcast with its complete HTML body](https://developers.kit.com/api-reference/broadcasts/create-a-broadcast)
 - [Read all subscribers belonging to a tag](https://developers.kit.com/api-reference/tags/list-subscribers-for-a-tag)
+
+## Revised content structure — 11 October 2026
+
+Newly generated journeys use `email-journey-v2`. The five emails form one progression, grounded in an answer selected from the saved assessment:
+
+| Email | Timing                     | Purpose                                                                                                               | One main action                                 |
+| ----- | -------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 1     | Report as soon as prepared | Detailed result: summary, primary evidence, secondary finding or unknowns, three Cs, starting focus and uncertainties | Choose one finding to explore                   |
+| 2     | Day 2                      | Recognize the primary pattern and observable signs                                                                    | Observe one real example                        |
+| 3     | Day 4                      | Explain possible mechanisms and consequences, and an alternative explanation to check                                 | Discuss one question                            |
+| 4     | Day 7                      | Prepare and try one achievable experiment, then check its effect                                                      | Agree and try the experiment                    |
+| 5     | Day 10                     | Connect the secondary finding with the primary issue and consider guided support                                      | Bring a finding or unresolved question to Nkoyo |
+
+When no secondary finding is supported, Email 5 is a conditional progress review rather than an invented second problem. When no primary finding is supported, the follow-ups gather evidence. Scenario matches remain hypothetical examples selected by the respondent, not claims about events that happened. Later emails do not assume the reader completed earlier actions. Joint priorities remain joint.
+
+The shared answer is selected from a usable primary-topic probe, the first matched scenario, a later scenario, or another usable answer. Skipped/neutral answers cannot become the shared example. Every generated email must cite that shared reference for staff review when it exists. Gemini receives the saved findings, answers, topic guides, explicit allowed reference IDs and a complete JSON example; it does not re-score Jev's result. The server validates exact slots, topics, section counts, evidence references, word limits, distinct subjects and distinct required main actions. Failed outputs are recorded and remain subject to the existing bounded job retries.
+
+Customer HTML/text and the staff Markdown export include the main action and the controlled next-email preview. Report-only delivery suppresses the preview of follow-ups because those messages require separate consent. The final email contains a fixed invitation to `hello@nkoyoeffionglewis.com`, the business email supplied by the owner. Models cannot invent booking links, offers, prices, credentials, service availability or deadlines. The final message promises no sixth email.
+
+Admin displays the revised purpose, shared reference, main action, next-email preview and invitation for version 2 journeys. The existing immediate/day 2/day 4/day 7/day 10 schedule, consent boundaries, delivery queue, Kit targeting, unsubscribe footer and model logging continue to apply. Existing version 1 drafts and already scheduled broadcasts keep their saved content. Fixed templates remain clearly marked staff integration tests and are never an automatic fallback for visitors.
+
+The server adds a clear hypothetical-example attribution to a section that cites a matched scenario when Gemini has omitted that qualification. It retains the original provider response in the model log and records the normalized draft separately. Extra unused model metadata is discarded; required content, exact topics, references, plain text, lengths and duplicate checks still apply. Skipped answers are omitted from the model's response context and counted as missing detail. A live synthetic final-prompt preview returned five validated drafts with 383, 168, 142, 155 and 145 body words; no contact was created and no email was sent.

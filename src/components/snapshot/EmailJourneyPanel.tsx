@@ -9,6 +9,8 @@ import {
   emailDayOffsets,
   emailJourneyMarkdown,
   eligibleJourneyEmails,
+  emailStructure,
+  emailSupportInvitation,
 } from "@/assessment-v2/email-journey";
 import { problemById } from "@/assessment-v2/problem-bank";
 import type { EmailJobView } from "@/assessment-v2/email-job-types";
@@ -91,6 +93,10 @@ export function EmailJourneyPanel() {
         {query.data?.deliveryEnabled
           ? "New requests are automatically prepared and scheduled according to consent. Earlier review drafts are not enrolled."
           : "Sending is not activated."}
+      </p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        New journeys: detailed result → recognize the pattern → understand why it matters → try one
+        practical change → connect the findings and consider support.
       </p>
       <p className="mt-2 text-sm text-muted-foreground">
         {query.data?.kitConfigured
@@ -324,6 +330,14 @@ export function EmailJourneyPanel() {
                 Written by {job.content.model} · {date(job.content.generatedAt)}. Evidence
                 references below link each passage to assessment questions.
               </p>
+              {job.content.version === "email-journey-v2" && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Sequence: result → recognition → understanding → action → connection and support.{" "}
+                  {job.content.threadQuestionId
+                    ? `Shared answer reference: ${job.content.threadQuestionId}.`
+                    : "No usable shared example was available; the emails acknowledge that limitation."}
+                </p>
+              )}
               <div className="mt-5 space-y-4">
                 {job.content.emails.map((email) => (
                   <details
@@ -348,6 +362,11 @@ export function EmailJourneyPanel() {
                         : "Not opted in — will not be uploaded"}
                     </summary>
                     <p className="mt-4 font-bold">Subject: {email.subject}</p>
+                    {job.content!.version === "email-journey-v2" && (
+                      <p className="mt-1 text-sm font-semibold text-magenta">
+                        {emailStructure[email.number - 1]?.label}
+                      </p>
+                    )}
                     <p className="mt-1 text-sm text-muted-foreground">Preview: {email.preview}</p>
                     <p className="mt-5">Hello,</p>
                     {email.sections.map((section, index) => (
@@ -365,6 +384,22 @@ export function EmailJourneyPanel() {
                         )}
                       </div>
                     ))}
+                    {email.mainAction && (
+                      <div className="mt-5 rounded-xl bg-blush p-4">
+                        <h4 className="font-bold">Your next step</h4>
+                        <p className="mt-2">{email.mainAction}</p>
+                      </div>
+                    )}
+                    {email.supportInvitation && (
+                      <p className="mt-4">
+                        <a className="font-semibold underline" href={emailSupportInvitation.href}>
+                          {emailSupportInvitation.label}
+                        </a>
+                      </p>
+                    )}
+                    {email.nextEmailPreview && (
+                      <p className="mt-4 text-sm text-muted-foreground">{email.nextEmailPreview}</p>
+                    )}
                     <p className="mt-5">
                       Nkoyo
                       <br />

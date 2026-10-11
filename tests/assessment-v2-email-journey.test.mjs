@@ -7,6 +7,8 @@ import {
   emailJourneyMarkdown,
   journeyEmailHtml,
   kitJourneyDrafts,
+  journeyEmailText,
+  emailSupportInvitation,
 } from "../src/assessment-v2/email-journey.ts";
 import { createGeminiEmailJourneyWriter } from "../src/assessment-v2/email-journey.server.ts";
 import { fixedTestEmailJourney } from "../src/assessment-v2/email-journey-fixed.ts";
@@ -16,7 +18,8 @@ test("fixed drafts retain saved topics and answer evidence with honest provenanc
   const value = session(),
     draft = fixedTestEmailJourney(value);
   assert.equal(draft.source, "fixed_test");
-  assert.equal(draft.model, "fixed-test-v1 (no Gemini)");
+  assert.equal(draft.model, "fixed-test-v2 (no Gemini)");
+  assert.equal(draft.version, "email-journey-v2");
   assert.equal(draft.sessionId, value.id);
   assert.equal(draft.jointPriority, true);
   assert.deepEqual(
@@ -29,6 +32,14 @@ test("fixed drafts retain saved topics and answer evidence with honest provenanc
   assert.ok(draft.emails[0].sections.some((section) => section.sourceQuestionIds.includes("q4")));
   assert.equal(kitJourneyDrafts(draft, 22, true).length, 5);
   assert.equal(kitJourneyDrafts(draft, 22, false).length, 1);
+  assert.ok(
+    !kitJourneyDrafts(draft, 22, false)[0].payload.content.includes(
+      draft.emails[0].nextEmailPreview,
+    ),
+  );
+  assert.ok(
+    kitJourneyDrafts(draft, 22, true)[0].payload.content.includes(draft.emails[0].nextEmailPreview),
+  );
   value.result.problems = [];
   value.result.priority = [];
   value.answers = [];
@@ -95,14 +106,15 @@ function output(brief) {
       number: slot.number,
       purpose: slot.purpose,
       focusId: slot.focusId,
-      subject: "A practical next step",
+      subject: `A practical next step ${slot.number}`,
       preview: "A synthetic draft to review.",
+      mainAction: `Take the distinct next step for email ${slot.number}.`,
       sections: Array.from({ length: slot.sectionCount }, () => ({
         heading: "Explore the evidence",
         paragraphs: [
           Array.from({ length: slot.number === 1 ? 50 : 30 }, () => "observation").join(" "),
         ],
-        sourceQuestionIds: ["q4"],
+        sourceQuestionIds: brief.threadQuestionId ? [brief.threadQuestionId] : [],
       })),
     })),
   };
@@ -168,6 +180,16 @@ test("Gemini receives real evidence without credentials and records the complete
   const result = await writer.generate(value);
   assert.equal(result.status, "draft");
   assert.equal(result.model, "gemini-test");
+  assert.equal(result.version, "email-journey-v2");
+  assert.equal(result.threadQuestionId, "q4");
+  assert.ok(
+    result.emails.slice(0, 4).every((email) => email.nextEmailPreview && !email.supportInvitation),
+  );
+  assert.equal(result.emails[4].nextEmailPreview, undefined);
+  assert.equal(result.emails[4].supportInvitation, true);
+  assert.ok(journeyEmailText(result.emails[4]).includes(emailSupportInvitation.address));
+  assert.ok(journeyEmailHtml(result.emails[4]).includes(emailSupportInvitation.href));
+  assert.ok(!journeyEmailHtml(result.emails[0]).includes(emailSupportInvitation.href));
   assert.equal(records[0].operation, "email_journey");
   assert.equal(records[1].status, "succeeded");
   assert.equal(records[1].output.emails.length, 5);
@@ -218,6 +240,20 @@ test("invalid topic changes, invented evidence, unsafe markup and truncation fai
       data.emails = data.emails.slice(0, 4);
     },
     (data) => {
+      delete data.emails[2].mainAction;
+    },
+    (data) => {
+      data.emails[2].mainAction = data.emails[1].mainAction;
+    },
+    (data) => {
+      data.emails[2].subject = data.emails[1].subject;
+    },
+    (data) => {
+      data.emails[2].sections[0].paragraphs = [
+        "Your team described a recurring delay in approvals. Your team described a recurring delay in approvals.",
+      ];
+    },
+    (data) => {
       data.emails[2].sections.forEach((section) => {
         section.sourceQuestionIds = [];
       });
@@ -234,5 +270,102 @@ test("invalid topic changes, invented evidence, unsafe markup and truncation fai
     await assert.rejects(writer.generate(value));
     assert.equal(records[1].status, "failed");
     assert.equal(records[1].output, null);
+  }
+});
+
+test("no secondary finding produces a final check-in and old saved emails retain their content", async () => {
+  const value = session();
+  value.result.problems = value.result.problems.slice(0, 1);
+  value.result.priority = ["P03"];
+  const brief = emailJourneyBrief(value);
+  assert.equal(brief.secondaryId, null);
+  assert.equal(brief.slots[4].focusId, null);
+  const writer = createGeminiEmailJourneyWriter({
+    apiKey: "test",
+    trace: recorder([]),
+    fetcher: async () => response(output(brief)),
+  });
+  const result = await writer.generate(value);
+  assert.match(result.emails[3].nextEmailPreview, /review what you may have noticed/);
+  assert.equal(result.emails[4].focusId, null);
+  const legacy = { ...result.emails[4] };
+  delete legacy.mainAction;
+  delete legacy.nextEmailPreview;
+  delete legacy.supportInvitation;
+  assert.ok(!journeyEmailHtml(legacy).includes(emailSupportInvitation.href));
+  assert.ok(!journeyEmailHtml(legacy).includes("Your next step</h2>"));
+  value.answers = [];
+  value.result.problems = [];
+  value.result.priority = [];
+  const emptyBrief = emailJourneyBrief(value);
+  const emptyWriter = createGeminiEmailJourneyWriter({
+    apiKey: "test",
+    trace: recorder([]),
+    fetcher: async () => response(output(emptyBrief)),
+  });
+  const empty = await emptyWriter.generate(value);
+  assert.equal(empty.threadQuestionId, null);
+  assert.equal(empty.primaryId, null);
+  assert.match(empty.emails[0].nextEmailPreview, /clearer example/);
+});
+
+test("the shared thread excludes skipped and neutral answers, and every email must preserve it", async () => {
+  const value = session();
+  value.answers.unshift({ questionId: "q1", optionIds: ["unsure"], submittedAt: value.createdAt });
+  value.answers.push({ questionId: "q11", text: "", skipped: true, submittedAt: value.createdAt });
+  value.questions.push({
+    id: "q11",
+    kind: "text",
+    optional: true,
+    text: "Optional example",
+    source: "fixed",
+  });
+  const brief = emailJourneyBrief(value);
+  assert.equal(brief.threadQuestionId, "q4");
+  for (const invalidId of ["q1", "q11"]) {
+    const data = output(brief);
+    data.emails[4].sections.forEach((section) => {
+      section.sourceQuestionIds = [invalidId];
+    });
+    const records = [];
+    const writer = createGeminiEmailJourneyWriter({
+      apiKey: "test",
+      trace: recorder(records),
+      fetcher: async () => response(data),
+    });
+    await assert.rejects(writer.generate(value));
+    assert.equal(records.at(-1).status, "failed");
+    const contextText = records[0].request.contents[0].parts[0].text;
+    assert.ok(!contextText.includes('"questionId":"q11"'));
+    assert.ok(contextText.includes('"omittedAnswerCount":1'));
+  }
+});
+
+test("a hypothetical match cannot be presented as a reported event", async () => {
+  const value = session();
+  value.questions.find((question) => question.id === "q4").answerMode = "scenario_match";
+  for (const qualify of [false, true]) {
+    const data = output(emailJourneyBrief(value));
+    data.emails.forEach((email) =>
+      email.sections.forEach((section) => {
+        section.paragraphs[0] = `${qualify ? "You chose a hypothetical example about delayed approvals." : "Your approvals waited two weeks."} ${section.paragraphs[0]}`;
+      }),
+    );
+    const records = [];
+    const writer = createGeminiEmailJourneyWriter({
+      apiKey: "test",
+      trace: recorder(records),
+      fetcher: async () => response(data),
+    });
+    const journey = await writer.generate(value);
+    assert.equal(journey.emails.length, 5);
+    assert.ok(
+      journey.emails.every((email) =>
+        email.sections.every((section) => /hypothetical/i.test(section.paragraphs[0])),
+      ),
+    );
+    assert.ok(
+      records[0].request.contents[0].parts[0].text.includes('"answerMode":"scenario_match"'),
+    );
   }
 });
