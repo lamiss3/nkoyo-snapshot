@@ -108,6 +108,10 @@ export function createGeminiEmailJourneyWriter(
         prompt,
         7500,
         emailJourneyResponseSchema(brief),
+        // Gemini's routed schema-enforcement path rejects the email schema with
+        // INVALID_ARGUMENT. JSON mode plus the unchanged runtime validator keeps
+        // the saved contract strict without invoking that failing provider path.
+        "json_object",
       );
       return recordedModelCall(
         { provider: "gemini", operation: "email_journey", configured_model: client.model, request },

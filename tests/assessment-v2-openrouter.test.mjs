@@ -241,12 +241,7 @@ test("five OpenRouter emails retain topics, actions and references; truncation c
       fetcher: async (_, init) => {
         const body = JSON.parse(init.body);
         assert.equal(body.max_tokens, 7500);
-        assert.equal(body.response_format.json_schema.name, "email_journey");
-        const emailSchema = body.response_format.json_schema.schema.properties.emails;
-        assert.equal(emailSchema.items.type, "object");
-        assert.equal(emailSchema.items.anyOf, undefined);
-        assert.equal(emailSchema.minItems, 5);
-        assert.equal(emailSchema.items.properties.sections.maxItems, 4);
+        assert.deepEqual(body.response_format, { type: "json_object" });
         assert.ok(body.messages[1].content.includes("routine approvals"));
         return response(
           { emails },
@@ -271,6 +266,37 @@ test("five OpenRouter emails retain topics, actions and references; truncation c
       assert.equal(records[1].usage.cost, 0.001);
     }
     assert.equal(records[1].status, truncated ? "failed" : "succeeded");
+  }
+});
+
+test("OpenRouter email JSON mode still rejects invalid contract output before saving", async () => {
+  const value = createAssessmentSession("fictional-json-mode", "adaptive-v1");
+  value.stage = "complete";
+  value.answers = context.answers;
+  value.result = {
+    problems: [],
+    priority: [],
+    threeCShare: { culture: 0, capacity: 0, compliance: 0 },
+    generatedAt: value.updatedAt,
+  };
+  for (const output of [
+    { emails: [] },
+    { emails: "invalid" },
+    { body_markdown: "Not an email journey" },
+  ]) {
+    const records = [];
+    const writer = createGeminiEmailJourneyWriter({
+      apiKey: "private-key",
+      transport: "openrouter",
+      trace: recorder(records),
+      fetcher: async (_, init) => {
+        assert.deepEqual(JSON.parse(init.body).response_format, { type: "json_object" });
+        return response(output);
+      },
+    });
+    await assert.rejects(writer.generate(value));
+    assert.equal(records[1].status, "failed");
+    assert.equal(records[1].output, null);
   }
 });
 

@@ -54,6 +54,7 @@ export function createGeminiClient(config: GeminiClientConfig) {
       prompt: string,
       maxTokens: number,
       schema: { name: string; schema: object },
+      outputFormat: "json_schema" | "json_object" = "json_schema",
     ) {
       return transport === "openrouter"
         ? {
@@ -62,7 +63,10 @@ export function createGeminiClient(config: GeminiClientConfig) {
               { role: "system", content: system },
               { role: "user", content: prompt },
             ],
-            response_format: { type: "json_schema", json_schema: { ...schema, strict: true } },
+            response_format:
+              outputFormat === "json_object"
+                ? { type: "json_object" }
+                : { type: "json_schema", json_schema: { ...schema, strict: true } },
             provider: { require_parameters: true, allow_fallbacks: true },
             reasoning: { effort: "minimal", exclude: true },
             max_tokens: maxTokens,
