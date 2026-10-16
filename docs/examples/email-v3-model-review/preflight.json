@@ -1,0 +1,14 @@
+{
+  "mode": "single-development-generation",
+  "transport": "google",
+  "model": "gemini-3.6-flash",
+  "keyPresent": true,
+  "fixtureInputsValidated": 3,
+  "networkAllowlist": "One POST to the configured model endpoint; redirects rejected",
+  "recorder": "Local memory/files only",
+  "subscribers": false,
+  "kit": false,
+  "jobs": false,
+  "sends": false,
+  "productionWrites": false
+}

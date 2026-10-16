@@ -1,0 +1,21 @@
+{
+  "notice": "FICTIONAL INPUT — isolated development generation review. No subscribers, Kit uploads, jobs, email sends or production writes. Model copy is retained without manual edits. Structural validation does not establish editorial quality.",
+  "status": "failed",
+  "transport": "google",
+  "configuredModel": "gemini-3.6-flash",
+  "responseModel": null,
+  "networkRequests": 1,
+  "httpStatus": 503,
+  "usage": null,
+  "error": {
+    "name": "Error",
+    "message": "Gemini request failed (503)"
+  },
+  "providerError": {
+    "code": 503,
+    "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+    "status": "UNAVAILABLE"
+  },
+  "nonJsonFailureResponse": null,
+  "paragraphWords": null
+}

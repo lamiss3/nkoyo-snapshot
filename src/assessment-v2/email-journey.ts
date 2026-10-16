@@ -1,39 +1,20 @@
 import { problemById } from "./problem-bank.ts";
 import { problemGuides } from "./result-content.ts";
 import type { AssessmentSession, ProblemId } from "./types.ts";
+import {
+  emailV3Purposes,
+  emailV3Slots,
+  emailSlotsForVersion,
+  type EmailPurpose,
+  type EmailJourneyVersion,
+} from "./email-contract.ts";
+import { emailTopicGuides } from "./email-topic-guides.ts";
+export type { EmailPurpose } from "./email-contract.ts";
 
-export const emailPurposes = [
-  "detailed_report",
-  "primary_awareness",
-  "primary_explanation",
-  "primary_action",
-  "secondary_exploration",
-] as const;
-export type EmailPurpose = (typeof emailPurposes)[number];
+export { legacyEmailPurposes } from "./email-contract.ts";
+export const emailPurposes = emailV3Purposes;
+export const emailStructure = emailV3Slots;
 export const emailDayOffsets = [0, 2, 4, 7, 10] as const;
-export const emailStructure = [
-  {
-    label: "Detailed result",
-    roles: [
-      "summary",
-      "primary_evidence",
-      "secondary_or_unknown",
-      "three_cs",
-      "starting_focus",
-      "uncertainty",
-    ],
-  },
-  { label: "Recognize the pattern", roles: ["recognition", "observable_signs", "what_to_notice"] },
-  {
-    label: "Understand why it matters",
-    roles: ["possible_mechanism", "possible_consequences", "distinction_to_check"],
-  },
-  { label: "Try one practical change", roles: ["preparation", "one_experiment", "progress_check"] },
-  {
-    label: "Connect the findings and consider support",
-    roles: ["connection_or_progress", "what_to_review", "guided_conversation"],
-  },
-] as const;
 /** Business address supplied by the owner. Models cannot invent destinations. */
 export const emailSupportInvitation = {
   label: "Discuss your Snapshot with Nkoyo",
@@ -52,7 +33,7 @@ export interface JourneyEmail {
   supportInvitation?: boolean;
 }
 export interface EmailJourney {
-  version: "email-journey-v1" | "email-journey-v2";
+  version: EmailJourneyVersion;
   status: "draft";
   sessionId: string;
   generatedAt: string;
@@ -66,7 +47,10 @@ export interface EmailJourney {
 }
 
 /** Authoritative topic selection stays in the existing result logic. */
-export function emailJourneyBrief(session: AssessmentSession) {
+export function emailJourneyBrief(
+  session: AssessmentSession,
+  version: EmailJourneyVersion = "email-journey-v3",
+) {
   if (session.stage !== "complete" || !session.result)
     throw new Error("A completed assessment is required for an email journey.");
   const result = session.result;
@@ -99,7 +83,13 @@ export function emailJourneyBrief(session: AssessmentSession) {
   return {
     primaryId,
     secondaryId,
-    threadQuestionId: thread?.questionId ?? null,
+    ...(version === "email-journey-v3" ? {} : { threadQuestionId: thread?.questionId ?? null }),
+    sparseEvidence:
+      usableAnswers.length < 2 ||
+      !primaryId ||
+      usableAnswers.every(
+        (answer) => questions.get(answer.questionId)?.answerMode === "scenario_match",
+      ),
     jointPriority: Boolean(
       primaryId &&
       secondaryId &&
@@ -112,7 +102,10 @@ export function emailJourneyBrief(session: AssessmentSession) {
       dimension: problemById[item.problemId].primaryDimension,
       evidence: item.evidence,
       explanation: item.explanation ?? null,
-      guide: problemGuides[item.problemId],
+      guide:
+        version === "email-journey-v3"
+          ? { ...problemGuides[item.problemId], advisory: emailTopicGuides[item.problemId] }
+          : problemGuides[item.problemId],
     })),
     threeCShare: result.threeCShare,
     responses: session.answers.map((answer) => ({
@@ -126,13 +119,27 @@ export function emailJourneyBrief(session: AssessmentSession) {
       writtenAnswer: answer.text ?? "",
       answerMode: questions.get(answer.questionId)?.answerMode ?? "direct_response",
       skipped: answer.skipped ?? false,
+      ...(version === "email-journey-v3"
+        ? {
+            evidenceUse: answer.skipped
+              ? "none"
+              : !answer.text?.trim() &&
+                  answer.optionIds?.every((id) =>
+                    ["none", "unsure", "varies", "little_impact"].includes(id),
+                  )
+                ? "uncertain_or_none"
+                : questions.get(answer.questionId)?.answerMode === "scenario_match"
+                  ? "hypothetical_match"
+                  : "preserve_original_wording_tense_and_frequency",
+          }
+        : {}),
     })),
-    slots: emailPurposes.map((purpose, index) => ({
+    slots: emailSlotsForVersion(version).map((slot, index) => ({
       number: index + 1,
-      purpose,
-      focusId: index === 4 ? secondaryId : primaryId,
-      sectionCount: index === 0 ? 6 : 3,
-      structure: emailStructure[index],
+      purpose: slot.purpose,
+      focusId: version === "email-journey-v3" ? primaryId : index === 4 ? secondaryId : primaryId,
+      sectionCount: slot.sectionCount,
+      structure: slot,
     })),
   };
 }
@@ -142,7 +149,23 @@ export function nextJourneyEmailPreview(
   number: number,
   primaryId: ProblemId | null,
   secondaryId: ProblemId | null,
+  version: EmailJourneyVersion = "email-journey-v3",
 ): string | undefined {
+  if (version === "email-journey-v3") {
+    if (number === 1)
+      return primaryId
+        ? "Next, we’ll use a simple observation to see where work gets stuck."
+        : "Next, we’ll look for observable clues before naming a problem.";
+    if (number === 2)
+      return "Next, we’ll turn that check into one small change to try, even if you have not started yet.";
+    if (number === 3)
+      return "Next, we’ll look at what different outcomes could mean and what to try next.";
+    if (number === 4)
+      return primaryId
+        ? "In the final email, we’ll consider what to handle internally and when an outside perspective might help."
+        : "In the final email, we’ll consider what evidence is still needed and whether a discussion would help.";
+    return undefined;
+  }
   if (number === 1)
     return primaryId
       ? "Next, I’ll help you recognize this pattern in everyday work."
@@ -164,16 +187,28 @@ export function eligibleJourneyEmails(marketingConsent: boolean): number[] {
 
 const disclaimer =
   "This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.";
-export function journeyEmailText(email: JourneyEmail): string {
+const reportScopeNote = (version: EmailJourneyVersion) =>
+  version === "email-journey-v3"
+    ? "This Snapshot offers a starting point based on your answers. It is not a diagnosis or a verified audit."
+    : disclaimer;
+/** Version is explicit because detailed_report is shared with historical journeys. */
+export function journeyEmailText(
+  email: JourneyEmail,
+  version: EmailJourneyVersion = "email-journey-v2",
+): string {
   return [
     "Hello,",
     ...email.sections.flatMap((section) => [section.heading, ...section.paragraphs]),
     ...(email.mainAction ? ["Your next step", email.mainAction] : []),
     ...(email.supportInvitation
-      ? [`${emailSupportInvitation.label}: ${emailSupportInvitation.address}`]
+      ? [
+          email.purpose === "next_decision"
+            ? emailSupportInvitation.address
+            : `${emailSupportInvitation.label}: ${emailSupportInvitation.address}`,
+        ]
       : []),
     ...(email.nextEmailPreview ? [email.nextEmailPreview] : []),
-    ...(email.number === 1 ? [disclaimer] : []),
+    ...(email.number === 1 ? [reportScopeNote(version)] : []),
     "Nkoyo\nIban Ison Solutions",
   ].join("\n\n");
 }
@@ -188,7 +223,10 @@ const htmlText = (value: string) =>
     .replace(/\{/g, "&#123;")
     .replace(/\}/g, "&#125;");
 /** Model strings are escaped as content. Only Kit's required footer is Liquid. */
-export function journeyEmailHtml(email: JourneyEmail): string {
+export function journeyEmailHtml(
+  email: JourneyEmail,
+  version: EmailJourneyVersion = "email-journey-v2",
+): string {
   return [
     "<p>Hello,</p>",
     ...email.sections.flatMap((section) => [
@@ -197,12 +235,16 @@ export function journeyEmailHtml(email: JourneyEmail): string {
         (paragraph) => `<p>${htmlText(paragraph).replace(/\n/g, "<br>")}</p>`,
       ),
     ]),
-    ...(email.mainAction ? [`<h2>Your next step</h2><p>${htmlText(email.mainAction)}</p>`] : []),
-    ...(email.supportInvitation
+    ...(email.mainAction
+      ? [
+          `<h2>Your next step</h2><p>${email.purpose === "next_decision" && email.supportInvitation ? `<a href="${emailSupportInvitation.href}">${htmlText(email.mainAction)}</a>` : htmlText(email.mainAction)}</p>`,
+        ]
+      : []),
+    ...(email.supportInvitation && email.purpose !== "next_decision"
       ? [`<p><a href="${emailSupportInvitation.href}">${emailSupportInvitation.label}</a></p>`]
       : []),
     ...(email.nextEmailPreview ? [`<p>${htmlText(email.nextEmailPreview)}</p>`] : []),
-    ...(email.number === 1 ? [`<p>${htmlText(disclaimer)}</p>`] : []),
+    ...(email.number === 1 ? [`<p>${htmlText(reportScopeNote(version))}</p>`] : []),
     "<p>Nkoyo<br>Iban Ison Solutions</p>",
     '<p><a href="{{ unsubscribe_url }}">Unsubscribe</a><br>{{ address }}</p>',
   ].join("\n");
@@ -220,7 +262,9 @@ export function kitJourneyDrafts(
   if (
     journey.emails.length !== 5 ||
     journey.emails.some(
-      (email, index) => email.number !== index + 1 || email.purpose !== emailPurposes[index],
+      (email, index) =>
+        email.number !== index + 1 ||
+        email.purpose !== emailSlotsForVersion(journey.version)[index]?.purpose,
     )
   )
     throw new Error("Invalid five-email journey");
@@ -234,6 +278,7 @@ export function kitJourneyDrafts(
         preview_text: email.preview,
         content: journeyEmailHtml(
           marketingConsent ? email : (({ nextEmailPreview, ...report }) => report)(email),
+          journey.version,
         ),
         description: `Nkoyo ${journey.sessionId} / ${journey.version} / email ${email.number}`,
         public: false,
@@ -244,7 +289,7 @@ export function kitJourneyDrafts(
     }));
 }
 
-const markdownText = (value: string) => value.replace(/[\\`*_{}\[\]<>#]/g, "\\$&");
+const markdownText = (value: string) => value.replace(/[\\`*_{}[\]<>#]/g, "\\$&");
 export function emailJourneyMarkdown(journey: EmailJourney): string {
   return [
     "# Nkoyo — five-email journey",
@@ -267,10 +312,16 @@ export function emailJourneyMarkdown(journey: EmailJourney): string {
       "",
       "Hello,",
       "",
-      ...email.sections.flatMap((section) => [
+      ...email.sections.flatMap((section, sectionIndex) => [
         `### ${markdownText(section.heading)}`,
         "",
         ...section.paragraphs.flatMap((paragraph) => [markdownText(paragraph), ""]),
+        ...(journey.version === "email-journey-v3"
+          ? [
+              `*Staff section role: ${markdownText(emailV3Slots[email.number - 1]!.roles[sectionIndex]!)}*`,
+              "",
+            ]
+          : []),
         ...(section.sourceQuestionIds.length
           ? [
               `*Staff evidence references: ${section.sourceQuestionIds.map(markdownText).join(", ")}*`,
@@ -280,10 +331,15 @@ export function emailJourneyMarkdown(journey: EmailJourney): string {
       ]),
       ...(email.mainAction ? ["### Your next step", "", markdownText(email.mainAction), ""] : []),
       ...(email.supportInvitation
-        ? [`${emailSupportInvitation.label}: ${emailSupportInvitation.address}`, ""]
+        ? [
+            email.purpose === "next_decision"
+              ? emailSupportInvitation.address
+              : `${emailSupportInvitation.label}: ${emailSupportInvitation.address}`,
+            "",
+          ]
         : []),
       ...(email.nextEmailPreview ? [markdownText(email.nextEmailPreview), ""] : []),
-      ...(email.number === 1 ? [disclaimer, ""] : []),
+      ...(email.number === 1 ? [reportScopeNote(journey.version), ""] : []),
       "Nkoyo",
       "Iban Ison Solutions",
       "",

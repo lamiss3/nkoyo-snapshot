@@ -6,7 +6,7 @@ import {
 } from "../src/assessment-v2/gemini-client.server.ts";
 import { createGeminiQuestionWriter } from "../src/assessment-v2/gemini.server.ts";
 import { createGeminiEmailJourneyWriter } from "../src/assessment-v2/email-journey.server.ts";
-import { fixedTestEmailJourney } from "../src/assessment-v2/email-journey-fixed.ts";
+import { emailJourneyBrief } from "../src/assessment-v2/email-journey.ts";
 import { createAssessmentSession } from "../src/assessment-v2/orchestrator.ts";
 import { legacyOpeningQuestions } from "../src/assessment-v2/opening-questions.ts";
 import { buildSessionReport, sessionReportMarkdown } from "../src/assessment-v2/session-report.ts";
@@ -217,17 +217,17 @@ test("five OpenRouter emails retain topics, actions and references; truncation c
     threeCShare: { culture: 50, capacity: 30, compliance: 20 },
     generatedAt: value.updatedAt,
   };
-  const emails = fixedTestEmailJourney(value).emails.map((email) => ({
+  const emails = emailJourneyBrief(value).slots.map((email) => ({
     number: email.number,
     purpose: email.purpose,
     focusId: email.focusId,
-    subject: email.subject,
-    preview: email.preview,
-    mainAction: email.mainAction,
-    sections: Array.from({ length: email.number === 1 ? 6 : 3 }, () => ({
+    subject: `Distinct subject ${email.number}`,
+    preview: "A practical question to check",
+    mainAction: `Agree the next step for message ${email.number}.`,
+    sections: Array.from({ length: email.sectionCount }, () => ({
       heading: "Evidence and interpretation",
       paragraphs: [
-        Array.from({ length: email.number === 1 ? 50 : 30 }, () => "observation").join(" "),
+        `Example ${email.number}: ${Array.from({ length: email.number === 1 ? 50 : 30 }, () => "observation").join(" ")}`,
       ],
       sourceQuestionIds: ["q4"],
     })),

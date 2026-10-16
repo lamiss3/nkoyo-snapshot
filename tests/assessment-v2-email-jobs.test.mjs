@@ -10,7 +10,7 @@ import {
   prepareKitDrafts,
   assertSingleKitRecipient,
 } from "../src/assessment-v2/kit-client.server.ts";
-import { emailPurposes } from "../src/assessment-v2/email-journey.ts";
+import { legacyEmailPurposes as emailPurposes } from "../src/assessment-v2/email-journey.ts";
 
 test("email ownership requires the saved capability, and the worker fails closed without its secret", () => {
   const token = "a".repeat(64),

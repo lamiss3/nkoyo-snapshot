@@ -8,7 +8,7 @@ import type { AssessmentSession } from "./types.ts";
 
 /** Explicit staff test only. This is never an automatic substitute for Gemini. */
 export function fixedTestEmailJourney(session: AssessmentSession): EmailJourney {
-  const brief = emailJourneyBrief(session);
+  const brief = emailJourneyBrief(session, "email-journey-v2");
   const primary = brief.topics[0],
     secondary = brief.topics[1];
   const sample = brief.responses.find((response) => response.questionId === brief.threadQuestionId);
@@ -133,7 +133,7 @@ export function fixedTestEmailJourney(session: AssessmentSession): EmailJourney 
     primaryId: brief.primaryId,
     secondaryId: brief.secondaryId,
     jointPriority: brief.jointPriority,
-    threadQuestionId: brief.threadQuestionId,
+    threadQuestionId: brief.threadQuestionId ?? null,
     emails: brief.slots.map((slot, index): JourneyEmail => ({
       number: slot.number,
       purpose: slot.purpose,
@@ -155,6 +155,7 @@ export function fixedTestEmailJourney(session: AssessmentSession): EmailJourney 
               index + 1,
               brief.primaryId,
               brief.secondaryId,
+              "email-journey-v2",
             )!,
           }),
     })),

@@ -1,0 +1,787 @@
+[
+  {
+    "journey": {
+      "version": "email-journey-v1",
+      "status": "draft",
+      "sessionId": "fictional-legacy-compatibility",
+      "generatedAt": "2026-10-16T12:00:00Z",
+      "model": "fixed-test-v2 (no Gemini)",
+      "source": "fixed_test",
+      "primaryId": "P03",
+      "secondaryId": "P04",
+      "jointPriority": false,
+      "emails": [
+        {
+          "number": 1,
+          "purpose": "detailed_report",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] Your detailed Snapshot report",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "Integration test",
+              "paragraphs": [
+                "This is a fixed template test of Nkoyo's email setup. Gemini did not write this email. It is a draft for review and has not been sent."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Your primary focus",
+              "paragraphs": [
+                "Decision bottleneck",
+                "Work can stall when ordinary choices keep returning to senior leadership."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Also worth exploring",
+              "paragraphs": [
+                "Responsibility without authority",
+                "Responsibility is harder to carry when the needed decisions or resources sit elsewhere."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Culture, Capacity and Compliance",
+              "paragraphs": [
+                "The saved assessment's relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.",
+                "The topics follow the saved result's ordering."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Choose a starting focus",
+              "paragraphs": [
+                "Which recurring decision could be made closer to the work, with clear limits?",
+                "The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed."
+              ],
+              "sourceQuestionIds": []
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "purpose": "primary_awareness",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] A closer look at your primary focus",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Notice the recurring situation",
+              "paragraphs": [
+                "Work can stall when ordinary choices keep returning to senior leadership.",
+                "Use a recent example to distinguish an occasional difficulty from a repeated pattern."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "A question to reflect on",
+              "paragraphs": [
+                "Which recurring decision could be made closer to the work, with clear limits?"
+              ],
+              "sourceQuestionIds": []
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "purpose": "primary_explanation",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] Understanding the pattern",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Explore how it affects the work",
+              "paragraphs": [
+                "Work can stall when ordinary choices keep returning to senior leadership.",
+                "Map what happens before and after the difficulty. Separate what you observed from what you assume caused it.",
+                "If this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Discuss it with the people involved",
+              "paragraphs": [
+                "Which recurring decision could be made closer to the work, with clear limits?",
+                "Check whether colleagues describe the same pattern and where their experience differs."
+              ],
+              "sourceQuestionIds": []
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "purpose": "primary_action",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] One practical action to try",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Try one small step",
+              "paragraphs": [
+                "Choose one delayed decision and write down its owner, approval limit, and escalation route."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Review what changed",
+              "paragraphs": [
+                "Choose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need."
+              ],
+              "sourceQuestionIds": []
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "purpose": "secondary_exploration",
+          "focusId": "P04",
+          "subject": "[TEST — FIXED] Connecting your findings and considering support",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Your secondary focus",
+              "paragraphs": [
+                "Responsibility without authority",
+                "Responsibility is harder to carry when the needed decisions or resources sit elsewhere."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "What a conversation could clarify",
+              "paragraphs": [
+                "Where is someone accountable for an outcome they cannot actually influence?",
+                "For one role, compare its expected results with the decisions and resources it can control.",
+                "The two topics may overlap, but this assessment has not proved a causal relationship.",
+                "A conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised."
+              ],
+              "sourceQuestionIds": []
+            }
+          ]
+        }
+      ]
+    },
+    "html": [
+      "<p>Hello,</p>\n<h2>Integration test</h2>\n<p>This is a fixed template test of Nkoyo&#39;s email setup. Gemini did not write this email. It is a draft for review and has not been sent.</p>\n<h2>Your primary focus</h2>\n<p>Decision bottleneck</p>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Also worth exploring</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>Culture, Capacity and Compliance</h2>\n<p>The saved assessment&#39;s relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.</p>\n<p>The topics follow the saved result&#39;s ordering.</p>\n<h2>Choose a starting focus</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.</p>\n<p>This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Notice the recurring situation</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Use a recent example to distinguish an occasional difficulty from a repeated pattern.</p>\n<h2>A question to reflect on</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Explore how it affects the work</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Map what happens before and after the difficulty. Separate what you observed from what you assume caused it.</p>\n<p>If this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.</p>\n<h2>Discuss it with the people involved</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Check whether colleagues describe the same pattern and where their experience differs.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Try one small step</h2>\n<p>Choose one delayed decision and write down its owner, approval limit, and escalation route.</p>\n<h2>Review what changed</h2>\n<p>Choose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Your secondary focus</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>What a conversation could clarify</h2>\n<p>Where is someone accountable for an outcome they cannot actually influence?</p>\n<p>For one role, compare its expected results with the decisions and resources it can control.</p>\n<p>The two topics may overlap, but this assessment has not proved a causal relationship.</p>\n<p>A conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>"
+    ],
+    "text": [
+      "Hello,\n\nIntegration test\n\nThis is a fixed template test of Nkoyo's email setup. Gemini did not write this email. It is a draft for review and has not been sent.\n\nYour primary focus\n\nDecision bottleneck\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nAlso worth exploring\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\nCulture, Capacity and Compliance\n\nThe saved assessment's relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.\n\nThe topics follow the saved result's ordering.\n\nChoose a starting focus\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nThe later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.\n\nThis Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nNotice the recurring situation\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nUse a recent example to distinguish an occasional difficulty from a repeated pattern.\n\nA question to reflect on\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nExplore how it affects the work\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nMap what happens before and after the difficulty. Separate what you observed from what you assume caused it.\n\nIf this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.\n\nDiscuss it with the people involved\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nCheck whether colleagues describe the same pattern and where their experience differs.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nTry one small step\n\nChoose one delayed decision and write down its owner, approval limit, and escalation route.\n\nReview what changed\n\nChoose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nYour secondary focus\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\nWhat a conversation could clarify\n\nWhere is someone accountable for an outcome they cannot actually influence?\n\nFor one role, compare its expected results with the decisions and resources it can control.\n\nThe two topics may overlap, but this assessment has not proved a causal relationship.\n\nA conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.\n\nNkoyo\nIban Ison Solutions"
+    ],
+    "markdown": "# Nkoyo — five-email journey\n\nSaved email content. Check the staff Admin for consent, scheduling and provider status.\n\nSession: fictional-legacy-compatibility\nGenerated: 2026-10-16T12:00:00Z\nModel: fixed-test-v2 (no Gemini)\nContent version: email-journey-v1\n\n## Email 1: detailed report\n\n**Subject:** \\[TEST — FIXED\\] Your detailed Snapshot report\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### Integration test\n\nThis is a fixed template test of Nkoyo's email setup. Gemini did not write this email. It is a draft for review and has not been sent.\n\n### Your primary focus\n\nDecision bottleneck\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Also worth exploring\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\n### Culture, Capacity and Compliance\n\nThe saved assessment's relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.\n\nThe topics follow the saved result's ordering.\n\n### Choose a starting focus\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nThe later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.\n\nThis Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.\n\nNkoyo\nIban Ison Solutions\n\n## Email 2: primary awareness\n\n**Subject:** \\[TEST — FIXED\\] A closer look at your primary focus\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Notice the recurring situation\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nUse a recent example to distinguish an occasional difficulty from a repeated pattern.\n\n### A question to reflect on\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nNkoyo\nIban Ison Solutions\n\n## Email 3: primary explanation\n\n**Subject:** \\[TEST — FIXED\\] Understanding the pattern\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Explore how it affects the work\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nMap what happens before and after the difficulty. Separate what you observed from what you assume caused it.\n\nIf this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.\n\n### Discuss it with the people involved\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nCheck whether colleagues describe the same pattern and where their experience differs.\n\nNkoyo\nIban Ison Solutions\n\n## Email 4: primary action\n\n**Subject:** \\[TEST — FIXED\\] One practical action to try\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Try one small step\n\nChoose one delayed decision and write down its owner, approval limit, and escalation route.\n\n### Review what changed\n\nChoose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.\n\nNkoyo\nIban Ison Solutions\n\n## Email 5: secondary exploration\n\n**Subject:** \\[TEST — FIXED\\] Connecting your findings and considering support\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Your secondary focus\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\n### What a conversation could clarify\n\nWhere is someone accountable for an outcome they cannot actually influence?\n\nFor one role, compare its expected results with the decisions and resources it can control.\n\nThe two topics may overlap, but this assessment has not proved a causal relationship.\n\nA conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.\n\nNkoyo\nIban Ison Solutions\n",
+    "reportOnly": [
+      {
+        "emailNumber": 1,
+        "dayOffset": 0,
+        "payload": {
+          "subject": "[TEST — FIXED] Your detailed Snapshot report",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>Integration test</h2>\n<p>This is a fixed template test of Nkoyo&#39;s email setup. Gemini did not write this email. It is a draft for review and has not been sent.</p>\n<h2>Your primary focus</h2>\n<p>Decision bottleneck</p>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Also worth exploring</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>Culture, Capacity and Compliance</h2>\n<p>The saved assessment&#39;s relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.</p>\n<p>The topics follow the saved result&#39;s ordering.</p>\n<h2>Choose a starting focus</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.</p>\n<p>This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v1 / email 1",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "optedIn": [
+      {
+        "emailNumber": 1,
+        "dayOffset": 0,
+        "payload": {
+          "subject": "[TEST — FIXED] Your detailed Snapshot report",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>Integration test</h2>\n<p>This is a fixed template test of Nkoyo&#39;s email setup. Gemini did not write this email. It is a draft for review and has not been sent.</p>\n<h2>Your primary focus</h2>\n<p>Decision bottleneck</p>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Also worth exploring</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>Culture, Capacity and Compliance</h2>\n<p>The saved assessment&#39;s relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.</p>\n<p>The topics follow the saved result&#39;s ordering.</p>\n<h2>Choose a starting focus</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.</p>\n<p>This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v1 / email 1",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 2,
+        "dayOffset": 2,
+        "payload": {
+          "subject": "[TEST — FIXED] A closer look at your primary focus",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Notice the recurring situation</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Use a recent example to distinguish an occasional difficulty from a repeated pattern.</p>\n<h2>A question to reflect on</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v1 / email 2",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 3,
+        "dayOffset": 4,
+        "payload": {
+          "subject": "[TEST — FIXED] Understanding the pattern",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Explore how it affects the work</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Map what happens before and after the difficulty. Separate what you observed from what you assume caused it.</p>\n<p>If this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.</p>\n<h2>Discuss it with the people involved</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Check whether colleagues describe the same pattern and where their experience differs.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v1 / email 3",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 4,
+        "dayOffset": 7,
+        "payload": {
+          "subject": "[TEST — FIXED] One practical action to try",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Try one small step</h2>\n<p>Choose one delayed decision and write down its owner, approval limit, and escalation route.</p>\n<h2>Review what changed</h2>\n<p>Choose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v1 / email 4",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 5,
+        "dayOffset": 10,
+        "payload": {
+          "subject": "[TEST — FIXED] Connecting your findings and considering support",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Your secondary focus</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>What a conversation could clarify</h2>\n<p>Where is someone accountable for an outcome they cannot actually influence?</p>\n<p>For one role, compare its expected results with the decisions and resources it can control.</p>\n<p>The two topics may overlap, but this assessment has not proved a causal relationship.</p>\n<p>A conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v1 / email 5",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "journey": {
+      "version": "email-journey-v2",
+      "status": "draft",
+      "sessionId": "fictional-legacy-compatibility",
+      "generatedAt": "2026-10-16T12:00:00Z",
+      "model": "fixed-test-v2 (no Gemini)",
+      "source": "fixed_test",
+      "primaryId": "P03",
+      "secondaryId": "P04",
+      "jointPriority": false,
+      "threadQuestionId": "q4",
+      "emails": [
+        {
+          "number": 1,
+          "purpose": "detailed_report",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] Your detailed Snapshot report",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "Integration test",
+              "paragraphs": [
+                "This is a fixed template test of Nkoyo's email setup. Gemini did not write this email. It is a draft for review and has not been sent."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Your primary focus",
+              "paragraphs": [
+                "Decision bottleneck",
+                "Work can stall when ordinary choices keep returning to senior leadership."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Also worth exploring",
+              "paragraphs": [
+                "Responsibility without authority",
+                "Responsibility is harder to carry when the needed decisions or resources sit elsewhere."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Culture, Capacity and Compliance",
+              "paragraphs": [
+                "The saved assessment's relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.",
+                "The topics follow the saved result's ordering."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Choose a starting focus",
+              "paragraphs": [
+                "Which recurring decision could be made closer to the work, with clear limits?",
+                "The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed."
+              ],
+              "sourceQuestionIds": []
+            }
+          ],
+          "mainAction": "Choose one finding or unresolved question from this report to explore first.",
+          "nextEmailPreview": "Next, I’ll help you recognize this pattern in everyday work."
+        },
+        {
+          "number": 2,
+          "purpose": "primary_awareness",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] A closer look at your primary focus",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Notice the recurring situation",
+              "paragraphs": [
+                "Work can stall when ordinary choices keep returning to senior leadership.",
+                "Use a recent example to distinguish an occasional difficulty from a repeated pattern."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "A question to reflect on",
+              "paragraphs": [
+                "Which recurring decision could be made closer to the work, with clear limits?"
+              ],
+              "sourceQuestionIds": []
+            }
+          ],
+          "mainAction": "Observe one real example and note what happened before and after the difficulty.",
+          "nextEmailPreview": "Next, we’ll explore what may sustain this pattern and which consequences to check."
+        },
+        {
+          "number": 3,
+          "purpose": "primary_explanation",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] Understanding the pattern",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Explore how it affects the work",
+              "paragraphs": [
+                "Work can stall when ordinary choices keep returning to senior leadership.",
+                "Map what happens before and after the difficulty. Separate what you observed from what you assume caused it.",
+                "If this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Discuss it with the people involved",
+              "paragraphs": [
+                "Which recurring decision could be made closer to the work, with clear limits?",
+                "Check whether colleagues describe the same pattern and where their experience differs."
+              ],
+              "sourceQuestionIds": []
+            }
+          ],
+          "mainAction": "Discuss this one question with your team: Which recurring decision could be made closer to the work, with clear limits?",
+          "nextEmailPreview": "Next, I’ll suggest one manageable step and what to watch afterward."
+        },
+        {
+          "number": 4,
+          "purpose": "primary_action",
+          "focusId": "P03",
+          "subject": "[TEST — FIXED] One practical action to try",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Try one small step",
+              "paragraphs": [
+                "Choose one delayed decision and write down its owner, approval limit, and escalation route."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "Review what changed",
+              "paragraphs": [
+                "Choose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need."
+              ],
+              "sourceQuestionIds": []
+            }
+          ],
+          "mainAction": "Agree whether to try this small experiment: Choose one delayed decision and write down its owner, approval limit, and escalation route.",
+          "nextEmailPreview": "In the final email, we’ll explore how the other finding may connect and what a conversation with Nkoyo could help clarify."
+        },
+        {
+          "number": 5,
+          "purpose": "secondary_exploration",
+          "focusId": "P04",
+          "subject": "[TEST — FIXED] Connecting your findings and considering support",
+          "preview": "Fixed template integration test — no Gemini generation, draft only.",
+          "sections": [
+            {
+              "heading": "An answer you gave",
+              "paragraphs": [
+                "Question: Tell us about one recent situation that shows the difficulty you most want to address.",
+                "Your answer: Fictional example: a routine approval waited two weeks.",
+                "This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue."
+              ],
+              "sourceQuestionIds": [
+                "q4"
+              ]
+            },
+            {
+              "heading": "Your secondary focus",
+              "paragraphs": [
+                "Responsibility without authority",
+                "Responsibility is harder to carry when the needed decisions or resources sit elsewhere."
+              ],
+              "sourceQuestionIds": []
+            },
+            {
+              "heading": "What a conversation could clarify",
+              "paragraphs": [
+                "Where is someone accountable for an outcome they cannot actually influence?",
+                "For one role, compare its expected results with the decisions and resources it can control.",
+                "The two topics may overlap, but this assessment has not proved a causal relationship.",
+                "A conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised."
+              ],
+              "sourceQuestionIds": []
+            }
+          ],
+          "mainAction": "If guided support would be useful, bring one finding or unresolved question to a conversation with Nkoyo.",
+          "supportInvitation": true
+        }
+      ]
+    },
+    "html": [
+      "<p>Hello,</p>\n<h2>Integration test</h2>\n<p>This is a fixed template test of Nkoyo&#39;s email setup. Gemini did not write this email. It is a draft for review and has not been sent.</p>\n<h2>Your primary focus</h2>\n<p>Decision bottleneck</p>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Also worth exploring</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>Culture, Capacity and Compliance</h2>\n<p>The saved assessment&#39;s relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.</p>\n<p>The topics follow the saved result&#39;s ordering.</p>\n<h2>Choose a starting focus</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.</p>\n<h2>Your next step</h2><p>Choose one finding or unresolved question from this report to explore first.</p>\n<p>Next, I’ll help you recognize this pattern in everyday work.</p>\n<p>This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Notice the recurring situation</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Use a recent example to distinguish an occasional difficulty from a repeated pattern.</p>\n<h2>A question to reflect on</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<h2>Your next step</h2><p>Observe one real example and note what happened before and after the difficulty.</p>\n<p>Next, we’ll explore what may sustain this pattern and which consequences to check.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Explore how it affects the work</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Map what happens before and after the difficulty. Separate what you observed from what you assume caused it.</p>\n<p>If this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.</p>\n<h2>Discuss it with the people involved</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Check whether colleagues describe the same pattern and where their experience differs.</p>\n<h2>Your next step</h2><p>Discuss this one question with your team: Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Next, I’ll suggest one manageable step and what to watch afterward.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Try one small step</h2>\n<p>Choose one delayed decision and write down its owner, approval limit, and escalation route.</p>\n<h2>Review what changed</h2>\n<p>Choose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.</p>\n<h2>Your next step</h2><p>Agree whether to try this small experiment: Choose one delayed decision and write down its owner, approval limit, and escalation route.</p>\n<p>In the final email, we’ll explore how the other finding may connect and what a conversation with Nkoyo could help clarify.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+      "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Your secondary focus</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>What a conversation could clarify</h2>\n<p>Where is someone accountable for an outcome they cannot actually influence?</p>\n<p>For one role, compare its expected results with the decisions and resources it can control.</p>\n<p>The two topics may overlap, but this assessment has not proved a causal relationship.</p>\n<p>A conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.</p>\n<h2>Your next step</h2><p>If guided support would be useful, bring one finding or unresolved question to a conversation with Nkoyo.</p>\n<p><a href=\"mailto:hello@nkoyoeffionglewis.com?subject=My%20Snapshot%20and%20next%20steps\">Discuss your Snapshot with Nkoyo</a></p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>"
+    ],
+    "text": [
+      "Hello,\n\nIntegration test\n\nThis is a fixed template test of Nkoyo's email setup. Gemini did not write this email. It is a draft for review and has not been sent.\n\nYour primary focus\n\nDecision bottleneck\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nAlso worth exploring\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\nCulture, Capacity and Compliance\n\nThe saved assessment's relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.\n\nThe topics follow the saved result's ordering.\n\nChoose a starting focus\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nThe later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.\n\nYour next step\n\nChoose one finding or unresolved question from this report to explore first.\n\nNext, I’ll help you recognize this pattern in everyday work.\n\nThis Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nNotice the recurring situation\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nUse a recent example to distinguish an occasional difficulty from a repeated pattern.\n\nA question to reflect on\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nYour next step\n\nObserve one real example and note what happened before and after the difficulty.\n\nNext, we’ll explore what may sustain this pattern and which consequences to check.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nExplore how it affects the work\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nMap what happens before and after the difficulty. Separate what you observed from what you assume caused it.\n\nIf this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.\n\nDiscuss it with the people involved\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nCheck whether colleagues describe the same pattern and where their experience differs.\n\nYour next step\n\nDiscuss this one question with your team: Which recurring decision could be made closer to the work, with clear limits?\n\nNext, I’ll suggest one manageable step and what to watch afterward.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nTry one small step\n\nChoose one delayed decision and write down its owner, approval limit, and escalation route.\n\nReview what changed\n\nChoose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.\n\nYour next step\n\nAgree whether to try this small experiment: Choose one delayed decision and write down its owner, approval limit, and escalation route.\n\nIn the final email, we’ll explore how the other finding may connect and what a conversation with Nkoyo could help clarify.\n\nNkoyo\nIban Ison Solutions",
+      "Hello,\n\nAn answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\nYour secondary focus\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\nWhat a conversation could clarify\n\nWhere is someone accountable for an outcome they cannot actually influence?\n\nFor one role, compare its expected results with the decisions and resources it can control.\n\nThe two topics may overlap, but this assessment has not proved a causal relationship.\n\nA conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.\n\nYour next step\n\nIf guided support would be useful, bring one finding or unresolved question to a conversation with Nkoyo.\n\nDiscuss your Snapshot with Nkoyo: hello@nkoyoeffionglewis.com\n\nNkoyo\nIban Ison Solutions"
+    ],
+    "markdown": "# Nkoyo — five-email journey\n\nSaved email content. Check the staff Admin for consent, scheduling and provider status.\n\nSession: fictional-legacy-compatibility\nGenerated: 2026-10-16T12:00:00Z\nModel: fixed-test-v2 (no Gemini)\nContent version: email-journey-v2\nShared answer reference for staff: q4\n\n## Email 1: detailed report\n\n**Subject:** \\[TEST — FIXED\\] Your detailed Snapshot report\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### Integration test\n\nThis is a fixed template test of Nkoyo's email setup. Gemini did not write this email. It is a draft for review and has not been sent.\n\n### Your primary focus\n\nDecision bottleneck\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Also worth exploring\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\n### Culture, Capacity and Compliance\n\nThe saved assessment's relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.\n\nThe topics follow the saved result's ordering.\n\n### Choose a starting focus\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nThe later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.\n\n### Your next step\n\nChoose one finding or unresolved question from this report to explore first.\n\nNext, I’ll help you recognize this pattern in everyday work.\n\nThis Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.\n\nNkoyo\nIban Ison Solutions\n\n## Email 2: primary awareness\n\n**Subject:** \\[TEST — FIXED\\] A closer look at your primary focus\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Notice the recurring situation\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nUse a recent example to distinguish an occasional difficulty from a repeated pattern.\n\n### A question to reflect on\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\n### Your next step\n\nObserve one real example and note what happened before and after the difficulty.\n\nNext, we’ll explore what may sustain this pattern and which consequences to check.\n\nNkoyo\nIban Ison Solutions\n\n## Email 3: primary explanation\n\n**Subject:** \\[TEST — FIXED\\] Understanding the pattern\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Explore how it affects the work\n\nWork can stall when ordinary choices keep returning to senior leadership.\n\nMap what happens before and after the difficulty. Separate what you observed from what you assume caused it.\n\nIf this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.\n\n### Discuss it with the people involved\n\nWhich recurring decision could be made closer to the work, with clear limits?\n\nCheck whether colleagues describe the same pattern and where their experience differs.\n\n### Your next step\n\nDiscuss this one question with your team: Which recurring decision could be made closer to the work, with clear limits?\n\nNext, I’ll suggest one manageable step and what to watch afterward.\n\nNkoyo\nIban Ison Solutions\n\n## Email 4: primary action\n\n**Subject:** \\[TEST — FIXED\\] One practical action to try\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Try one small step\n\nChoose one delayed decision and write down its owner, approval limit, and escalation route.\n\n### Review what changed\n\nChoose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.\n\n### Your next step\n\nAgree whether to try this small experiment: Choose one delayed decision and write down its owner, approval limit, and escalation route.\n\nIn the final email, we’ll explore how the other finding may connect and what a conversation with Nkoyo could help clarify.\n\nNkoyo\nIban Ison Solutions\n\n## Email 5: secondary exploration\n\n**Subject:** \\[TEST — FIXED\\] Connecting your findings and considering support\n**Preview:** Fixed template integration test — no Gemini generation, draft only.\n\nHello,\n\n### An answer you gave\n\nQuestion: Tell us about one recent situation that shows the difficulty you most want to address.\n\nYour answer: Fictional example: a routine approval waited two weeks.\n\nThis excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.\n\n*Staff evidence references: q4*\n\n### Your secondary focus\n\nResponsibility without authority\n\nResponsibility is harder to carry when the needed decisions or resources sit elsewhere.\n\n### What a conversation could clarify\n\nWhere is someone accountable for an outcome they cannot actually influence?\n\nFor one role, compare its expected results with the decisions and resources it can control.\n\nThe two topics may overlap, but this assessment has not proved a causal relationship.\n\nA conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.\n\n### Your next step\n\nIf guided support would be useful, bring one finding or unresolved question to a conversation with Nkoyo.\n\nDiscuss your Snapshot with Nkoyo: hello@nkoyoeffionglewis.com\n\nNkoyo\nIban Ison Solutions\n",
+    "reportOnly": [
+      {
+        "emailNumber": 1,
+        "dayOffset": 0,
+        "payload": {
+          "subject": "[TEST — FIXED] Your detailed Snapshot report",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>Integration test</h2>\n<p>This is a fixed template test of Nkoyo&#39;s email setup. Gemini did not write this email. It is a draft for review and has not been sent.</p>\n<h2>Your primary focus</h2>\n<p>Decision bottleneck</p>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Also worth exploring</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>Culture, Capacity and Compliance</h2>\n<p>The saved assessment&#39;s relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.</p>\n<p>The topics follow the saved result&#39;s ordering.</p>\n<h2>Choose a starting focus</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.</p>\n<h2>Your next step</h2><p>Choose one finding or unresolved question from this report to explore first.</p>\n<p>This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v2 / email 1",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "optedIn": [
+      {
+        "emailNumber": 1,
+        "dayOffset": 0,
+        "payload": {
+          "subject": "[TEST — FIXED] Your detailed Snapshot report",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>Integration test</h2>\n<p>This is a fixed template test of Nkoyo&#39;s email setup. Gemini did not write this email. It is a draft for review and has not been sent.</p>\n<h2>Your primary focus</h2>\n<p>Decision bottleneck</p>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Also worth exploring</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>Culture, Capacity and Compliance</h2>\n<p>The saved assessment&#39;s relative emphasis is Culture 40%, Capacity 40% and Compliance 20%. These shares are not validated organizational scores.</p>\n<p>The topics follow the saved result&#39;s ordering.</p>\n<h2>Choose a starting focus</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>The later messages will help you recognize the pattern, understand its possible effects and try one manageable change. No cause or improvement is assumed.</p>\n<h2>Your next step</h2><p>Choose one finding or unresolved question from this report to explore first.</p>\n<p>Next, I’ll help you recognize this pattern in everyday work.</p>\n<p>This Snapshot is a starting point for discussion, based on your answers. It is not a diagnosis or a verified audit. The Culture, Capacity and Compliance shares describe relative emphasis in this assessment, not measured organizational scores.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v2 / email 1",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 2,
+        "dayOffset": 2,
+        "payload": {
+          "subject": "[TEST — FIXED] A closer look at your primary focus",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Notice the recurring situation</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Use a recent example to distinguish an occasional difficulty from a repeated pattern.</p>\n<h2>A question to reflect on</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<h2>Your next step</h2><p>Observe one real example and note what happened before and after the difficulty.</p>\n<p>Next, we’ll explore what may sustain this pattern and which consequences to check.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v2 / email 2",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 3,
+        "dayOffset": 4,
+        "payload": {
+          "subject": "[TEST — FIXED] Understanding the pattern",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Explore how it affects the work</h2>\n<p>Work can stall when ordinary choices keep returning to senior leadership.</p>\n<p>Map what happens before and after the difficulty. Separate what you observed from what you assume caused it.</p>\n<p>If this pattern continues, delays or repeated extra work could affect delivery. Check whether that is happening rather than treating it as inevitable.</p>\n<h2>Discuss it with the people involved</h2>\n<p>Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Check whether colleagues describe the same pattern and where their experience differs.</p>\n<h2>Your next step</h2><p>Discuss this one question with your team: Which recurring decision could be made closer to the work, with clear limits?</p>\n<p>Next, I’ll suggest one manageable step and what to watch afterward.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v2 / email 3",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 4,
+        "dayOffset": 7,
+        "payload": {
+          "subject": "[TEST — FIXED] One practical action to try",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Try one small step</h2>\n<p>Choose one delayed decision and write down its owner, approval limit, and escalation route.</p>\n<h2>Review what changed</h2>\n<p>Choose an owner and a review date seven days from now. Note whether the change helped, what remained difficult, and what further evidence you need.</p>\n<h2>Your next step</h2><p>Agree whether to try this small experiment: Choose one delayed decision and write down its owner, approval limit, and escalation route.</p>\n<p>In the final email, we’ll explore how the other finding may connect and what a conversation with Nkoyo could help clarify.</p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v2 / email 4",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "emailNumber": 5,
+        "dayOffset": 10,
+        "payload": {
+          "subject": "[TEST — FIXED] Connecting your findings and considering support",
+          "preview_text": "Fixed template integration test — no Gemini generation, draft only.",
+          "content": "<p>Hello,</p>\n<h2>An answer you gave</h2>\n<p>Question: Tell us about one recent situation that shows the difficulty you most want to address.</p>\n<p>Your answer: Fictional example: a routine approval waited two weeks.</p>\n<p>This excerpt is included to test the connection to the saved assessment. It does not establish the cause of the issue.</p>\n<h2>Your secondary focus</h2>\n<p>Responsibility without authority</p>\n<p>Responsibility is harder to carry when the needed decisions or resources sit elsewhere.</p>\n<h2>What a conversation could clarify</h2>\n<p>Where is someone accountable for an outcome they cannot actually influence?</p>\n<p>For one role, compare its expected results with the decisions and resources it can control.</p>\n<p>The two topics may overlap, but this assessment has not proved a causal relationship.</p>\n<p>A conversation with Nkoyo could help you examine the connection and decide which next step is appropriate. No outcome or service availability is promised.</p>\n<h2>Your next step</h2><p>If guided support would be useful, bring one finding or unresolved question to a conversation with Nkoyo.</p>\n<p><a href=\"mailto:hello@nkoyoeffionglewis.com?subject=My%20Snapshot%20and%20next%20steps\">Discuss your Snapshot with Nkoyo</a></p>\n<p>Nkoyo<br>Iban Ison Solutions</p>\n<p><a href=\"{{ unsubscribe_url }}\">Unsubscribe</a><br>{{ address }}</p>",
+          "description": "Nkoyo fictional-legacy-compatibility / email-journey-v2 / email 5",
+          "public": false,
+          "published_at": "2026-10-16T12:00:00Z",
+          "send_at": null,
+          "subscriber_filter": [
+            {
+              "all": [
+                {
+                  "type": "tag",
+                  "ids": [
+                    42
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -1,6 +1,12 @@
 # Nkoyo — five personalized assessment emails
 
-## The chosen design
+## Current local revision: v3
+
+New generation uses **finding and first check → obstacle distinction → bounded test → interpretation of possible results → next decision**. All five are still generated together. Saved v1/v2 content retains its original mappings and rendering. This revision is local only; it has not been deployed or tested through live generation/delivery.
+
+See [the v3 implementation guide](nkoyo-email-generation-v3.md) for canonical roles, targets and acceptance bounds, topic advice, prompts/schema/validation, compatibility, consent and the fictional review sample. No migration is required. The historical records below do not define v3's slot counts, shared-reference policy or writing instructions.
+
+## Historical design through v2
 
 All five emails are written for the individual using the actual questions and answers from their completed assessment. The earlier topic-sequence approach is an alternative, not the current design. Topic IDs remain useful metadata, but the content comes from the person's examples and constraints.
 

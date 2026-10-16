@@ -1,371 +1,461 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createAssessmentSession } from "../src/assessment-v2/orchestrator.ts";
+import { readFile } from "node:fs/promises";
 import {
   emailJourneyBrief,
   eligibleJourneyEmails,
   emailJourneyMarkdown,
   journeyEmailHtml,
-  kitJourneyDrafts,
   journeyEmailText,
+  kitJourneyDrafts,
   emailSupportInvitation,
+  legacyEmailPurposes,
 } from "../src/assessment-v2/email-journey.ts";
-import { createGeminiEmailJourneyWriter } from "../src/assessment-v2/email-journey.server.ts";
+import { emailV3Slots, emailSlotsForVersion } from "../src/assessment-v2/email-contract.ts";
+import {
+  emailJourneyResponseSchema,
+  validateEmailJourneyOutput,
+  paragraphWordCount,
+} from "../src/assessment-v2/email-validation.ts";
+import {
+  createGeminiEmailJourneyWriter,
+  buildEmailJourney,
+  emailJourneySystemInstruction,
+} from "../src/assessment-v2/email-journey.server.ts";
 import { fixedTestEmailJourney } from "../src/assessment-v2/email-journey-fixed.ts";
 import { assertFixedEmailTestAllowed } from "../src/assessment-v2/email-job-policy.server.ts";
-
-test("fixed drafts retain saved topics and answer evidence with honest provenance, including uncertain results", () => {
-  const value = session(),
-    draft = fixedTestEmailJourney(value);
-  assert.equal(draft.source, "fixed_test");
-  assert.equal(draft.model, "fixed-test-v2 (no Gemini)");
-  assert.equal(draft.version, "email-journey-v2");
-  assert.equal(draft.sessionId, value.id);
-  assert.equal(draft.jointPriority, true);
-  assert.deepEqual(
-    draft.emails.map((email) => email.focusId),
-    ["P03", "P03", "P03", "P03", "P04"],
-  );
-  assert.ok(draft.emails.every((email) => email.subject.startsWith("[TEST — FIXED]")));
-  assert.ok(JSON.stringify(draft).includes("approvals waited two weeks"));
-  assert.ok(!JSON.stringify(draft).includes("private-capability"));
-  assert.ok(draft.emails[0].sections.some((section) => section.sourceQuestionIds.includes("q4")));
-  assert.equal(kitJourneyDrafts(draft, 22, true).length, 5);
-  assert.equal(kitJourneyDrafts(draft, 22, false).length, 1);
-  assert.ok(
-    !kitJourneyDrafts(draft, 22, false)[0].payload.content.includes(
-      draft.emails[0].nextEmailPreview,
-    ),
-  );
-  assert.ok(
-    kitJourneyDrafts(draft, 22, true)[0].payload.content.includes(draft.emails[0].nextEmailPreview),
-  );
-  value.result.problems = [];
-  value.result.priority = [];
-  value.answers = [];
-  const uncertain = fixedTestEmailJourney(value);
-  assert.equal(uncertain.primaryId, null);
-  assert.equal(uncertain.secondaryId, null);
-  assert.ok(JSON.stringify(uncertain).includes("No second issue identified"));
+import { emailTopicGuides } from "../src/assessment-v2/email-topic-guides.ts";
+import { problemById } from "../src/assessment-v2/problem-bank.ts";
+import { fictionalSession, fictionalOutput } from "./fixtures/email-v3-fictional.mjs";
+const clone = () => structuredClone(fictionalOutput);
+const recorder = (records) => ({
+  async start(spec) {
+    records.push(spec);
+    return "call";
+  },
+  async finish(id, data) {
+    records.push({ id, ...data });
+  },
 });
-test("fixed test mode cannot address ordinary contacts or run in production", () => {
-  assertFixedEmailTestAllowed("test", "Test@EXAMPLE.com", " test@example.com ");
-  for (const mode of [undefined, "production", "other"])
-    assert.throws(() => assertFixedEmailTestAllowed(mode, "test@example.com", "test@example.com"));
-  assert.throws(() => assertFixedEmailTestAllowed("test", "other@example.com", "test@example.com"));
-  assert.throws(() => assertFixedEmailTestAllowed("test", "test@example.com", ""));
-});
-
-function session() {
-  const value = createAssessmentSession("synthetic-email-example", "adaptive-v1");
-  value.stage = "complete";
-  value.answers = [
-    {
-      questionId: "q4",
-      text: "Synthetic example: approvals waited two weeks.",
-      submittedAt: value.createdAt,
-    },
-  ];
-  value.traceToken = "private-capability";
-  value.result = {
-    problems: [
-      {
-        problemId: "P03",
-        evidence: "supported",
-        prioritySignal: 0.82,
-        supportSignal: 0.9,
-        impactSignal: 0.8,
-        urgencySignal: 0.7,
-      },
-      {
-        problemId: "P04",
-        evidence: "possible",
-        prioritySignal: 0.8,
-        supportSignal: 0.8,
-        impactSignal: 0.8,
-        urgencySignal: 0.7,
-      },
-      {
-        problemId: "P16",
-        evidence: "contradicted",
-        prioritySignal: 0.99,
-        supportSignal: 0.1,
-        impactSignal: null,
-        urgencySignal: null,
-      },
-    ],
-    priority: ["P03", "P04"],
-    threeCShare: { culture: 35, capacity: 39, compliance: 26 },
-    generatedAt: value.createdAt,
-  };
-  return value;
-}
-function output(brief) {
-  return {
-    emails: brief.slots.map((slot) => ({
-      number: slot.number,
-      purpose: slot.purpose,
-      focusId: slot.focusId,
-      subject: `A practical next step ${slot.number}`,
-      preview: "A synthetic draft to review.",
-      mainAction: `Take the distinct next step for email ${slot.number}.`,
-      sections: Array.from({ length: slot.sectionCount }, () => ({
-        heading: "Explore the evidence",
-        paragraphs: [
-          Array.from({ length: slot.number === 1 ? 50 : 30 }, () => "observation").join(" "),
-        ],
-        sourceQuestionIds: brief.threadQuestionId ? [brief.threadQuestionId] : [],
-      })),
-    })),
-  };
-}
-const response = (payload) =>
+const response = (value) =>
   new Response(
     JSON.stringify({
-      modelVersion: "gemini-test",
-      candidates: [
-        { finishReason: "STOP", content: { parts: [{ text: JSON.stringify(payload) }] } },
-      ],
+      modelVersion: "gemini-mocked",
+      candidates: [{ finishReason: "STOP", content: { parts: [{ text: JSON.stringify(value) }] } }],
     }),
-    { status: 200 },
   );
-function recorder(records) {
-  return {
-    async start(spec) {
-      records.push(spec);
-      return "call";
-    },
-    async finish(id, data) {
-      records.push({ id, ...data });
-    },
-  };
-}
+const build = (value = fictionalOutput, session = fictionalSession()) =>
+  buildEmailJourney(
+    session,
+    value,
+    "Fictional editorial sample; no model called",
+    "2026-10-16T12:00:00Z",
+  );
 
-test("journey keeps authoritative joint topics, excludes contradicted topics and limits non-opted-in delivery", () => {
-  const value = session();
-  const brief = emailJourneyBrief(value);
-  assert.equal(brief.primaryId, "P03");
-  assert.equal(brief.secondaryId, "P04");
-  assert.equal(brief.jointPriority, true);
+test("one v3 contract defines five purposes, positional section roles, targets and counts", () => {
   assert.deepEqual(
-    brief.slots.map((slot) => slot.focusId),
-    ["P03", "P03", "P03", "P03", "P04"],
+    emailV3Slots.map((s) => s.purpose),
+    [
+      "detailed_report",
+      "obstacle_distinction",
+      "bounded_test",
+      "result_interpretation",
+      "next_decision",
+    ],
   );
-  assert.ok(!JSON.stringify(brief).includes("private-capability"));
-  assert.ok(!brief.topics.some((topic) => topic.id === "P16"));
-  assert.deepEqual(eligibleJourneyEmails(false), [1]);
-  assert.deepEqual(eligibleJourneyEmails(true), [1, 2, 3, 4, 5]);
-  value.result.problems = value.result.problems.slice(0, 1);
-  assert.equal(emailJourneyBrief(value).secondaryId, null);
-  value.result.problems = [];
-  assert.ok(emailJourneyBrief(value).slots.every((slot) => slot.focusId === null));
-  value.stage = "opening";
-  assert.throws(() => emailJourneyBrief(value), /completed/);
+  assert.deepEqual(
+    emailV3Slots.map((s) => s.roles.length),
+    [4, 3, 3, 3, 3],
+  );
+  assert.deepEqual(emailV3Slots[3].roles, [
+    "interpretation_frame",
+    "outcome_branches",
+    "smallest_next_adjustment",
+  ]);
+  const brief = emailJourneyBrief(fictionalSession());
+  assert.deepEqual(
+    brief.slots.map((s) => s.sectionCount),
+    [4, 3, 3, 3, 3],
+  );
+  assert.deepEqual(
+    brief.slots.map((s) => s.focusId),
+    ["P03", "P03", "P03", "P03", "P03"],
+  );
+  assert.equal(brief.threadQuestionId, undefined);
+  assert.deepEqual(
+    validateEmailJourneyOutput(clone(), brief).map(paragraphWordCount),
+    fictionalOutput.emails.map(paragraphWordCount),
+  );
 });
 
-test("Gemini receives real evidence without credentials and records the complete draft", async () => {
-  const value = session(),
-    records = [];
+test("all eligible topics have compact advisory hypotheses, checks, distinct branches and limits; only selected guides are sent", () => {
+  assert.deepEqual(Object.keys(emailTopicGuides).sort(), Object.keys(problemById).sort());
+  for (const guide of Object.values(emailTopicGuides)) {
+    assert.equal(guide.explanations.length, 2);
+    assert.ok(guide.explanations.every((e) => e.possibility && e.clue));
+    assert.ok(
+      guide.firstCheck.action && guide.firstCheck.observe && guide.boundedTest && guide.limits,
+    );
+    assert.ok(guide.obstacleTool.action && guide.obstacleTool.record && guide.obstacleTool.use);
+    assert.notEqual(guide.obstacleTool.action, guide.firstCheck.action);
+    assert.ok(guide.results.length >= 2);
+    assert.equal(new Set(guide.results.map((r) => r.nextAdjustment)).size, guide.results.length);
+  }
+  const session = fictionalSession();
+  session.result.problems.push({
+    problemId: "P16",
+    evidence: "contradicted",
+    prioritySignal: 1,
+    supportSignal: 0,
+    impactSignal: 0,
+    urgencySignal: 0,
+  });
+  session.result.priority = ["P03", "P04"];
+  const brief = emailJourneyBrief(session);
+  assert.deepEqual(
+    brief.topics.map((t) => t.id),
+    ["P03", "P04"],
+  );
+  assert.equal(brief.jointPriority, true);
+  assert.ok(brief.topics.every((t) => t.guide.advisory));
+  assert.equal(brief.topics.length, 2);
+});
+
+test("one mocked Gemini call creates all five v3 emails and records actual request, response and validated output", async () => {
+  const session = fictionalSession();
+  session.traceToken = "private-capability";
+  const records = [];
+  let calls = 0;
   const writer = createGeminiEmailJourneyWriter({
     apiKey: "test-secret",
     trace: recorder(records),
     fetcher: async (url, init) => {
+      calls++;
       assert.ok(!url.includes("test-secret"));
+      assert.equal(init.headers["x-goog-api-key"], "test-secret");
       const request = JSON.parse(init.body);
-      assert.ok(request.contents[0].parts[0].text.includes("approvals waited two weeks"));
-      assert.ok(!JSON.stringify(request).includes("private-capability"));
-      return response(output(emailJourneyBrief(value)));
+      const prompt = request.contents[0].parts[0].text;
+      assert.ok(prompt.includes("supply request"));
+      assert.ok(!prompt.includes("private-capability"));
+      assert.ok(!prompt.includes("threadQuestionId"));
+      assert.ok(!request.systemInstruction.parts[0].text.includes("EVERY email"));
+      assert.ok(request.systemInstruction.parts[0].text.includes("outcome_branches"));
+      assert.ok(request.systemInstruction.parts[0].text.includes("Do not expose that planning"));
+      return response(clone());
     },
   });
-  const result = await writer.generate(value);
-  assert.equal(result.status, "draft");
-  assert.equal(result.model, "gemini-test");
-  assert.equal(result.version, "email-journey-v2");
-  assert.equal(result.threadQuestionId, "q4");
-  assert.ok(
-    result.emails.slice(0, 4).every((email) => email.nextEmailPreview && !email.supportInvitation),
-  );
-  assert.equal(result.emails[4].nextEmailPreview, undefined);
-  assert.equal(result.emails[4].supportInvitation, true);
-  assert.ok(journeyEmailText(result.emails[4]).includes(emailSupportInvitation.address));
-  assert.ok(journeyEmailHtml(result.emails[4]).includes(emailSupportInvitation.href));
-  assert.ok(!journeyEmailHtml(result.emails[0]).includes(emailSupportInvitation.href));
-  assert.equal(records[0].operation, "email_journey");
+  const result = await writer.generate(session);
+  assert.equal(calls, 1);
+  assert.equal(result.version, "email-journey-v3");
+  assert.equal(result.model, "gemini-mocked");
+  assert.equal(result.threadQuestionId, undefined);
   assert.equal(records[1].status, "succeeded");
-  assert.equal(records[1].output.emails.length, 5);
-  assert.ok(emailJourneyMarkdown(result).includes("Check the staff Admin"));
-  assert.ok(!emailJourneyMarkdown(result).includes("No emails have been sent"));
-  const drafts = kitJourneyDrafts(result, 123, true);
+  assert.deepEqual(records[1].output, result);
+  assert.equal(result.emails[4].supportInvitation, true);
+  assert.equal(result.emails[4].nextEmailPreview, undefined);
+});
+
+test("runtime rejects objective slot, field, reference and markup defects", () => {
+  const brief = emailJourneyBrief(fictionalSession());
+  const mutations = [
+    (d) => (d.planning = "Internal planning must not be returned"),
+    (d) => (d.emails[0].sections[0].role = "result_summary"),
+    (d) => (d.emails[2].sections = structuredClone(d.emails[1].sections)),
+    (d) => ([d.emails[0], d.emails[1]] = [d.emails[1], d.emails[0]]),
+    (d) => (d.emails[1].purpose = "primary_awareness"),
+    (d) => (d.emails[4].focusId = "P04"),
+    (d) => d.emails[0].sections.pop(),
+    (d) => d.emails.pop(),
+    (d) => delete d.emails[2].mainAction,
+    (d) => (d.emails[1].sections[0].paragraphs = "wrong type"),
+    (d) => (d.emails[0].sections[0].sourceQuestionIds = ["q999"]),
+    (d) => (d.emails[0].subject = "{{ subscriber.email }}"),
+    (d) => (d.emails[0].preview = "<script>"),
+    (d) => (d.emails[1].sections[0].paragraphs = ["[link](https://example.com)"]),
+    (d) => (d.emails[0].subject = "bad\nsubject"),
+    (d) => (d.emails[1].mainAction = d.emails[0].mainAction),
+    (d) => (d.emails[1].subject = d.emails[0].subject),
+    (d) => (d.emails[1].sections[0].paragraphs = [d.emails[1].mainAction]),
+    (d) => d.emails[2].sections.forEach((s) => (s.sourceQuestionIds = [])),
+    (d) =>
+      (d.emails[2].sections[0].paragraphs = [
+        "Your team described a recurring delay in approvals. Your team described a recurring delay in approvals.",
+      ]),
+  ];
+  for (const mutate of mutations) {
+    const data = clone();
+    mutate(data);
+    assert.throws(() => validateEmailJourneyOutput(data, brief));
+  }
+});
+
+test("known internal IDs and instruction fragments cannot leak through any customer field, including mainAction", () => {
+  const brief = emailJourneyBrief(fictionalSession());
+  for (const leaked of [
+    "q4",
+    "probe_p03",
+    "sourceQuestionIds",
+    "result_summary",
+    "Return only JSON",
+    "P03",
+  ])
+    for (const field of ["subject", "preview", "mainAction", "heading", "paragraph"]) {
+      const data = clone();
+      const email = data.emails[1];
+      if (field === "heading") email.sections[0].heading = `Check ${leaked}`;
+      else if (field === "paragraph") email.sections[0].paragraphs[0] += ` Review ${leaked}.`;
+      else email[field] = `Check ${leaked}.`;
+      assert.throws(() => validateEmailJourneyOutput(data, brief), /internal/);
+    }
+  const valid = clone();
+  valid.emails[1].subject = "Q4 planning: keep the scope small";
+  valid.emails[1].preview = "A liquid reserve is an ordinary phrase, not a template instruction.";
+  assert.equal(validateEmailJourneyOutput(valid, brief).length, 5);
+});
+
+function setWords(data, index, total) {
+  const sections = data.emails[index].sections;
+  sections.forEach(
+    (section, i) =>
+      (section.paragraphs = [
+        Array.from(
+          { length: Math.floor(total / sections.length) + (i < total % sections.length ? 1 : 0) },
+          (_, j) => (j === 0 ? `Observation${index}${i}` : "evidence"),
+        ).join(" "),
+      ]),
+  );
+}
+test("paragraph bounds are objective, separate from targets, and allow sparse evidence without padding", () => {
+  const brief = emailJourneyBrief(fictionalSession());
+  assert.equal(brief.sparseEvidence, false);
+  for (const [i, slot] of emailV3Slots.entries()) {
+    for (const words of [slot.acceptedWords[0], slot.acceptedWords[1]]) {
+      const data = clone();
+      setWords(data, i, words);
+      assert.equal(validateEmailJourneyOutput(data, brief).length, 5);
+    }
+    for (const words of [slot.acceptedWords[0] - 1, slot.acceptedWords[1] + 1]) {
+      const data = clone();
+      setWords(data, i, words);
+      assert.throws(() => validateEmailJourneyOutput(data, brief), /length/);
+    }
+  }
+  const sparse = { ...brief, sparseEvidence: true };
+  const short = clone();
+  emailV3Slots.forEach((slot, i) => setWords(short, i, slot.sparseMinimum));
+  assert.equal(validateEmailJourneyOutput(short, sparse).length, 5);
+});
+
+test("provider schema uses canonical per-slot purposes, focus IDs, section counts and valid evidence IDs", () => {
+  const brief = emailJourneyBrief(fictionalSession());
+  const schema = emailJourneyResponseSchema(brief).schema;
+  const variants = schema.properties.emails.items.anyOf;
+  assert.equal(variants.length, 5);
+  variants.forEach((variant, i) => {
+    assert.deepEqual(variant.properties.purpose.enum, [emailV3Slots[i].purpose]);
+    assert.equal(variant.properties.sections.minItems, emailV3Slots[i].roles.length);
+    assert.equal(variant.properties.sections.maxItems, emailV3Slots[i].roles.length);
+    assert.deepEqual(variant.properties.focusId.enum, ["P03"]);
+  });
+  assert.ok(emailJourneySystemInstruction.includes("No mandatory three-C section"));
+});
+
+test("each email can cite its own relevant answer; skipped answers are omitted and cannot be cited", async () => {
+  const session = fictionalSession();
+  session.answers.push({
+    questionId: "q11",
+    text: "",
+    skipped: true,
+    submittedAt: session.createdAt,
+  });
+  const data = clone();
+  data.emails[4].sections.forEach((s) => (s.sourceQuestionIds = ["probe_p04"]));
+  const records = [];
+  const writer = createGeminiEmailJourneyWriter({
+    apiKey: "x",
+    trace: recorder(records),
+    fetcher: async () => response(data),
+  });
+  assert.equal((await writer.generate(session)).emails.length, 5);
+  assert.ok(!records[0].request.contents[0].parts[0].text.includes('"questionId":"q11"'));
+  assert.ok(records[0].request.contents[0].parts[0].text.includes('"omittedAnswerCount":1'));
+  data.emails[4].sections[0].sourceQuestionIds = ["q11"];
+  assert.throws(
+    () => validateEmailJourneyOutput(data, emailJourneyBrief(session)),
+    /does not exist/,
+  );
+});
+
+test("null primary/secondary and joint priorities retain authoritative metadata and truthful previews", () => {
+  const one = fictionalSession();
+  one.result.problems = one.result.problems.slice(0, 1);
+  const single = build(clone(), one);
+  assert.equal(single.secondaryId, null);
+  assert.equal(single.emails[4].focusId, "P03");
+  assert.ok(!single.emails[3].nextEmailPreview.includes("other finding"));
+  const empty = fictionalSession();
+  empty.result.problems = [];
+  empty.result.priority = [];
+  empty.answers = [];
+  const raw = clone();
+  raw.emails.forEach((e) => {
+    e.focusId = null;
+    e.sections.forEach((s) => (s.sourceQuestionIds = []));
+  });
+  const none = build(raw, empty);
+  assert.equal(none.primaryId, null);
+  assert.equal(none.secondaryId, null);
+  assert.match(none.emails[0].nextEmailPreview, /before naming a problem/);
+  const joint = fictionalSession();
+  joint.result.priority = ["P03", "P04"];
+  const both = build(clone(), joint);
+  assert.equal(both.jointPriority, true);
+  // These fixtures check metadata and structure, not whether arbitrary prose is factually justified.
+});
+
+test("hypothetical-only and neutral/contradictory inputs retain their evidence limits without repeated inserted caveats", () => {
+  const session = fictionalSession();
+  session.questions.find((q) => q.id === "q4").answerMode = "scenario_match";
+  session.answers = [
+    {
+      questionId: "q4",
+      text: "A hypothetical example selected as a similarity, not an observed event.",
+      submittedAt: session.createdAt,
+    },
+  ];
+  const brief = emailJourneyBrief(session);
+  assert.equal(brief.responses[0].evidenceUse, "hypothetical_match");
+  assert.equal(brief.sparseEvidence, true);
+  const data = clone();
+  data.emails.forEach((e) => e.sections.forEach((s) => (s.sourceQuestionIds = ["q4"])));
+  assert.deepEqual(validateEmailJourneyOutput(data, brief), data.emails); // No keyword-based rewriting of model paragraphs.
+  session.answers = [{ questionId: "q1", optionIds: ["unsure"], submittedAt: session.createdAt }];
+  session.result.problems.forEach((p) => (p.evidence = "contradicted"));
+  const neutral = emailJourneyBrief(session);
+  assert.equal(neutral.primaryId, null);
+  assert.equal(neutral.responses[0].evidenceUse, "uncertain_or_none");
+  assert.ok(
+    emailJourneySystemInstruction.includes('do not turn "would be difficult" into "happened"'),
+  );
+});
+
+test("safe customer rendering has one action/invitation, while staff export keeps separate evidence metadata", () => {
+  const journey = build();
+  for (const email of journey.emails) {
+    const html = journeyEmailHtml(email, journey.version),
+      text = journeyEmailText(email, journey.version);
+    assert.equal((html.match(/Your next step/g) ?? []).length, 1);
+    assert.equal(text.split(email.mainAction).length - 1, 1);
+    assert.ok(!html.includes("Staff evidence references"));
+    assert.ok(!html.includes("probe_p"));
+  }
+  const final = journeyEmailHtml(journey.emails[4], journey.version);
+  assert.equal(final.split(emailSupportInvitation.href).length - 1, 1);
+  assert.ok(!final.includes(emailSupportInvitation.label));
+  assert.ok(final.includes("{{ unsubscribe_url }}"));
+  assert.match(emailJourneyMarkdown(journey), /Staff evidence references/);
+  const unsafe = {
+    ...journey.emails[4],
+    mainAction: "<input> {{ secret }} & action",
+    nextEmailPreview: "<script> & next",
+  };
+  const escaped = journeyEmailHtml(unsafe, journey.version);
+  assert.ok(!escaped.includes("<input>"));
+  assert.ok(!escaped.includes("<script>"));
+  assert.ok(!escaped.includes("{{ secret }}"));
+  assert.ok(escaped.includes("&amp;"));
+});
+
+test("v3 report scope note is brief in every rendering path; legacy scope copy is unchanged", () => {
+  const journey = build();
+  const expected =
+    "This Snapshot offers a starting point based on your answers. It is not a diagnosis or a verified audit.";
+  for (const rendered of [
+    journeyEmailHtml(journey.emails[0], journey.version),
+    journeyEmailText(journey.emails[0], journey.version),
+    emailJourneyMarkdown(journey),
+    kitJourneyDrafts(journey, 42, false)[0].payload.content,
+    kitJourneyDrafts(journey, 42, true)[0].payload.content,
+  ]) {
+    assert.ok(rendered.includes(expected));
+    assert.ok(!rendered.includes("shares describe relative emphasis"));
+    assert.ok(!rendered.includes("measured organizational scores"));
+  }
+  assert.ok(journeyEmailHtml(journey.emails[0]).includes("shares describe relative emphasis"));
+  assert.ok(!journeyEmailHtml(journey.emails[1], journey.version).includes(expected));
+});
+
+test("separate outcome paragraph entries remain separate in customer HTML and text", () => {
+  const email = structuredClone(build().emails[3]);
+  email.sections[1].paragraphs = [
+    "If the request moves, keep the agreed handoff for one comparable request.",
+    "If it returns for a missing item, clarify that input before changing the route.",
+    "If the decision boundary is disputed, agree who can decide before widening the test.",
+  ];
+  const html = journeyEmailHtml(email, "email-journey-v3");
+  const text = journeyEmailText(email, "email-journey-v3");
+  for (const paragraph of email.sections[1].paragraphs)
+    assert.ok(html.includes(`<p>${paragraph}</p>`));
+  assert.ok(text.includes(email.sections[1].paragraphs.join("\n\n")));
+  // This verifies paragraph preservation, not whether arbitrary model branches are useful or accurate.
+});
+
+test("report-only delivery stands alone; opt-in retains private recipient targeting and existing offsets", () => {
+  const journey = build();
+  assert.deepEqual(eligibleJourneyEmails(false), [1]);
+  assert.deepEqual(eligibleJourneyEmails(true), [1, 2, 3, 4, 5]);
+  const only = kitJourneyDrafts(journey, 42, false);
+  assert.equal(only.length, 1);
+  assert.ok(!only[0].payload.content.includes(journey.emails[0].nextEmailPreview));
+  const all = kitJourneyDrafts(journey, 42, true);
+  assert.equal(all.length, 5);
   assert.deepEqual(
-    drafts.map((draft) => draft.dayOffset),
+    all.map((e) => e.dayOffset),
     [0, 2, 4, 7, 10],
   );
-  assert.ok(
-    drafts.every((draft) => draft.payload.send_at === null && draft.payload.public === false),
+  assert.ok(all.every((d) => d.payload.public === false && d.payload.send_at === null));
+  assert.equal(all[0].payload.subscriber_filter[0].all[0].ids[0], 42);
+  assert.throws(() => kitJourneyDrafts(journey, 0, true));
+  assert.throws(() => emailSlotsForVersion("unknown"));
+});
+
+test("saved v1/v2 fixtures retain exact customer, export and delivery bodies without regeneration", async () => {
+  const fixtures = JSON.parse(
+    await readFile(new URL("./fixtures/email-journey-legacy.json", import.meta.url), "utf8"),
   );
-  assert.ok(drafts.every((draft) => draft.payload.subscriber_filter[0].all[0].ids[0] === 123));
-  assert.equal(kitJourneyDrafts(result, 123, false).length, 1);
-  assert.throws(() => kitJourneyDrafts(result, 0, true), /recipient tag/);
-  assert.ok(!drafts[0].payload.content.includes("sourceQuestionIds"));
-  const hostile = {
-    ...result.emails[0],
-    sections: [
-      {
-        heading: "<script>",
-        paragraphs: ["{{ subscriber.email_address }} & another <input>"],
-        sourceQuestionIds: ["q4"],
-      },
-    ],
-  };
-  const html = journeyEmailHtml(hostile);
-  assert.ok(!html.includes("<script>"));
-  assert.ok(!html.includes("{{ subscriber.email_address }}"));
-  assert.ok(html.includes("&amp;"));
-  assert.ok(html.includes("{{ unsubscribe_url }}"));
-});
-
-test("invalid topic changes, invented evidence, unsafe markup and truncation fail and are logged", async () => {
-  const value = session();
-  for (const mutation of [
-    (data) => {
-      data.emails[4].focusId = "P16";
-    },
-    (data) => {
-      data.emails[0].sections[0].sourceQuestionIds = ["q999"];
-    },
-    (data) => {
-      data.emails[0].subject = "{{ subscriber.email_address }}";
-    },
-    (data) => {
-      data.emails = data.emails.slice(0, 4);
-    },
-    (data) => {
-      delete data.emails[2].mainAction;
-    },
-    (data) => {
-      data.emails[2].mainAction = data.emails[1].mainAction;
-    },
-    (data) => {
-      data.emails[2].subject = data.emails[1].subject;
-    },
-    (data) => {
-      data.emails[2].sections[0].paragraphs = [
-        "Your team described a recurring delay in approvals. Your team described a recurring delay in approvals.",
-      ];
-    },
-    (data) => {
-      data.emails[2].sections.forEach((section) => {
-        section.sourceQuestionIds = [];
-      });
-    },
-  ]) {
-    const records = [],
-      data = output(emailJourneyBrief(value));
-    mutation(data);
-    const writer = createGeminiEmailJourneyWriter({
-      apiKey: "test",
-      trace: recorder(records),
-      fetcher: async () => response(data),
-    });
-    await assert.rejects(writer.generate(value));
-    assert.equal(records[1].status, "failed");
-    assert.equal(records[1].output, null);
+  for (const f of fixtures) {
+    assert.deepEqual(f.journey.emails.map(journeyEmailHtml), f.html);
+    assert.deepEqual(f.journey.emails.map(journeyEmailText), f.text);
+    assert.equal(emailJourneyMarkdown(f.journey), f.markdown);
+    assert.deepEqual(kitJourneyDrafts(f.journey, 42, false), f.reportOnly);
+    assert.deepEqual(kitJourneyDrafts(f.journey, 42, true), f.optedIn);
+    assert.deepEqual(
+      emailSlotsForVersion(f.journey.version).map((s) => s.purpose),
+      legacyEmailPurposes,
+    );
   }
+  const fixed = fixedTestEmailJourney(fictionalSession());
+  assert.equal(fixed.version, "email-journey-v2");
+  assert.equal(fixed.source, "fixed_test");
+  assert.deepEqual(
+    fixed.emails.map((e) => e.purpose),
+    legacyEmailPurposes,
+  );
 });
 
-test("no secondary finding produces a final check-in and old saved emails retain their content", async () => {
-  const value = session();
-  value.result.problems = value.result.problems.slice(0, 1);
-  value.result.priority = ["P03"];
-  const brief = emailJourneyBrief(value);
-  assert.equal(brief.secondaryId, null);
-  assert.equal(brief.slots[4].focusId, null);
+test("failed validation is logged as failure, with no substitute journey", async () => {
+  const records = [];
+  const invalid = clone();
+  invalid.emails[0].mainAction = "Review probe_p03";
   const writer = createGeminiEmailJourneyWriter({
-    apiKey: "test",
-    trace: recorder([]),
-    fetcher: async () => response(output(brief)),
+    apiKey: "x",
+    trace: recorder(records),
+    fetcher: async () => response(invalid),
   });
-  const result = await writer.generate(value);
-  assert.match(result.emails[3].nextEmailPreview, /review what you may have noticed/);
-  assert.equal(result.emails[4].focusId, null);
-  const legacy = { ...result.emails[4] };
-  delete legacy.mainAction;
-  delete legacy.nextEmailPreview;
-  delete legacy.supportInvitation;
-  assert.ok(!journeyEmailHtml(legacy).includes(emailSupportInvitation.href));
-  assert.ok(!journeyEmailHtml(legacy).includes("Your next step</h2>"));
-  value.answers = [];
-  value.result.problems = [];
-  value.result.priority = [];
-  const emptyBrief = emailJourneyBrief(value);
-  const emptyWriter = createGeminiEmailJourneyWriter({
-    apiKey: "test",
-    trace: recorder([]),
-    fetcher: async () => response(output(emptyBrief)),
-  });
-  const empty = await emptyWriter.generate(value);
-  assert.equal(empty.threadQuestionId, null);
-  assert.equal(empty.primaryId, null);
-  assert.match(empty.emails[0].nextEmailPreview, /clearer example/);
-});
-
-test("the shared thread excludes skipped and neutral answers, and every email must preserve it", async () => {
-  const value = session();
-  value.answers.unshift({ questionId: "q1", optionIds: ["unsure"], submittedAt: value.createdAt });
-  value.answers.push({ questionId: "q11", text: "", skipped: true, submittedAt: value.createdAt });
-  value.questions.push({
-    id: "q11",
-    kind: "text",
-    optional: true,
-    text: "Optional example",
-    source: "fixed",
-  });
-  const brief = emailJourneyBrief(value);
-  assert.equal(brief.threadQuestionId, "q4");
-  for (const invalidId of ["q1", "q11"]) {
-    const data = output(brief);
-    data.emails[4].sections.forEach((section) => {
-      section.sourceQuestionIds = [invalidId];
-    });
-    const records = [];
-    const writer = createGeminiEmailJourneyWriter({
-      apiKey: "test",
-      trace: recorder(records),
-      fetcher: async () => response(data),
-    });
-    await assert.rejects(writer.generate(value));
-    assert.equal(records.at(-1).status, "failed");
-    const contextText = records[0].request.contents[0].parts[0].text;
-    assert.ok(!contextText.includes('"questionId":"q11"'));
-    assert.ok(contextText.includes('"omittedAnswerCount":1'));
-  }
-});
-
-test("a hypothetical match cannot be presented as a reported event", async () => {
-  const value = session();
-  value.questions.find((question) => question.id === "q4").answerMode = "scenario_match";
-  for (const qualify of [false, true]) {
-    const data = output(emailJourneyBrief(value));
-    data.emails.forEach((email) =>
-      email.sections.forEach((section) => {
-        section.paragraphs[0] = `${qualify ? "You chose a hypothetical example about delayed approvals." : "Your approvals waited two weeks."} ${section.paragraphs[0]}`;
-      }),
-    );
-    const records = [];
-    const writer = createGeminiEmailJourneyWriter({
-      apiKey: "test",
-      trace: recorder(records),
-      fetcher: async () => response(data),
-    });
-    const journey = await writer.generate(value);
-    assert.equal(journey.emails.length, 5);
-    assert.ok(
-      journey.emails.every((email) =>
-        email.sections.every((section) => /hypothetical/i.test(section.paragraphs[0])),
-      ),
-    );
-    assert.ok(
-      records[0].request.contents[0].parts[0].text.includes('"answerMode":"scenario_match"'),
-    );
-  }
+  await assert.rejects(writer.generate(fictionalSession()));
+  assert.equal(records[1].status, "failed");
+  assert.equal(records[1].output, null);
+  assertFixedEmailTestAllowed("test", "test@example.com", "test@example.com");
+  for (const mode of [undefined, "production", "other"])
+    assert.throws(() => assertFixedEmailTestAllowed(mode, "test@example.com", "test@example.com"));
 });

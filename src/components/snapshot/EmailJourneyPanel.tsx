@@ -9,9 +9,9 @@ import {
   emailDayOffsets,
   emailJourneyMarkdown,
   eligibleJourneyEmails,
-  emailStructure,
   emailSupportInvitation,
 } from "@/assessment-v2/email-journey";
+import { emailSlotsForVersion } from "@/assessment-v2/email-contract";
 import { problemById } from "@/assessment-v2/problem-bank";
 import type { EmailJobView } from "@/assessment-v2/email-job-types";
 
@@ -95,8 +95,8 @@ export function EmailJourneyPanel() {
           : "Sending is not activated."}
       </p>
       <p className="mt-2 text-sm text-muted-foreground">
-        New journeys: detailed result → recognize the pattern → understand why it matters → try one
-        practical change → connect the findings and consider support.
+        New journeys: finding and first check → locate the obstacle → bounded test → interpret
+        possible results → next decision.
       </p>
       <p className="mt-2 text-sm text-muted-foreground">
         {query.data?.kitConfigured
@@ -120,11 +120,14 @@ export function EmailJourneyPanel() {
       )}
       {query.data?.fixedTestEnabled && (
         <details className="mt-5 rounded-xl border border-border p-4">
-          <summary className="cursor-pointer font-bold">Test with fixed emails (no Gemini)</summary>
+          <summary className="cursor-pointer font-bold">
+            Test delivery with legacy v2 templates (no Gemini)
+          </summary>
           <p className="mt-3 text-sm text-muted-foreground">
-            Use a completed test assessment and your allowed test address. This saves five clearly
-            marked template drafts using the assessment's topics and an answer excerpt. Review them
-            below, then upload to Kit. Nothing is sent.
+            These v2 templates test the delivery integration, not the new v3 editorial flow. Use a
+            completed test assessment and your allowed test address. This saves five clearly marked
+            template drafts using the assessment's topics and an answer excerpt. Review them below,
+            then upload to Kit. Nothing is sent.
           </p>
           <label className="mt-4 block text-sm font-semibold" htmlFor="fixed-email-assessment">
             Completed test assessment ID
@@ -330,6 +333,12 @@ export function EmailJourneyPanel() {
                 Written by {job.content.model} · {date(job.content.generatedAt)}. Evidence
                 references below link each passage to assessment questions.
               </p>
+              {job.content.version === "email-journey-v3" && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Sequence: first check → obstacle distinction → bounded test → possible results →
+                  next decision. Later messages work whether or not the reader has started.
+                </p>
+              )}
               {job.content.version === "email-journey-v2" && (
                 <p className="mt-2 text-sm text-muted-foreground">
                   Sequence: result → recognition → understanding → action → connection and support.{" "}
@@ -362,9 +371,9 @@ export function EmailJourneyPanel() {
                         : "Not opted in — will not be uploaded"}
                     </summary>
                     <p className="mt-4 font-bold">Subject: {email.subject}</p>
-                    {job.content!.version === "email-journey-v2" && (
+                    {job.content!.version !== "email-journey-v1" && (
                       <p className="mt-1 text-sm font-semibold text-magenta">
-                        {emailStructure[email.number - 1]?.label}
+                        {emailSlotsForVersion(job.content!.version)[email.number - 1]?.label}
                       </p>
                     )}
                     <p className="mt-1 text-sm text-muted-foreground">Preview: {email.preview}</p>
@@ -372,6 +381,16 @@ export function EmailJourneyPanel() {
                     {email.sections.map((section, index) => (
                       <div key={index} className="mt-5">
                         <h4 className="font-bold">{section.heading}</h4>
+                        {job.content!.version === "email-journey-v3" && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Staff section role:{" "}
+                            {
+                              emailSlotsForVersion(job.content!.version)[email.number - 1]?.roles[
+                                index
+                              ]
+                            }
+                          </p>
+                        )}
                         {section.paragraphs.map((paragraph, index) => (
                           <p key={index} className="mt-2 whitespace-pre-wrap leading-relaxed">
                             {paragraph}
@@ -387,19 +406,35 @@ export function EmailJourneyPanel() {
                     {email.mainAction && (
                       <div className="mt-5 rounded-xl bg-blush p-4">
                         <h4 className="font-bold">Your next step</h4>
-                        <p className="mt-2">{email.mainAction}</p>
+                        <p className="mt-2">
+                          {email.purpose === "next_decision" && email.supportInvitation ? (
+                            <a
+                              className="font-semibold underline"
+                              href={emailSupportInvitation.href}
+                            >
+                              {email.mainAction}
+                            </a>
+                          ) : (
+                            email.mainAction
+                          )}
+                        </p>
                       </div>
                     )}
-                    {email.supportInvitation && (
+                    {email.supportInvitation && email.purpose !== "next_decision" && (
                       <p className="mt-4">
                         <a className="font-semibold underline" href={emailSupportInvitation.href}>
                           {emailSupportInvitation.label}
                         </a>
                       </p>
                     )}
-                    {email.nextEmailPreview && (
-                      <p className="mt-4 text-sm text-muted-foreground">{email.nextEmailPreview}</p>
-                    )}
+                    {email.nextEmailPreview &&
+                      (job.content!.version !== "email-journey-v3" ||
+                        job.followup_consent ||
+                        email.number !== 1) && (
+                        <p className="mt-4 text-sm text-muted-foreground">
+                          {email.nextEmailPreview}
+                        </p>
+                      )}
                     <p className="mt-5">
                       Nkoyo
                       <br />

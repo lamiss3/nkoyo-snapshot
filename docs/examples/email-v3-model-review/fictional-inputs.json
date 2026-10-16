@@ -1,0 +1,1861 @@
+{
+  "notice": "FICTIONAL INPUT — isolated development generation review. No subscribers, Kit uploads, jobs, email sends or production writes. Model copy is retained without manual edits. Structural validation does not establish editorial quality.",
+  "cases": [
+    {
+      "key": "purchasing",
+      "label": "FICTIONAL: purchasing delay with possible authority issue",
+      "session": {
+        "id": "f1c71000-0000-4000-8000-000000000001",
+        "version": "adaptive-v2",
+        "stage": "complete",
+        "questions": [
+          {
+            "id": "q1a",
+            "text": "Where does getting work moving become difficult?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "decisions",
+                "text": "Getting decisions made or approvals completed."
+              },
+              {
+                "id": "authority",
+                "text": "Knowing who is responsible and who has authority to act."
+              },
+              {
+                "id": "relationships",
+                "text": "Working effectively across the board, leadership, staff, or partners."
+              },
+              {
+                "id": "values",
+                "text": "Putting agreed values and expectations into everyday practice."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q1b",
+            "text": "Which pressures affect your people and resources?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "demand",
+                "text": "Keeping up with demand, growth, or expansion."
+              },
+              {
+                "id": "workload",
+                "text": "Managing workload, staffing gaps, or recurring exhaustion."
+              },
+              {
+                "id": "key_person",
+                "text": "Keeping work moving when a key person is unavailable or leaves."
+              },
+              {
+                "id": "funding",
+                "text": "Funding ongoing work and planning beyond current grants."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q1c",
+            "text": "Which pressures affect plans, tools or requirements?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "strategy",
+                "text": "Turning shared priorities and plans into coordinated action."
+              },
+              {
+                "id": "technology",
+                "text": "Making technology or AI useful and manageable."
+              },
+              {
+                "id": "requirements",
+                "text": "Keeping up with requirements, reporting, or preparing for unexpected events."
+              },
+              {
+                "id": "other",
+                "text": "Something else."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q2a",
+            "text": "When pressure rises, what happens to decisions and coordination?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "escalate",
+                "text": "More decisions and questions go to senior leadership."
+              },
+              {
+                "id": "wait_for_authority",
+                "text": "People wait while responsibility or authority is clarified."
+              },
+              {
+                "id": "extra_checks",
+                "text": "Additional approvals, checks, or reporting are introduced."
+              },
+              {
+                "id": "separate_ways",
+                "text": "Different teams or individuals find their own ways forward."
+              },
+              {
+                "id": "unsure",
+                "text": "It varies / none of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q2b",
+            "text": "When pressure rises, what happens to work and priorities?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "extra_work",
+                "text": "People take on extra work or work longer hours."
+              },
+              {
+                "id": "postpone",
+                "text": "Planned work is postponed to handle immediate demands."
+              },
+              {
+                "id": "key_person",
+                "text": "Work depends on a particular person’s knowledge or relationships."
+              },
+              {
+                "id": "agreed_process",
+                "text": "People adjust priorities and responsibilities through an agreed process."
+              },
+              {
+                "id": "unsure",
+                "text": "It varies / none of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q3",
+            "kind": "single",
+            "text": "Which consequence of these difficulties most needs attention now?",
+            "source": "fixed",
+            "options": [
+              {
+                "id": "delay",
+                "text": "Important work or decisions are delayed."
+              },
+              {
+                "id": "wellbeing",
+                "text": "Staff wellbeing or retention is suffering."
+              },
+              {
+                "id": "service",
+                "text": "Service quality or reliability is affected."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / no clear impact / I’m not sure."
+              }
+            ],
+            "helper": "Choose the closest consequence, if any."
+          },
+          {
+            "id": "q4",
+            "kind": "single",
+            "source": "fixed",
+            "answerMode": "scenario_match",
+            "text": "Which situation is closest to what you are experiencing?",
+            "helper": "These are hypothetical examples. Choose the closest match to your experience; it does not need to fit exactly.",
+            "options": [
+              {
+                "id": "scenario_P03",
+                "text": "A. A routine task waits for a senior person’s approval even though the team has the information needed to move ahead."
+              },
+              {
+                "id": "scenario_P04",
+                "text": "B. Someone is accountable for a task but cannot make the decisions needed to complete it, so work pauses while permission is clarified."
+              },
+              {
+                "id": "scenario_P05",
+                "text": "C. The board and leadership revisit who should decide an operational matter, leaving a team unsure how to proceed."
+              },
+              {
+                "id": "none",
+                "text": "None of these fits / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q9",
+            "kind": "single",
+            "source": "generated",
+            "answerMode": "scenario_match",
+            "model": "Fictional scenario fixture; no AI called",
+            "text": "Which hypothetical situation is the closest match?",
+            "options": [
+              {
+                "id": "boundary",
+                "text": "A colleague owns a task but would need another person's permission for its next decision, even with the necessary information available."
+              },
+              {
+                "id": "inputs",
+                "text": "The approver is agreed, but a request would wait until its missing information is supplied."
+              },
+              {
+                "id": "none",
+                "text": "Neither fits / I am not sure."
+              }
+            ]
+          },
+          {
+            "id": "q11",
+            "kind": "text",
+            "source": "fixed",
+            "optional": true,
+            "text": "Is there one recent example or anything else you want to add? Leave out names or confidential information."
+          }
+        ],
+        "answers": [
+          {
+            "questionId": "q1a",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "decisions",
+              "authority"
+            ]
+          },
+          {
+            "questionId": "q1b",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "unsure"
+            ]
+          },
+          {
+            "questionId": "q1c",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "unsure"
+            ]
+          },
+          {
+            "questionId": "q2a",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "escalate"
+            ]
+          },
+          {
+            "questionId": "q2b",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "agreed_process"
+            ]
+          },
+          {
+            "questionId": "q3",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "delay"
+            ]
+          },
+          {
+            "questionId": "q4",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "scenario_P03"
+            ]
+          },
+          {
+            "questionId": "q9",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "boundary"
+            ]
+          },
+          {
+            "questionId": "q11",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "text": "Last month a routine supply request took two weeks to reach approval. It was returned twice for missing information. The team knew the approver for that request. Some colleagues say they are unsure which small purchases they may approve themselves, but we have not mapped those decisions or checked whether the delay is typical. We have not tried a new process."
+          }
+        ],
+        "evaluations": [],
+        "topFour": [],
+        "finalists": null,
+        "result": {
+          "problems": [
+            {
+              "problemId": "P03",
+              "evidence": "supported",
+              "prioritySignal": 0.735,
+              "supportSignal": 0.735,
+              "impactSignal": 0.6,
+              "urgencySignal": 0.4
+            },
+            {
+              "problemId": "P04",
+              "evidence": "possible",
+              "prioritySignal": 0.535,
+              "supportSignal": 0.535,
+              "impactSignal": 0.6,
+              "urgencySignal": 0.4
+            }
+          ],
+          "priority": [
+            "P03"
+          ],
+          "threeCShare": {
+            "culture": 45,
+            "capacity": 35,
+            "compliance": 20
+          },
+          "generatedAt": "2026-10-16T12:00:00Z"
+        },
+        "events": [],
+        "createdAt": "2026-10-16T12:00:00Z",
+        "updatedAt": "2026-10-16T12:00:00Z"
+      },
+      "generationBrief": {
+        "primaryId": "P03",
+        "secondaryId": "P04",
+        "sparseEvidence": false,
+        "jointPriority": false,
+        "topics": [
+          {
+            "id": "P03",
+            "name": "Decision bottleneck",
+            "dimension": "capacity",
+            "evidence": "supported",
+            "explanation": null,
+            "guide": {
+              "headline": "Routine decisions may be waiting too long for approval.",
+              "meaning": "Work can stall when ordinary choices keep returning to senior leadership.",
+              "explore": "Which recurring decision could be made closer to the work, with clear limits?",
+              "action": "Choose one delayed decision and write down its owner, approval limit, and escalation route.",
+              "advisory": {
+                "explanations": [
+                  {
+                    "possibility": "Routine approval authority is unclear.",
+                    "clue": "A request moves between people who disagree about who can decide."
+                  },
+                  {
+                    "possibility": "The approval route is clear but a necessary input or review is missing.",
+                    "clue": "An identified approver waits for a specific missing item."
+                  }
+                ],
+                "firstCheck": {
+                  "action": "Trace one routine decision from request to its next step.",
+                  "observe": "Where it waits and what would let it move."
+                },
+                "obstacleTool": {
+                  "action": "Divide the same request's timeline into preparing it, waiting for a decision, and correcting returned information.",
+                  "record": "Note available dates and the stated reason for each pause. Mark missing timing as unknown, not zero.",
+                  "use": "Time spent correcting a request suggests testing one clearer input; time waiting with complete information suggests checking the agreed approver's next step. Total elapsed time alone cannot distinguish them."
+                },
+                "boundedTest": "Use the timeline to choose one change: clarify one repeatedly missing input OR confirm the existing permitted decision route. Agree it with the request owner and appropriate approver for one comparable low-risk request. Record preparation, waiting and corrections as before; review at its next decision or an agreed stopping date. Keep other required checks in place so the comparison is useful.",
+                "results": [
+                  {
+                    "ifResult": "A named owner can act once the boundary is clear",
+                    "interpretation": "Ambiguous authority may contribute",
+                    "nextAdjustment": "Keep that boundary for this decision type and check another example."
+                  },
+                  {
+                    "ifResult": "It still waits for a named input",
+                    "interpretation": "The input or review may be the constraint",
+                    "nextAdjustment": "Improve that one handoff instead of widening authority."
+                  }
+                ],
+                "limits": "One faster decision does not establish that all approvals should be delegated."
+              }
+            }
+          },
+          {
+            "id": "P04",
+            "name": "Responsibility without authority",
+            "dimension": "culture",
+            "evidence": "possible",
+            "explanation": null,
+            "guide": {
+              "headline": "People may own results without the authority to deliver them.",
+              "meaning": "Responsibility is harder to carry when the needed decisions or resources sit elsewhere.",
+              "explore": "Where is someone accountable for an outcome they cannot actually influence?",
+              "action": "For one role, compare its expected results with the decisions and resources it can control.",
+              "advisory": {
+                "explanations": [
+                  {
+                    "possibility": "A role lacks a necessary decision right.",
+                    "clue": "A person is accountable but must seek permission for the agreed step."
+                  },
+                  {
+                    "possibility": "It has the right but lacks an input or resource needed to use it.",
+                    "clue": "Permission is clear while a specific dependency is unavailable."
+                  }
+                ],
+                "firstCheck": {
+                  "action": "Compare one expected outcome with the decisions needed to deliver it.",
+                  "observe": "Which decision or dependency sits outside the role."
+                },
+                "obstacleTool": {
+                  "action": "List the next two steps needed for the same task, beside the person expected to carry each one.",
+                  "record": "For each step, ask whether permission is already agreed and what input is still needed.",
+                  "use": "A step needing permission calls for a decision-boundary discussion; an authorized step missing a contribution calls for a dependency handoff."
+                },
+                "boundedTest": "With the role holder and whoever can approve its boundaries, examine one task. Agree a safe decision limit or a named dependency; record whether that task advances and review before extending the arrangement.",
+                "results": [
+                  {
+                    "ifResult": "A clarified decision right allows the step",
+                    "interpretation": "An authority mismatch may matter",
+                    "nextAdjustment": "Document that narrow right and its escalation boundary."
+                  },
+                  {
+                    "ifResult": "The step still lacks a named dependency",
+                    "interpretation": "Authority alone may not resolve it",
+                    "nextAdjustment": "Assign the next dependency to an agreed owner."
+                  }
+                ],
+                "limits": "Do not assume the reader can change a role or approve resources."
+              }
+            }
+          }
+        ],
+        "threeCShare": {
+          "culture": 45,
+          "capacity": 35,
+          "compliance": 20
+        },
+        "responses": [
+          {
+            "questionId": "q1a",
+            "question": "Where does getting work moving become difficult?",
+            "selectedAnswers": [
+              "Getting decisions made or approvals completed.",
+              "Knowing who is responsible and who has authority to act."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q1b",
+            "question": "Which pressures affect your people and resources?",
+            "selectedAnswers": [
+              "None of these / I’m not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q1c",
+            "question": "Which pressures affect plans, tools or requirements?",
+            "selectedAnswers": [
+              "None of these / I’m not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q2a",
+            "question": "When pressure rises, what happens to decisions and coordination?",
+            "selectedAnswers": [
+              "More decisions and questions go to senior leadership."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q2b",
+            "question": "When pressure rises, what happens to work and priorities?",
+            "selectedAnswers": [
+              "People adjust priorities and responsibilities through an agreed process."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q3",
+            "question": "Which consequence of these difficulties most needs attention now?",
+            "selectedAnswers": [
+              "Important work or decisions are delayed."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q4",
+            "question": "Which situation is closest to what you are experiencing?",
+            "selectedAnswers": [
+              "A. A routine task waits for a senior person’s approval even though the team has the information needed to move ahead."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "scenario_match",
+            "skipped": false,
+            "evidenceUse": "hypothetical_match"
+          },
+          {
+            "questionId": "q9",
+            "question": "Which hypothetical situation is the closest match?",
+            "selectedAnswers": [
+              "A colleague owns a task but would need another person's permission for its next decision, even with the necessary information available."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "scenario_match",
+            "skipped": false,
+            "evidenceUse": "hypothetical_match"
+          },
+          {
+            "questionId": "q11",
+            "question": "Is there one recent example or anything else you want to add? Leave out names or confidential information.",
+            "selectedAnswers": [],
+            "writtenAnswer": "Last month a routine supply request took two weeks to reach approval. It was returned twice for missing information. The team knew the approver for that request. Some colleagues say they are unsure which small purchases they may approve themselves, but we have not mapped those decisions or checked whether the delay is typical. We have not tried a new process.",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          }
+        ],
+        "slots": [
+          {
+            "number": 1,
+            "purpose": "detailed_report",
+            "focusId": "P03",
+            "sectionCount": 4,
+            "structure": {
+              "purpose": "detailed_report",
+              "label": "Understand the finding and try a small check",
+              "roles": [
+                "result_summary",
+                "evidence_and_interpretation",
+                "secondary_or_uncertainty",
+                "first_check"
+              ],
+              "targetWords": [
+                300,
+                450
+              ],
+              "acceptedWords": [
+                120,
+                600
+              ],
+              "sparseMinimum": 60,
+              "instruction": "Deliver the strongest supported finding immediately using specific answers, a useful interpretation and the main uncertainty once, near the claim it limits. Include a secondary finding only if useful. Offer one small first check: what to look at and what to record. Explain enough to act without exhaustively comparing explanations; save the sharper observation tool for Email 2. This report must stand alone. No required three-C section or percentages.",
+              "sectionCount": 4
+            }
+          },
+          {
+            "number": 2,
+            "purpose": "obstacle_distinction",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "obstacle_distinction",
+              "label": "Locate the obstacle",
+              "roles": [
+                "explanations_to_distinguish",
+                "observable_clues",
+                "one_observation"
+              ],
+              "targetWords": [
+                160,
+                240
+              ],
+              "acceptedWords": [
+                70,
+                330
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Add a NEW observation tool or a sharper way to locate the obstacle, using the selected guide's obstacleTool where useful. Distinguish genuinely different explanations that would lead to different actions through something the reader can record or compare. Do not repeat Email 1's explanation as the contribution. State what each observed difference would change about the next step. Develop the existing check, not a separate assignment. Do not force an information/access/authority/workload taxonomy onto every topic.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 3,
+            "purpose": "bounded_test",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "bounded_test",
+              "label": "Run or refine one bounded test",
+              "roles": [
+                "question_and_scope",
+                "test_method",
+                "what_to_record"
+              ],
+              "targetWords": [
+                180,
+                280
+              ],
+              "acceptedWords": [
+                80,
+                380
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Develop the existing check and Email 2's observation into one executable test of a single practical change on a comparable case. State the question, narrow scope, who needs to agree, any relevant information/access/authority, what to record and when to review it. Use concrete instructions, not a description of how a test should be designed. Do not invent staff, resources or authority. Refinement is not a competing assignment.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 4,
+            "purpose": "result_interpretation",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "result_interpretation",
+              "label": "Interpret possible results",
+              "roles": [
+                "interpretation_frame",
+                "outcome_branches",
+                "smallest_next_adjustment"
+              ],
+              "targetWords": [
+                180,
+                280
+              ],
+              "acceptedWords": [
+                80,
+                380
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Open naturally, for example: If you tried the check, here is how to interpret what happened. In the outcome_branches section, put two or three outcomes in SEPARATE short paragraphs (one paragraphs[] entry per branch). Each pairs an observable result, a limited interpretation and a different practical next adjustment. Include a smaller entry point for someone who has not started. Keep unknown outcomes conditional without narrating when this email was written. Never claim completion; do not generalize one result to the whole organization or automatically confirm the initial hypothesis.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 5,
+            "purpose": "next_decision",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "next_decision",
+              "label": "Decide what to handle or discuss",
+              "roles": [
+                "unresolved_decision",
+                "connection_or_boundary",
+                "next_step_criteria"
+              ],
+              "targetWords": [
+                160,
+                260
+              ],
+              "acceptedWords": [
+                70,
+                360
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Name the decision still to make. Connect a supported secondary finding only if relevant, as a hypothesis; otherwise deepen the primary uncertainty. Preserve joint priorities. Give concrete criteria for an internal adjustment versus an outside perspective, and a compact preparation aid: the issue, one available example and the decision to make. Make this useful even without a completed check. mainAction is one conditional next-decision request, including discussion with Nkoyo about that specific decision if useful. The renderer links that action to the approved route; do not add a separate sales request, offer, urgency or promised outcome.",
+              "sectionCount": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "sparse-conflicting",
+      "label": "FICTIONAL: sparse and conflicting accounts",
+      "session": {
+        "id": "f1c71000-0000-4000-8000-000000000002",
+        "version": "adaptive-v2",
+        "stage": "complete",
+        "questions": [
+          {
+            "id": "q1a",
+            "text": "Where does getting work moving become difficult?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "decisions",
+                "text": "Getting decisions made or approvals completed."
+              },
+              {
+                "id": "authority",
+                "text": "Knowing who is responsible and who has authority to act."
+              },
+              {
+                "id": "relationships",
+                "text": "Working effectively across the board, leadership, staff, or partners."
+              },
+              {
+                "id": "values",
+                "text": "Putting agreed values and expectations into everyday practice."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q1b",
+            "text": "Which pressures affect your people and resources?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "demand",
+                "text": "Keeping up with demand, growth, or expansion."
+              },
+              {
+                "id": "workload",
+                "text": "Managing workload, staffing gaps, or recurring exhaustion."
+              },
+              {
+                "id": "key_person",
+                "text": "Keeping work moving when a key person is unavailable or leaves."
+              },
+              {
+                "id": "funding",
+                "text": "Funding ongoing work and planning beyond current grants."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q1c",
+            "text": "Which pressures affect plans, tools or requirements?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "strategy",
+                "text": "Turning shared priorities and plans into coordinated action."
+              },
+              {
+                "id": "technology",
+                "text": "Making technology or AI useful and manageable."
+              },
+              {
+                "id": "requirements",
+                "text": "Keeping up with requirements, reporting, or preparing for unexpected events."
+              },
+              {
+                "id": "other",
+                "text": "Something else."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q2a",
+            "text": "When pressure rises, what happens to decisions and coordination?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "escalate",
+                "text": "More decisions and questions go to senior leadership."
+              },
+              {
+                "id": "wait_for_authority",
+                "text": "People wait while responsibility or authority is clarified."
+              },
+              {
+                "id": "extra_checks",
+                "text": "Additional approvals, checks, or reporting are introduced."
+              },
+              {
+                "id": "separate_ways",
+                "text": "Different teams or individuals find their own ways forward."
+              },
+              {
+                "id": "unsure",
+                "text": "It varies / none of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q2b",
+            "text": "When pressure rises, what happens to work and priorities?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "extra_work",
+                "text": "People take on extra work or work longer hours."
+              },
+              {
+                "id": "postpone",
+                "text": "Planned work is postponed to handle immediate demands."
+              },
+              {
+                "id": "key_person",
+                "text": "Work depends on a particular person’s knowledge or relationships."
+              },
+              {
+                "id": "agreed_process",
+                "text": "People adjust priorities and responsibilities through an agreed process."
+              },
+              {
+                "id": "unsure",
+                "text": "It varies / none of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q3",
+            "kind": "single",
+            "text": "Which consequence of these difficulties most needs attention now?",
+            "source": "fixed",
+            "options": [
+              {
+                "id": "delay",
+                "text": "Important work or decisions are delayed."
+              },
+              {
+                "id": "wellbeing",
+                "text": "Staff wellbeing or retention is suffering."
+              },
+              {
+                "id": "service",
+                "text": "Service quality or reliability is affected."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / no clear impact / I’m not sure."
+              }
+            ],
+            "helper": "Choose the closest consequence, if any."
+          },
+          {
+            "id": "q4",
+            "kind": "single",
+            "source": "fixed",
+            "answerMode": "scenario_match",
+            "text": "Which situation is closest to what you are experiencing?",
+            "helper": "These are hypothetical examples. Choose the closest match to your experience; it does not need to fit exactly.",
+            "options": [
+              {
+                "id": "scenario_P03",
+                "text": "A. A routine task waits for a senior person’s approval even though the team has the information needed to move ahead."
+              },
+              {
+                "id": "scenario_P04",
+                "text": "B. Someone is accountable for a task but cannot make the decisions needed to complete it, so work pauses while permission is clarified."
+              },
+              {
+                "id": "scenario_P05",
+                "text": "C. The board and leadership revisit who should decide an operational matter, leaving a team unsure how to proceed."
+              },
+              {
+                "id": "none",
+                "text": "None of these fits / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q9",
+            "kind": "single",
+            "source": "generated",
+            "answerMode": "scenario_match",
+            "model": "Fictional scenario fixture; no AI called",
+            "text": "Which hypothetical situation is the closest match?",
+            "options": [
+              {
+                "id": "boundary",
+                "text": "A colleague owns a task but would need another person's permission for its next decision, even with the necessary information available."
+              },
+              {
+                "id": "inputs",
+                "text": "The approver is agreed, but a request would wait until its missing information is supplied."
+              },
+              {
+                "id": "none",
+                "text": "Neither fits / I am not sure."
+              }
+            ]
+          },
+          {
+            "id": "q11",
+            "kind": "text",
+            "source": "fixed",
+            "optional": true,
+            "text": "Is there one recent example or anything else you want to add? Leave out names or confidential information."
+          }
+        ],
+        "answers": [
+          {
+            "questionId": "q1a",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "unsure"
+            ]
+          },
+          {
+            "questionId": "q4",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "none"
+            ]
+          },
+          {
+            "questionId": "q9",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "none"
+            ]
+          },
+          {
+            "questionId": "q11",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "text": "Someone says routine approvals take weeks. I only saw one small purchase approved the same afternoon, and I have no dates or details for the claimed delays. I do not know how other teams handle this."
+          }
+        ],
+        "evaluations": [],
+        "topFour": [],
+        "finalists": null,
+        "result": {
+          "problems": [
+            {
+              "problemId": "P03",
+              "evidence": "possible",
+              "prioritySignal": 0.4,
+              "supportSignal": 0.4,
+              "impactSignal": 0.6,
+              "urgencySignal": 0.4
+            },
+            {
+              "problemId": "P04",
+              "evidence": "insufficient_information",
+              "prioritySignal": 0.1,
+              "supportSignal": 0.1,
+              "impactSignal": 0.6,
+              "urgencySignal": 0.4
+            }
+          ],
+          "priority": [
+            "P03"
+          ],
+          "threeCShare": {
+            "culture": 45,
+            "capacity": 35,
+            "compliance": 20
+          },
+          "generatedAt": "2026-10-16T12:00:00Z"
+        },
+        "events": [],
+        "createdAt": "2026-10-16T12:00:00Z",
+        "updatedAt": "2026-10-16T12:00:00Z"
+      },
+      "generationBrief": {
+        "primaryId": "P03",
+        "secondaryId": null,
+        "sparseEvidence": true,
+        "jointPriority": false,
+        "topics": [
+          {
+            "id": "P03",
+            "name": "Decision bottleneck",
+            "dimension": "capacity",
+            "evidence": "possible",
+            "explanation": null,
+            "guide": {
+              "headline": "Routine decisions may be waiting too long for approval.",
+              "meaning": "Work can stall when ordinary choices keep returning to senior leadership.",
+              "explore": "Which recurring decision could be made closer to the work, with clear limits?",
+              "action": "Choose one delayed decision and write down its owner, approval limit, and escalation route.",
+              "advisory": {
+                "explanations": [
+                  {
+                    "possibility": "Routine approval authority is unclear.",
+                    "clue": "A request moves between people who disagree about who can decide."
+                  },
+                  {
+                    "possibility": "The approval route is clear but a necessary input or review is missing.",
+                    "clue": "An identified approver waits for a specific missing item."
+                  }
+                ],
+                "firstCheck": {
+                  "action": "Trace one routine decision from request to its next step.",
+                  "observe": "Where it waits and what would let it move."
+                },
+                "obstacleTool": {
+                  "action": "Divide the same request's timeline into preparing it, waiting for a decision, and correcting returned information.",
+                  "record": "Note available dates and the stated reason for each pause. Mark missing timing as unknown, not zero.",
+                  "use": "Time spent correcting a request suggests testing one clearer input; time waiting with complete information suggests checking the agreed approver's next step. Total elapsed time alone cannot distinguish them."
+                },
+                "boundedTest": "Use the timeline to choose one change: clarify one repeatedly missing input OR confirm the existing permitted decision route. Agree it with the request owner and appropriate approver for one comparable low-risk request. Record preparation, waiting and corrections as before; review at its next decision or an agreed stopping date. Keep other required checks in place so the comparison is useful.",
+                "results": [
+                  {
+                    "ifResult": "A named owner can act once the boundary is clear",
+                    "interpretation": "Ambiguous authority may contribute",
+                    "nextAdjustment": "Keep that boundary for this decision type and check another example."
+                  },
+                  {
+                    "ifResult": "It still waits for a named input",
+                    "interpretation": "The input or review may be the constraint",
+                    "nextAdjustment": "Improve that one handoff instead of widening authority."
+                  }
+                ],
+                "limits": "One faster decision does not establish that all approvals should be delegated."
+              }
+            }
+          }
+        ],
+        "threeCShare": {
+          "culture": 45,
+          "capacity": 35,
+          "compliance": 20
+        },
+        "responses": [
+          {
+            "questionId": "q1a",
+            "question": "Where does getting work moving become difficult?",
+            "selectedAnswers": [
+              "None of these / I’m not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q4",
+            "question": "Which situation is closest to what you are experiencing?",
+            "selectedAnswers": [
+              "None of these fits / I’m not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "scenario_match",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q9",
+            "question": "Which hypothetical situation is the closest match?",
+            "selectedAnswers": [
+              "Neither fits / I am not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "scenario_match",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q11",
+            "question": "Is there one recent example or anything else you want to add? Leave out names or confidential information.",
+            "selectedAnswers": [],
+            "writtenAnswer": "Someone says routine approvals take weeks. I only saw one small purchase approved the same afternoon, and I have no dates or details for the claimed delays. I do not know how other teams handle this.",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          }
+        ],
+        "slots": [
+          {
+            "number": 1,
+            "purpose": "detailed_report",
+            "focusId": "P03",
+            "sectionCount": 4,
+            "structure": {
+              "purpose": "detailed_report",
+              "label": "Understand the finding and try a small check",
+              "roles": [
+                "result_summary",
+                "evidence_and_interpretation",
+                "secondary_or_uncertainty",
+                "first_check"
+              ],
+              "targetWords": [
+                300,
+                450
+              ],
+              "acceptedWords": [
+                120,
+                600
+              ],
+              "sparseMinimum": 60,
+              "instruction": "Deliver the strongest supported finding immediately using specific answers, a useful interpretation and the main uncertainty once, near the claim it limits. Include a secondary finding only if useful. Offer one small first check: what to look at and what to record. Explain enough to act without exhaustively comparing explanations; save the sharper observation tool for Email 2. This report must stand alone. No required three-C section or percentages.",
+              "sectionCount": 4
+            }
+          },
+          {
+            "number": 2,
+            "purpose": "obstacle_distinction",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "obstacle_distinction",
+              "label": "Locate the obstacle",
+              "roles": [
+                "explanations_to_distinguish",
+                "observable_clues",
+                "one_observation"
+              ],
+              "targetWords": [
+                160,
+                240
+              ],
+              "acceptedWords": [
+                70,
+                330
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Add a NEW observation tool or a sharper way to locate the obstacle, using the selected guide's obstacleTool where useful. Distinguish genuinely different explanations that would lead to different actions through something the reader can record or compare. Do not repeat Email 1's explanation as the contribution. State what each observed difference would change about the next step. Develop the existing check, not a separate assignment. Do not force an information/access/authority/workload taxonomy onto every topic.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 3,
+            "purpose": "bounded_test",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "bounded_test",
+              "label": "Run or refine one bounded test",
+              "roles": [
+                "question_and_scope",
+                "test_method",
+                "what_to_record"
+              ],
+              "targetWords": [
+                180,
+                280
+              ],
+              "acceptedWords": [
+                80,
+                380
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Develop the existing check and Email 2's observation into one executable test of a single practical change on a comparable case. State the question, narrow scope, who needs to agree, any relevant information/access/authority, what to record and when to review it. Use concrete instructions, not a description of how a test should be designed. Do not invent staff, resources or authority. Refinement is not a competing assignment.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 4,
+            "purpose": "result_interpretation",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "result_interpretation",
+              "label": "Interpret possible results",
+              "roles": [
+                "interpretation_frame",
+                "outcome_branches",
+                "smallest_next_adjustment"
+              ],
+              "targetWords": [
+                180,
+                280
+              ],
+              "acceptedWords": [
+                80,
+                380
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Open naturally, for example: If you tried the check, here is how to interpret what happened. In the outcome_branches section, put two or three outcomes in SEPARATE short paragraphs (one paragraphs[] entry per branch). Each pairs an observable result, a limited interpretation and a different practical next adjustment. Include a smaller entry point for someone who has not started. Keep unknown outcomes conditional without narrating when this email was written. Never claim completion; do not generalize one result to the whole organization or automatically confirm the initial hypothesis.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 5,
+            "purpose": "next_decision",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "next_decision",
+              "label": "Decide what to handle or discuss",
+              "roles": [
+                "unresolved_decision",
+                "connection_or_boundary",
+                "next_step_criteria"
+              ],
+              "targetWords": [
+                160,
+                260
+              ],
+              "acceptedWords": [
+                70,
+                360
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Name the decision still to make. Connect a supported secondary finding only if relevant, as a hypothesis; otherwise deepen the primary uncertainty. Preserve joint priorities. Give concrete criteria for an internal adjustment versus an outside perspective, and a compact preparation aid: the issue, one available example and the decision to make. Make this useful even without a completed check. mainAction is one conditional next-decision request, including discussion with Nkoyo about that specific decision if useful. The renderer links that action to the approved route; do not add a separate sales request, offer, urgency or promised outcome.",
+              "sectionCount": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "no-secondary",
+      "label": "FICTIONAL: approval delay with no eligible secondary finding",
+      "session": {
+        "id": "f1c71000-0000-4000-8000-000000000003",
+        "version": "adaptive-v2",
+        "stage": "complete",
+        "questions": [
+          {
+            "id": "q1a",
+            "text": "Where does getting work moving become difficult?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "decisions",
+                "text": "Getting decisions made or approvals completed."
+              },
+              {
+                "id": "authority",
+                "text": "Knowing who is responsible and who has authority to act."
+              },
+              {
+                "id": "relationships",
+                "text": "Working effectively across the board, leadership, staff, or partners."
+              },
+              {
+                "id": "values",
+                "text": "Putting agreed values and expectations into everyday practice."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q1b",
+            "text": "Which pressures affect your people and resources?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "demand",
+                "text": "Keeping up with demand, growth, or expansion."
+              },
+              {
+                "id": "workload",
+                "text": "Managing workload, staffing gaps, or recurring exhaustion."
+              },
+              {
+                "id": "key_person",
+                "text": "Keeping work moving when a key person is unavailable or leaves."
+              },
+              {
+                "id": "funding",
+                "text": "Funding ongoing work and planning beyond current grants."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q1c",
+            "text": "Which pressures affect plans, tools or requirements?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "strategy",
+                "text": "Turning shared priorities and plans into coordinated action."
+              },
+              {
+                "id": "technology",
+                "text": "Making technology or AI useful and manageable."
+              },
+              {
+                "id": "requirements",
+                "text": "Keeping up with requirements, reporting, or preparing for unexpected events."
+              },
+              {
+                "id": "other",
+                "text": "Something else."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q2a",
+            "text": "When pressure rises, what happens to decisions and coordination?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "escalate",
+                "text": "More decisions and questions go to senior leadership."
+              },
+              {
+                "id": "wait_for_authority",
+                "text": "People wait while responsibility or authority is clarified."
+              },
+              {
+                "id": "extra_checks",
+                "text": "Additional approvals, checks, or reporting are introduced."
+              },
+              {
+                "id": "separate_ways",
+                "text": "Different teams or individuals find their own ways forward."
+              },
+              {
+                "id": "unsure",
+                "text": "It varies / none of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q2b",
+            "text": "When pressure rises, what happens to work and priorities?",
+            "kind": "multiple",
+            "maxSelections": 2,
+            "source": "fixed",
+            "helper": "Choose up to two that fit the past three months.",
+            "options": [
+              {
+                "id": "extra_work",
+                "text": "People take on extra work or work longer hours."
+              },
+              {
+                "id": "postpone",
+                "text": "Planned work is postponed to handle immediate demands."
+              },
+              {
+                "id": "key_person",
+                "text": "Work depends on a particular person’s knowledge or relationships."
+              },
+              {
+                "id": "agreed_process",
+                "text": "People adjust priorities and responsibilities through an agreed process."
+              },
+              {
+                "id": "unsure",
+                "text": "It varies / none of these / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q3",
+            "kind": "single",
+            "text": "Which consequence of these difficulties most needs attention now?",
+            "source": "fixed",
+            "options": [
+              {
+                "id": "delay",
+                "text": "Important work or decisions are delayed."
+              },
+              {
+                "id": "wellbeing",
+                "text": "Staff wellbeing or retention is suffering."
+              },
+              {
+                "id": "service",
+                "text": "Service quality or reliability is affected."
+              },
+              {
+                "id": "unsure",
+                "text": "None of these / no clear impact / I’m not sure."
+              }
+            ],
+            "helper": "Choose the closest consequence, if any."
+          },
+          {
+            "id": "q4",
+            "kind": "single",
+            "source": "fixed",
+            "answerMode": "scenario_match",
+            "text": "Which situation is closest to what you are experiencing?",
+            "helper": "These are hypothetical examples. Choose the closest match to your experience; it does not need to fit exactly.",
+            "options": [
+              {
+                "id": "scenario_P03",
+                "text": "A. A routine task waits for a senior person’s approval even though the team has the information needed to move ahead."
+              },
+              {
+                "id": "scenario_P04",
+                "text": "B. Someone is accountable for a task but cannot make the decisions needed to complete it, so work pauses while permission is clarified."
+              },
+              {
+                "id": "scenario_P05",
+                "text": "C. The board and leadership revisit who should decide an operational matter, leaving a team unsure how to proceed."
+              },
+              {
+                "id": "none",
+                "text": "None of these fits / I’m not sure."
+              }
+            ]
+          },
+          {
+            "id": "q9",
+            "kind": "single",
+            "source": "generated",
+            "answerMode": "scenario_match",
+            "model": "Fictional scenario fixture; no AI called",
+            "text": "Which hypothetical situation is the closest match?",
+            "options": [
+              {
+                "id": "boundary",
+                "text": "A colleague owns a task but would need another person's permission for its next decision, even with the necessary information available."
+              },
+              {
+                "id": "inputs",
+                "text": "The approver is agreed, but a request would wait until its missing information is supplied."
+              },
+              {
+                "id": "none",
+                "text": "Neither fits / I am not sure."
+              }
+            ]
+          },
+          {
+            "id": "q11",
+            "kind": "text",
+            "source": "fixed",
+            "optional": true,
+            "text": "Is there one recent example or anything else you want to add? Leave out names or confidential information."
+          }
+        ],
+        "answers": [
+          {
+            "questionId": "q1a",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "decisions"
+            ]
+          },
+          {
+            "questionId": "q1b",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "unsure"
+            ]
+          },
+          {
+            "questionId": "q1c",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "unsure"
+            ]
+          },
+          {
+            "questionId": "q2a",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "escalate"
+            ]
+          },
+          {
+            "questionId": "q2b",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "agreed_process"
+            ]
+          },
+          {
+            "questionId": "q3",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "delay"
+            ]
+          },
+          {
+            "questionId": "q4",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "scenario_P03"
+            ]
+          },
+          {
+            "questionId": "q9",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "optionIds": [
+              "none"
+            ]
+          },
+          {
+            "questionId": "q11",
+            "submittedAt": "2026-10-16T12:00:00Z",
+            "text": "Last month a routine supply request took two weeks to reach approval and was returned twice for missing information. Staff agree who can approve that type of purchase. We have not checked whether other requests have the same information gap or tried a new process. I cannot identify a separate responsibility or authority problem."
+          }
+        ],
+        "evaluations": [],
+        "topFour": [],
+        "finalists": null,
+        "result": {
+          "problems": [
+            {
+              "problemId": "P03",
+              "evidence": "supported",
+              "prioritySignal": 0.735,
+              "supportSignal": 0.735,
+              "impactSignal": 0.6,
+              "urgencySignal": 0.4
+            },
+            {
+              "problemId": "P04",
+              "evidence": "insufficient_information",
+              "prioritySignal": 0.1,
+              "supportSignal": 0.1,
+              "impactSignal": 0.6,
+              "urgencySignal": 0.4
+            }
+          ],
+          "priority": [
+            "P03"
+          ],
+          "threeCShare": {
+            "culture": 45,
+            "capacity": 35,
+            "compliance": 20
+          },
+          "generatedAt": "2026-10-16T12:00:00Z"
+        },
+        "events": [],
+        "createdAt": "2026-10-16T12:00:00Z",
+        "updatedAt": "2026-10-16T12:00:00Z"
+      },
+      "generationBrief": {
+        "primaryId": "P03",
+        "secondaryId": null,
+        "sparseEvidence": false,
+        "jointPriority": false,
+        "topics": [
+          {
+            "id": "P03",
+            "name": "Decision bottleneck",
+            "dimension": "capacity",
+            "evidence": "supported",
+            "explanation": null,
+            "guide": {
+              "headline": "Routine decisions may be waiting too long for approval.",
+              "meaning": "Work can stall when ordinary choices keep returning to senior leadership.",
+              "explore": "Which recurring decision could be made closer to the work, with clear limits?",
+              "action": "Choose one delayed decision and write down its owner, approval limit, and escalation route.",
+              "advisory": {
+                "explanations": [
+                  {
+                    "possibility": "Routine approval authority is unclear.",
+                    "clue": "A request moves between people who disagree about who can decide."
+                  },
+                  {
+                    "possibility": "The approval route is clear but a necessary input or review is missing.",
+                    "clue": "An identified approver waits for a specific missing item."
+                  }
+                ],
+                "firstCheck": {
+                  "action": "Trace one routine decision from request to its next step.",
+                  "observe": "Where it waits and what would let it move."
+                },
+                "obstacleTool": {
+                  "action": "Divide the same request's timeline into preparing it, waiting for a decision, and correcting returned information.",
+                  "record": "Note available dates and the stated reason for each pause. Mark missing timing as unknown, not zero.",
+                  "use": "Time spent correcting a request suggests testing one clearer input; time waiting with complete information suggests checking the agreed approver's next step. Total elapsed time alone cannot distinguish them."
+                },
+                "boundedTest": "Use the timeline to choose one change: clarify one repeatedly missing input OR confirm the existing permitted decision route. Agree it with the request owner and appropriate approver for one comparable low-risk request. Record preparation, waiting and corrections as before; review at its next decision or an agreed stopping date. Keep other required checks in place so the comparison is useful.",
+                "results": [
+                  {
+                    "ifResult": "A named owner can act once the boundary is clear",
+                    "interpretation": "Ambiguous authority may contribute",
+                    "nextAdjustment": "Keep that boundary for this decision type and check another example."
+                  },
+                  {
+                    "ifResult": "It still waits for a named input",
+                    "interpretation": "The input or review may be the constraint",
+                    "nextAdjustment": "Improve that one handoff instead of widening authority."
+                  }
+                ],
+                "limits": "One faster decision does not establish that all approvals should be delegated."
+              }
+            }
+          }
+        ],
+        "threeCShare": {
+          "culture": 45,
+          "capacity": 35,
+          "compliance": 20
+        },
+        "responses": [
+          {
+            "questionId": "q1a",
+            "question": "Where does getting work moving become difficult?",
+            "selectedAnswers": [
+              "Getting decisions made or approvals completed."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q1b",
+            "question": "Which pressures affect your people and resources?",
+            "selectedAnswers": [
+              "None of these / I’m not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q1c",
+            "question": "Which pressures affect plans, tools or requirements?",
+            "selectedAnswers": [
+              "None of these / I’m not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q2a",
+            "question": "When pressure rises, what happens to decisions and coordination?",
+            "selectedAnswers": [
+              "More decisions and questions go to senior leadership."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q2b",
+            "question": "When pressure rises, what happens to work and priorities?",
+            "selectedAnswers": [
+              "People adjust priorities and responsibilities through an agreed process."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q3",
+            "question": "Which consequence of these difficulties most needs attention now?",
+            "selectedAnswers": [
+              "Important work or decisions are delayed."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          },
+          {
+            "questionId": "q4",
+            "question": "Which situation is closest to what you are experiencing?",
+            "selectedAnswers": [
+              "A. A routine task waits for a senior person’s approval even though the team has the information needed to move ahead."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "scenario_match",
+            "skipped": false,
+            "evidenceUse": "hypothetical_match"
+          },
+          {
+            "questionId": "q9",
+            "question": "Which hypothetical situation is the closest match?",
+            "selectedAnswers": [
+              "Neither fits / I am not sure."
+            ],
+            "writtenAnswer": "",
+            "answerMode": "scenario_match",
+            "skipped": false,
+            "evidenceUse": "uncertain_or_none"
+          },
+          {
+            "questionId": "q11",
+            "question": "Is there one recent example or anything else you want to add? Leave out names or confidential information.",
+            "selectedAnswers": [],
+            "writtenAnswer": "Last month a routine supply request took two weeks to reach approval and was returned twice for missing information. Staff agree who can approve that type of purchase. We have not checked whether other requests have the same information gap or tried a new process. I cannot identify a separate responsibility or authority problem.",
+            "answerMode": "direct_response",
+            "skipped": false,
+            "evidenceUse": "preserve_original_wording_tense_and_frequency"
+          }
+        ],
+        "slots": [
+          {
+            "number": 1,
+            "purpose": "detailed_report",
+            "focusId": "P03",
+            "sectionCount": 4,
+            "structure": {
+              "purpose": "detailed_report",
+              "label": "Understand the finding and try a small check",
+              "roles": [
+                "result_summary",
+                "evidence_and_interpretation",
+                "secondary_or_uncertainty",
+                "first_check"
+              ],
+              "targetWords": [
+                300,
+                450
+              ],
+              "acceptedWords": [
+                120,
+                600
+              ],
+              "sparseMinimum": 60,
+              "instruction": "Deliver the strongest supported finding immediately using specific answers, a useful interpretation and the main uncertainty once, near the claim it limits. Include a secondary finding only if useful. Offer one small first check: what to look at and what to record. Explain enough to act without exhaustively comparing explanations; save the sharper observation tool for Email 2. This report must stand alone. No required three-C section or percentages.",
+              "sectionCount": 4
+            }
+          },
+          {
+            "number": 2,
+            "purpose": "obstacle_distinction",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "obstacle_distinction",
+              "label": "Locate the obstacle",
+              "roles": [
+                "explanations_to_distinguish",
+                "observable_clues",
+                "one_observation"
+              ],
+              "targetWords": [
+                160,
+                240
+              ],
+              "acceptedWords": [
+                70,
+                330
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Add a NEW observation tool or a sharper way to locate the obstacle, using the selected guide's obstacleTool where useful. Distinguish genuinely different explanations that would lead to different actions through something the reader can record or compare. Do not repeat Email 1's explanation as the contribution. State what each observed difference would change about the next step. Develop the existing check, not a separate assignment. Do not force an information/access/authority/workload taxonomy onto every topic.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 3,
+            "purpose": "bounded_test",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "bounded_test",
+              "label": "Run or refine one bounded test",
+              "roles": [
+                "question_and_scope",
+                "test_method",
+                "what_to_record"
+              ],
+              "targetWords": [
+                180,
+                280
+              ],
+              "acceptedWords": [
+                80,
+                380
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Develop the existing check and Email 2's observation into one executable test of a single practical change on a comparable case. State the question, narrow scope, who needs to agree, any relevant information/access/authority, what to record and when to review it. Use concrete instructions, not a description of how a test should be designed. Do not invent staff, resources or authority. Refinement is not a competing assignment.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 4,
+            "purpose": "result_interpretation",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "result_interpretation",
+              "label": "Interpret possible results",
+              "roles": [
+                "interpretation_frame",
+                "outcome_branches",
+                "smallest_next_adjustment"
+              ],
+              "targetWords": [
+                180,
+                280
+              ],
+              "acceptedWords": [
+                80,
+                380
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Open naturally, for example: If you tried the check, here is how to interpret what happened. In the outcome_branches section, put two or three outcomes in SEPARATE short paragraphs (one paragraphs[] entry per branch). Each pairs an observable result, a limited interpretation and a different practical next adjustment. Include a smaller entry point for someone who has not started. Keep unknown outcomes conditional without narrating when this email was written. Never claim completion; do not generalize one result to the whole organization or automatically confirm the initial hypothesis.",
+              "sectionCount": 3
+            }
+          },
+          {
+            "number": 5,
+            "purpose": "next_decision",
+            "focusId": "P03",
+            "sectionCount": 3,
+            "structure": {
+              "purpose": "next_decision",
+              "label": "Decide what to handle or discuss",
+              "roles": [
+                "unresolved_decision",
+                "connection_or_boundary",
+                "next_step_criteria"
+              ],
+              "targetWords": [
+                160,
+                260
+              ],
+              "acceptedWords": [
+                70,
+                360
+              ],
+              "sparseMinimum": 40,
+              "instruction": "Name the decision still to make. Connect a supported secondary finding only if relevant, as a hypothesis; otherwise deepen the primary uncertainty. Preserve joint priorities. Give concrete criteria for an internal adjustment versus an outside perspective, and a compact preparation aid: the issue, one available example and the decision to make. Make this useful even without a completed check. mainAction is one conditional next-decision request, including discussion with Nkoyo about that specific decision if useful. The renderer links that action to the approved route; do not add a separate sales request, offer, urgency or promised outcome.",
+              "sectionCount": 3
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
