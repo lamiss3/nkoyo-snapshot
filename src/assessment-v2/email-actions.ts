@@ -78,7 +78,14 @@ export const manageEmailJourney = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const jobs = await import("./email-jobs.server");
     await jobs.requireEmailStaff(context.supabase, context.userId);
-    if (data.action === "generate") return jobs.processEmailJob(data.id, true);
+    if (data.action === "generate") {
+      const result = await jobs.processEmailJob(data.id, true);
+      // Match the visitor preparation path: resume this consented automatic job
+      // after successful recovery, rather than waiting out its old retry delay.
+      if (process.env["EMAIL_AUTOMATION_ENABLED"] === "true")
+        await (await import("./email-automation.server")).processAutomaticKitJob(data.id);
+      return result;
+    }
     if (data.action === "approve") return jobs.approveEmailJob(data.id, context.userId);
     return (await import("./kit-jobs.server")).prepareKitJob(data.id, context.userId);
   });

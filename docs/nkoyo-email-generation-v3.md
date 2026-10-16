@@ -58,6 +58,8 @@ Staff Admin uses the saved version's labels, marks v3's different progression an
 
 `email_journeys.content` is JSONB. Migrations `0002`/`0003` check the five-email count and session ID, not individual purpose values. **No migration is needed or applied.** The claim query requires `content IS NULL`, preserving successful-journey reuse. Consent, private single-recipient targeting, offsets `[0,2,4,7,10]`, leases, retries, credentials, delivery switches and already scheduled messages are unchanged.
 
+Staff `generate` recovery now also invokes the existing `processAutomaticKitJob` for that specific job when global automatic delivery is enabled, matching the visitor preparation path. The helper still verifies the job's own automatic flag, saved content, consent and private recipient state. This avoids holding a successfully recovered automatic request behind its previous generation-backoff time; review-only jobs and already scheduled messages retain their existing guards. No new delivery mechanism or database migration is introduced.
+
 ## Local verification and editorial review
 
 Run the local-only sample builder:
