@@ -165,7 +165,7 @@ test("OpenRouter legacy sessions still receive their original one-then-two quest
 
 test("HTTP, truncation, provider-error, malformed JSON and invalid scenario responses fail and stay logged", async () => {
   const failedResponses = [
-    ...[401, 402, 429, 503].map(
+    ...[400, 401, 402, 429, 503].map(
       (status) => () => new Response('{"error":{"message":"upstream detail"}}', { status }),
     ),
     () => response(scenario, { error: { message: "Provider failed" } }),
@@ -242,6 +242,11 @@ test("five OpenRouter emails retain topics, actions and references; truncation c
         const body = JSON.parse(init.body);
         assert.equal(body.max_tokens, 7500);
         assert.equal(body.response_format.json_schema.name, "email_journey");
+        const emailSchema = body.response_format.json_schema.schema.properties.emails;
+        assert.equal(emailSchema.items.type, "object");
+        assert.equal(emailSchema.items.anyOf, undefined);
+        assert.equal(emailSchema.minItems, 5);
+        assert.equal(emailSchema.items.properties.sections.maxItems, 4);
         assert.ok(body.messages[1].content.includes("routine approvals"));
         return response(
           { emails },

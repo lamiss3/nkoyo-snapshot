@@ -246,17 +246,50 @@ test("paragraph bounds are objective, separate from targets, and allow sparse ev
   assert.equal(validateEmailJourneyOutput(short, sparse).length, 5);
 });
 
-test("provider schema uses canonical per-slot purposes, focus IDs, section counts and valid evidence IDs", () => {
+test("compact provider schema derives allowed values from the contract; runtime retains exact slot validation", () => {
   const brief = emailJourneyBrief(fictionalSession());
   const schema = emailJourneyResponseSchema(brief).schema;
-  const variants = schema.properties.emails.items.anyOf;
-  assert.equal(variants.length, 5);
-  variants.forEach((variant, i) => {
-    assert.deepEqual(variant.properties.purpose.enum, [emailV3Slots[i].purpose]);
-    assert.equal(variant.properties.sections.minItems, emailV3Slots[i].roles.length);
-    assert.equal(variant.properties.sections.maxItems, emailV3Slots[i].roles.length);
-    assert.deepEqual(variant.properties.focusId.enum, ["P03"]);
-  });
+  const item = schema.properties.emails.items;
+  assert.equal(item.type, "object");
+  assert.equal(item.anyOf, undefined);
+  assert.deepEqual(
+    item.properties.purpose.enum,
+    emailV3Slots.map((s) => s.purpose),
+  );
+  assert.equal(schema.properties.emails.minItems, 5);
+  assert.equal(schema.properties.emails.maxItems, 5);
+  assert.deepEqual(item.properties.number, { type: "integer", minimum: 1, maximum: 5 });
+  assert.equal(item.properties.sections.minItems, 3);
+  assert.equal(item.properties.sections.maxItems, 4);
+  assert.deepEqual(item.properties.focusId.enum, ["P03"]);
+  assert.deepEqual(
+    item.properties.sections.items.properties.sourceQuestionIds.items.enum,
+    brief.responses.filter((r) => !r.skipped).map((r) => r.questionId),
+  );
+  // One shared shape/reference enum avoids five expanded branches on Gemini's provider path.
+  assert.equal(JSON.stringify(schema).split('"sourceQuestionIds":').length - 1, 1);
+  const empty = { ...brief, primaryId: null, responses: [] };
+  const nullItem = emailJourneyResponseSchema(empty).schema.properties.emails.items;
+  assert.deepEqual(nullItem.properties.focusId, { type: "null" });
+  assert.equal(nullItem.properties.sections.items.properties.sourceQuestionIds.maxItems, 0);
+  for (const mutate of [
+    (d) => {
+      d.emails[0].purpose = d.emails[1].purpose;
+    },
+    (d) => {
+      d.emails[0].sections.pop();
+    },
+    (d) => {
+      [d.emails[0], d.emails[1]] = [d.emails[1], d.emails[0]];
+    },
+    (d) => {
+      d.emails[2].focusId = "P04";
+    },
+  ]) {
+    const data = clone();
+    mutate(data);
+    assert.throws(() => validateEmailJourneyOutput(data, brief), /structure/);
+  }
   assert.ok(emailJourneySystemInstruction.includes("No mandatory three-C section"));
 });
 

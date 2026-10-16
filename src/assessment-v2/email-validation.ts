@@ -152,9 +152,12 @@ export function validateEmailJourneyOutput(raw: unknown, brief: EmailBrief) {
   return parsed.emails;
 }
 
-/** Per-slot variants carry number, purpose, focus and section counts from the same contract. */
+/** Keep the provider schema compact: Gemini endpoints can reject the expanded
+ * five-branch schema before generation. The unchanged runtime validator enforces
+ * each canonical slot's exact order, purpose, focus and section count. */
 export function emailJourneyResponseSchema(brief: EmailBrief) {
   const allowed = brief.responses.filter((r) => !r.skipped).map((r) => r.questionId);
+  const counts = emailV3Slots.map((slot) => slot.roles.length);
   return {
     name: "email_journey",
     schema: {
@@ -167,51 +170,51 @@ export function emailJourneyResponseSchema(brief: EmailBrief) {
           minItems: emailV3Slots.length,
           maxItems: emailV3Slots.length,
           items: {
-            anyOf: brief.slots.map((slot, index) => ({
-              type: "object",
-              additionalProperties: false,
-              required: [
-                "number",
-                "purpose",
-                "focusId",
-                "subject",
-                "preview",
-                "mainAction",
-                "sections",
-              ],
-              properties: {
-                number: { type: "integer", enum: [slot.number] },
-                purpose: { type: "string", enum: [emailV3Slots[index]!.purpose] },
-                focusId: slot.focusId ? { type: "string", enum: [slot.focusId] } : { type: "null" },
-                subject: { type: "string", minLength: 1, maxLength: 100 },
-                preview: { type: "string", minLength: 1, maxLength: 180 },
-                mainAction: { type: "string", minLength: 1, maxLength: 450 },
-                sections: {
-                  type: "array",
-                  minItems: emailV3Slots[index]!.roles.length,
-                  maxItems: emailV3Slots[index]!.roles.length,
-                  items: {
-                    type: "object",
-                    additionalProperties: false,
-                    required: ["heading", "paragraphs", "sourceQuestionIds"],
-                    properties: {
-                      heading: { type: "string", minLength: 1, maxLength: 100 },
-                      paragraphs: {
-                        type: "array",
-                        minItems: 1,
-                        maxItems: 3,
-                        items: { type: "string", minLength: 1, maxLength: 3000 },
-                      },
-                      sourceQuestionIds: {
-                        type: "array",
-                        maxItems: allowed.length ? 16 : 0,
-                        items: { type: "string", ...(allowed.length ? { enum: allowed } : {}) },
-                      },
+            type: "object",
+            additionalProperties: false,
+            required: [
+              "number",
+              "purpose",
+              "focusId",
+              "subject",
+              "preview",
+              "mainAction",
+              "sections",
+            ],
+            properties: {
+              number: { type: "integer", minimum: 1, maximum: emailV3Slots.length },
+              purpose: { type: "string", enum: emailV3Purposes },
+              focusId: brief.primaryId
+                ? { type: "string", enum: [brief.primaryId] }
+                : { type: "null" },
+              subject: { type: "string", minLength: 1, maxLength: 100 },
+              preview: { type: "string", minLength: 1, maxLength: 180 },
+              mainAction: { type: "string", minLength: 1, maxLength: 450 },
+              sections: {
+                type: "array",
+                minItems: Math.min(...counts),
+                maxItems: Math.max(...counts),
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["heading", "paragraphs", "sourceQuestionIds"],
+                  properties: {
+                    heading: { type: "string", minLength: 1, maxLength: 100 },
+                    paragraphs: {
+                      type: "array",
+                      minItems: 1,
+                      maxItems: 3,
+                      items: { type: "string", minLength: 1, maxLength: 3000 },
+                    },
+                    sourceQuestionIds: {
+                      type: "array",
+                      maxItems: allowed.length ? 16 : 0,
+                      items: { type: "string", ...(allowed.length ? { enum: allowed } : {}) },
                     },
                   },
                 },
               },
-            })),
+            },
           },
         },
       },
