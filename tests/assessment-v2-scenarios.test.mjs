@@ -77,16 +77,29 @@ test("short screens cover original signals without requiring an Other text box",
     const short = openingQuestions
       .filter((q) => q.id.startsWith(legacy.id))
       .flatMap((q) => q.options.map((o) => o.id));
-    for (const option of legacy.options.filter((o) => !["none", "unsure", "varies"].includes(o.id)))
+    for (const option of legacy.options.filter(
+      (o) => !["none", "unsure", "varies", "other"].includes(o.id),
+    ))
       assert.ok(short.includes(option.id));
   }
-  assert.ok(openingQuestions.filter(q => q.id.startsWith("q2")).every(q => /It varies/.test(q.options.at(-1).text)));
-  let value = submitAssessmentAnswer(session, { questionId: "q1c", optionIds: ["other"] });
-  assert.ok(value.answers.some((a) => a.optionIds.includes("other")));
+  assert.ok(
+    openingQuestions
+      .filter((q) => q.id.startsWith("q2"))
+      .every((q) => /It varies/.test(q.options.at(-1).text)),
+  );
+  const third = openingQuestions[2];
+  assert.deepEqual(
+    third.options.find((o) => o.id === "funding"),
+    { id: "funding", text: "Maintaining consistent funding." },
+  );
+  assert.ok(!third.options.some((o) => o.id === "other"));
+  let value = submitAssessmentAnswer(session, { questionId: "q1c", optionIds: ["funding"] });
+  assert.ok(value.answers.some((a) => a.questionId === "q1c" && a.optionIds.includes("funding")));
+  assert.ok(openingScenarioQuestion(value.answers).options.some((o) => o.id === "scenario_P01"));
   assert.throws(() =>
     submitAssessmentAnswer(value, {
       questionId: "q1c",
-      optionIds: ["strategy", "technology", "other"],
+      optionIds: ["strategy", "technology", "funding"],
     }),
   );
 });
@@ -123,21 +136,47 @@ test("saved seven-screen openings still require all their answers and retain rep
   ];
   session.questions = [
     ...groups.map(([id, legacyId, ids]) => ({
-      ...legacyOpeningQuestions.find(q => q.id === legacyId), id,
-      options: [...ids.map(id => legacyOpeningQuestions.find(q => q.id === legacyId).options.find(o => o.id === id)), {id:"unsure", text:"None / unsure"}],
+      ...legacyOpeningQuestions.find((q) => q.id === legacyId),
+      id,
+      options: [
+        ...ids.map((id) =>
+          legacyOpeningQuestions.find((q) => q.id === legacyId).options.find((o) => o.id === id),
+        ),
+        { id: "unsure", text: "None / unsure" },
+      ],
     })),
-    ...session.questions.filter(q => q.id === "q3" || q.id === "q4"),
+    ...session.questions.filter((q) => q.id === "q3" || q.id === "q4"),
   ];
   assert.equal(questionsForStage(session).length, 9);
-  for (const q of questionsForStage(session).filter(q => q.id !== "q2c" && q.id !== "q3" && q.id !== "q4"))
-    session = submitAssessmentAnswer(session, {questionId:q.id, optionIds:[q.options[0].id]});
+  for (const q of questionsForStage(session).filter(
+    (q) => q.id !== "q2c" && q.id !== "q3" && q.id !== "q4",
+  ))
+    session = submitAssessmentAnswer(session, { questionId: q.id, optionIds: [q.options[0].id] });
   assert.equal(stageIsComplete(session), false);
-  session = submitAssessmentAnswer(session, {questionId:"q2c", optionIds:["separate_ways"]});
-  for (const id of ["q3", "q4"]) session = submitAssessmentAnswer(session, {questionId:id, optionIds:[session.questions.find(q=>q.id===id).options[0].id]});
+  session = submitAssessmentAnswer(session, { questionId: "q2c", optionIds: ["separate_ways"] });
+  for (const id of ["q3", "q4"])
+    session = submitAssessmentAnswer(session, {
+      questionId: id,
+      optionIds: [session.questions.find((q) => q.id === id).options[0].id],
+    });
   assert.equal(stageIsComplete(session), true);
-  session = await advanceAssessment(session, {evaluator:evaluator([])});
-  assert.equal(session.stage,"probes");
-  const report = buildSessionReport({session:{session_id:session.id,snapshot:session,status:"active",stage:session.stage,created_at:session.createdAt,updated_at:session.updatedAt,completed_at:null,last_error:null}, events:[],calls:[],contacts:[]});
+  session = await advanceAssessment(session, { evaluator: evaluator([]) });
+  assert.equal(session.stage, "probes");
+  const report = buildSessionReport({
+    session: {
+      session_id: session.id,
+      snapshot: session,
+      status: "active",
+      stage: session.stage,
+      created_at: session.createdAt,
+      updated_at: session.updatedAt,
+      completed_at: null,
+      last_error: null,
+    },
+    events: [],
+    calls: [],
+    contacts: [],
+  });
   assert.equal(report.sections[1].title, "Phase 1 — Opening picture (Q1–Q9)");
   assert.equal(report.sections[2].title, "Phase 2 — Check the likely issues (Q10–Q13)");
 });

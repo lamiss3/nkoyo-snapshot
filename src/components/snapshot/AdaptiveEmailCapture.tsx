@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Loader2, Mail } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { submitAdaptiveReportRequest } from "@/lib/snapshot-api";
 const emailSchema = z.string().trim().email("Enter a valid email address.").max(255);
 
 export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -58,6 +59,12 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
       }
       setSavedAutomatic(saved.automatic);
       setStatus("saved");
+      // Stay in the same app so the already-started preparation request can continue.
+      // If navigation fails, the saved confirmation below is still available.
+      void navigate({
+        to: "/report-requested",
+        search: { delivery: saved.automatic ? "automatic" : "review" },
+      }).catch(() => {});
     } catch {
       setMessage("We could not save your request. Please try again.");
       setStatus("error");
@@ -82,6 +89,13 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
             </>
           )}
         </p>
+        <Link
+          to="/report-requested"
+          search={{ delivery: savedAutomatic ? "automatic" : "review" }}
+          className="mt-5 inline-flex font-bold underline underline-offset-4"
+        >
+          What happens next
+        </Link>
       </section>
     );
 
@@ -101,6 +115,11 @@ export function AdaptiveEmailCapture({ session }: { session: AssessmentSession }
         {!delivery.data?.automatic && "We’ll save your request for preparation and review. "}Your
         results above remain available without sharing an email.
       </p>
+      {delivery.data?.automatic && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Created around your answers and delivered to your inbox in about five minutes.
+        </p>
+      )}
 
       <form onSubmit={submit} noValidate className="mt-6">
         <label htmlFor="adaptive-report-email" className="text-sm font-semibold">

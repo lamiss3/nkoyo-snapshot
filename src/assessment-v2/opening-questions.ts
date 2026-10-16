@@ -13,12 +13,18 @@ export const legacyOpeningQuestions: readonly AssessmentQuestion[] = [
     options: [
       { id: "decisions", text: "Getting decisions made or approvals completed." },
       { id: "authority", text: "Knowing who is responsible and who has authority to act." },
-      { id: "relationships", text: "Working effectively across the board, leadership, staff, or partners." },
+      {
+        id: "relationships",
+        text: "Working effectively across the board, leadership, staff, or partners.",
+      },
       { id: "values", text: "Putting agreed values and expectations into everyday practice." },
       { id: "demand", text: "Keeping up with demand, growth, or expansion." },
       { id: "workload", text: "Managing workload, staffing gaps, or recurring exhaustion." },
       { id: "funding", text: "Funding ongoing work and planning beyond current grants." },
-      { id: "requirements", text: "Keeping up with requirements, reporting, or preparing for unexpected events." },
+      {
+        id: "requirements",
+        text: "Keeping up with requirements, reporting, or preparing for unexpected events.",
+      },
       { id: "key_person", text: "Keeping work moving when a key person is unavailable or leaves." },
       { id: "strategy", text: "Turning shared priorities and plans into coordinated action." },
       { id: "technology", text: "Making technology or AI useful and manageable." },
@@ -37,12 +43,21 @@ export const legacyOpeningQuestions: readonly AssessmentQuestion[] = [
     options: [
       { id: "escalate", text: "More decisions and questions go to senior leadership." },
       { id: "extra_work", text: "People take on extra work or work longer hours." },
-      { id: "wait_for_authority", text: "People wait while responsibility or authority is clarified." },
+      {
+        id: "wait_for_authority",
+        text: "People wait while responsibility or authority is clarified.",
+      },
       { id: "separate_ways", text: "Different teams or individuals find their own ways forward." },
       { id: "postpone", text: "Planned work is postponed to handle immediate demands." },
-      { id: "key_person", text: "Work depends on a particular person’s knowledge or relationships." },
+      {
+        id: "key_person",
+        text: "Work depends on a particular person’s knowledge or relationships.",
+      },
       { id: "extra_checks", text: "Additional approvals, checks, or reporting are introduced." },
-      { id: "agreed_process", text: "People adjust priorities and responsibilities through an agreed process." },
+      {
+        id: "agreed_process",
+        text: "People adjust priorities and responsibilities through an agreed process.",
+      },
       { id: "varies", text: "The response varies too much to identify a usual pattern." },
       { id: "unsure", text: "I haven’t observed this / I’m not sure." },
     ],
@@ -56,11 +71,17 @@ export const legacyOpeningQuestions: readonly AssessmentQuestion[] = [
       { id: "delay", text: "Important work or decisions are delayed." },
       { id: "wellbeing", text: "Staff wellbeing or retention is suffering." },
       { id: "service", text: "Service quality or reliability is affected." },
-      { id: "leader_time", text: "Senior leadership has too little time for its main responsibilities." },
+      {
+        id: "leader_time",
+        text: "Senior leadership has too little time for its main responsibilities.",
+      },
       { id: "finances", text: "Financial stability or future commitments are becoming uncertain." },
       { id: "safeguards", text: "Accountability, obligations, or safeguards are at risk." },
       { id: "focus", text: "Teams are losing focus or working toward competing priorities." },
-      { id: "opportunity", text: "Growth, partnerships, or other opportunities are being held back." },
+      {
+        id: "opportunity",
+        text: "Growth, partnerships, or other opportunities are being held back.",
+      },
       { id: "other", text: "Another consequence." },
       { id: "little_impact", text: "There has been little or no noticeable impact." },
       { id: "unsure", text: "I’m not sure." },
@@ -70,27 +91,78 @@ export const legacyOpeningQuestions: readonly AssessmentQuestion[] = [
     id: "q4",
     kind: "text",
     text: "Tell us about one recent situation that shows the difficulty you most want to address.",
-    helper: "What happened, who was affected, and what changed or became harder? A few sentences are enough. Leave out names or confidential details.",
+    helper:
+      "What happened, who was affected, and what changed or became harder? A few sentences are enough. Leave out names or confidential details.",
     source: "fixed",
   },
 ];
 
-const options = (ids: string[], legacyId: string) => ids.map((id) => legacyOpeningQuestions.find((q) => q.id === legacyId)!.options!.find((o) => o.id === id)!);
-const shortQuestion = (id: string, text: string, ids: string[], legacyId: string, neutralText = "None of these / I’m not sure."): AssessmentQuestion => ({
-  id, text, kind: "multiple", maxSelections: 2, source: "fixed",
+const options = (ids: string[], legacyId: string) =>
+  ids.map((id) =>
+    legacyOpeningQuestions.find((q) => q.id === legacyId)!.options!.find((o) => o.id === id)!,
+  );
+const shortQuestion = (
+  id: string,
+  text: string,
+  ids: string[],
+  legacyId: string,
+  neutralText = "None of these / I’m not sure.",
+  labels: Record<string, string> = {},
+): AssessmentQuestion => ({
+  id,
+  text,
+  kind: "multiple",
+  maxSelections: 2,
+  source: "fixed",
   helper: "Choose up to two that fit the past three months.",
-  options: [...options(ids, legacyId), { id: "unsure", text: neutralText }],
+  options: [
+    ...options(ids, legacyId).map((option) => ({
+      ...option,
+      text: labels[option.id] ?? option.text,
+    })),
+    { id: "unsure", text: neutralText },
+  ],
 });
 
 /** Five screens retain the substantive signals, with five choices per screen.
  * An inconsistent response is grouped with the neutral unsure choice. */
 export const openingQuestions: readonly AssessmentQuestion[] = [
-  shortQuestion("q1a", "Where does getting work moving become difficult?", ["decisions", "authority", "relationships", "values"], "q1"),
-  shortQuestion("q1b", "Which pressures affect your people and resources?", ["demand", "workload", "key_person", "funding"], "q1"),
-  shortQuestion("q1c", "Which pressures affect plans, tools or requirements?", ["strategy", "technology", "requirements", "other"], "q1"),
-  shortQuestion("q2a", "When pressure rises, what happens to decisions and coordination?", ["escalate", "wait_for_authority", "extra_checks", "separate_ways"], "q2", "It varies / none of these / I’m not sure."),
-  shortQuestion("q2b", "When pressure rises, what happens to work and priorities?", ["extra_work", "postpone", "key_person", "agreed_process"], "q2", "It varies / none of these / I’m not sure."),
+  shortQuestion(
+    "q1a",
+    "Where does getting work moving become difficult?",
+    ["decisions", "authority", "relationships", "values"],
+    "q1",
+  ),
+  shortQuestion(
+    "q1b",
+    "Which pressures affect your people and resources?",
+    ["demand", "workload", "key_person", "funding"],
+    "q1",
+  ),
+  shortQuestion(
+    "q1c",
+    "Which pressures affect plans, tools or requirements?",
+    ["strategy", "technology", "requirements", "funding"],
+    "q1",
+    undefined,
+    { funding: "Maintaining consistent funding." },
+  ),
+  shortQuestion(
+    "q2a",
+    "When pressure rises, what happens to decisions and coordination?",
+    ["escalate", "wait_for_authority", "extra_checks", "separate_ways"],
+    "q2",
+    "It varies / none of these / I’m not sure.",
+  ),
+  shortQuestion(
+    "q2b",
+    "When pressure rises, what happens to work and priorities?",
+    ["extra_work", "postpone", "key_person", "agreed_process"],
+    "q2",
+    "It varies / none of these / I’m not sure.",
+  ),
 ];
 
 /** Use the stored opening layout so earlier seven-screen sessions can finish. */
-export const isOpeningQuestion = (question: AssessmentQuestion) => /^q[12][a-d]?$/.test(question.id) || question.id === "q3" || question.id === "q4";
+export const isOpeningQuestion = (question: AssessmentQuestion) =>
+  /^q[12][a-d]?$/.test(question.id) || question.id === "q3" || question.id === "q4";

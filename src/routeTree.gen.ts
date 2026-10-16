@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ReportRequestedRouteImport } from './routes/report-requested'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as SnapshotRouteImport } from './routes/snapshot'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -36,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRequestedRoute = ReportRequestedRouteImport.update({
+  id: '/report-requested',
+  path: '/report-requested',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultsRoute = ResultsRouteImport.update({
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/privacy': typeof PrivacyRoute
+  '/report-requested': typeof ReportRequestedRoute
   '/results': typeof ResultsRoute
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/privacy': typeof PrivacyRoute
+  '/report-requested': typeof ReportRequestedRoute
   '/results': typeof ResultsRoute
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/privacy': typeof PrivacyRoute
+  '/report-requested': typeof ReportRequestedRoute
   '/results': typeof ResultsRoute
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/privacy'
+    | '/report-requested'
     | '/results'
     | '/snapshot'
     | '/terms'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/privacy'
+    | '/report-requested'
     | '/results'
     | '/snapshot'
     | '/terms'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/privacy'
+    | '/report-requested'
     | '/results'
     | '/snapshot'
     | '/terms'
@@ -135,6 +147,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   PrivacyRoute: typeof PrivacyRoute
+  ReportRequestedRoute: typeof ReportRequestedRoute
   ResultsRoute: typeof ResultsRoute
   SnapshotRoute: typeof SnapshotRoute
   TermsRoute: typeof TermsRoute
@@ -169,6 +182,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report-requested': {
+      id: '/report-requested'
+      path: '/report-requested'
+      fullPath: '/report-requested'
+      preLoaderRoute: typeof ReportRequestedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/results': {
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   PrivacyRoute: PrivacyRoute,
+  ReportRequestedRoute: ReportRequestedRoute,
   ResultsRoute: ResultsRoute,
   SnapshotRoute: SnapshotRoute,
   TermsRoute: TermsRoute,
