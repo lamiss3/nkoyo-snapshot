@@ -140,7 +140,7 @@ export function AssessmentLogPanel() {
         <h4 className="mt-6 font-bold">Model calls</h4>
         {detail.data.calls.length === 0 && <p className="mt-2 text-sm text-muted-foreground">No model calls were made for this session.</p>}
         {detail.data.calls.map((call) => <article key={call.id} className="mt-4 rounded-2xl border border-border bg-blush/40 p-4">
-          <h5 className="font-bold">{call.provider.toUpperCase()} · {call.operation} · {call.status}</h5>
+          <h5 className="font-bold">{call.provider === "gemini" && call.configured_model.startsWith("google/") ? "GEMINI VIA OPENROUTER" : call.provider.toUpperCase()} · {call.operation} · {call.status}</h5>
           <p className="mt-2 break-words text-xs text-muted-foreground">Configured model: {call.configured_model} · Returned model: {call.response_model ?? "not supplied"}<br />{date(call.started_at)} · {call.duration_ms === null ? "duration pending" : `${call.duration_ms} ms`} · HTTP {call.http_status ?? "no response"}<br />Attempt: {call.attempt_id}</p>
           {call.status === "started" && <p className="mt-2 text-xs">The call began but no final record was saved. It may still be running or have been interrupted.</p>}
           <JsonDetails title="Exact model input / request body" value={call.request} />

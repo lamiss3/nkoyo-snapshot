@@ -7,6 +7,7 @@ import {
 } from "./email-journey.ts";
 import { recordedModelCall, type ModelCallRecorder } from "./provider-trace.server.ts";
 import type { AssessmentSession } from "./types.ts";
+import { createGeminiClient, type GeminiClientConfig } from "./gemini-client.server.ts";
 
 const plain = (max: number) =>
   z
@@ -64,14 +65,13 @@ Every section paraphrasing respondent evidence must cite the relevant question I
 
 /** Draft-only writer used by durable jobs. It cannot send or enrol anyone.
  * A recorder is required so every production call preserves request/response. */
-export function createGeminiEmailJourneyWriter(config: {
-  apiKey: string;
-  model?: string;
-  fetcher?: typeof fetch;
-  trace: ModelCallRecorder;
-}) {
-  if (!config.apiKey) throw new Error("GEMINI_API_KEY is required");
-  const model = config.model ?? "gemini-3.6-flash";
+export function createGeminiEmailJourneyWriter(
+  config: GeminiClientConfig & {
+    trace: ModelCallRecorder;
+  },
+) {
+  const client = createGeminiClient(config);
+  const model = client.model;
   return {
     async generate(session: AssessmentSession): Promise<EmailJourney> {
       const brief = emailJourneyBrief(session);
@@ -109,56 +109,80 @@ export function createGeminiEmailJourneyWriter(config: {
           })),
         })),
       };
-      const request = {
-        systemInstruction: { parts: [{ text: emailJourneySystemInstruction }] },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                text: `Assessment context (JSON): ${JSON.stringify(context)}\nUse this valid JSON shape, replacing all placeholder copy: ${JSON.stringify(shape)}\nQuote every property name and string. Return all five slots, the required ordered section roles and exact section counts. The ONLY allowed sourceQuestionIds are ${JSON.stringify(allowedSourceIds)}. A mention of an omitted/skipped answer must use an empty reference list, never the skipped ID. Include threadQuestionId in each email when supplied.`,
+      const request = client.request(
+        emailJourneySystemInstruction,
+        `Assessment context (JSON): ${JSON.stringify(context)}\nUse this valid JSON shape, replacing all placeholder copy: ${JSON.stringify(shape)}\nQuote every property name and string. Return all five slots, the required ordered section roles and exact section counts. The ONLY allowed sourceQuestionIds are ${JSON.stringify(allowedSourceIds)}. A mention of an omitted/skipped answer must use an empty reference list, never the skipped ID. Include threadQuestionId in each email when supplied.`,
+        7500,
+        {
+          name: "email_journey",
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            required: ["emails"],
+            properties: {
+              emails: {
+                type: "array",
+                minItems: 5,
+                maxItems: 5,
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: [
+                    "number",
+                    "purpose",
+                    "focusId",
+                    "subject",
+                    "preview",
+                    "mainAction",
+                    "sections",
+                  ],
+                  properties: {
+                    number: { type: "integer", minimum: 1, maximum: 5 },
+                    purpose: { type: "string", enum: emailPurposes },
+                    focusId: { type: ["string", "null"] },
+                    subject: { type: "string", maxLength: 100 },
+                    preview: { type: "string", maxLength: 180 },
+                    mainAction: { type: "string", maxLength: 450 },
+                    sections: {
+                      type: "array",
+                      minItems: 3,
+                      maxItems: 6,
+                      items: {
+                        type: "object",
+                        additionalProperties: false,
+                        required: ["heading", "paragraphs", "sourceQuestionIds"],
+                        properties: {
+                          heading: { type: "string", maxLength: 100 },
+                          paragraphs: {
+                            type: "array",
+                            minItems: 1,
+                            maxItems: 3,
+                            items: { type: "string", maxLength: 3000 },
+                          },
+                          sourceQuestionIds: {
+                            type: "array",
+                            maxItems: 16,
+                            items: {
+                              type: "string",
+                              ...(allowedSourceIds.length ? { enum: allowedSourceIds } : {}),
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
-            ],
+            },
           },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          maxOutputTokens: 7500,
-          ...(/^gemini-3\.[56]-flash/.test(model)
-            ? { thinkingConfig: { thinkingLevel: "minimal" } }
-            : {}),
         },
-      };
+      );
       return recordedModelCall(
         { provider: "gemini", operation: "email_journey", configured_model: model, request },
         config.trace,
         async (capture) => {
-          const response = await (config.fetcher ?? fetch)(
-            `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-            {
-              method: "POST",
-              headers: { "x-goog-api-key": config.apiKey, "Content-Type": "application/json" },
-              body: JSON.stringify(request),
-              signal: AbortSignal.timeout(60000),
-            },
-          );
-          await capture(response);
-          if (!response.ok) throw new Error(`Gemini email generation failed (${response.status})`);
-          const payload = (await response.json()) as {
-            modelVersion?: string;
-            candidates?: {
-              finishReason?: string;
-              content?: { parts?: { text?: string; thought?: boolean }[] };
-            }[];
-          };
-          const candidate = payload.candidates?.[0];
-          if (candidate?.finishReason && candidate.finishReason !== "STOP")
-            throw new Error("Gemini returned an incomplete email journey");
-          const content =
-            candidate?.content?.parts
-              ?.filter((part) => !part.thought)
-              .map((part) => part.text ?? "")
-              .join("") ?? "";
+          const response = await client.complete(request, 60000, capture);
+          const content = response.text;
           const parsed = outputSchema.parse(JSON.parse(content));
           const distinct = (values: string[]) =>
             new Set(values.map((value) => value.trim().toLowerCase())).size === values.length;
@@ -249,7 +273,7 @@ export function createGeminiEmailJourneyWriter(config: {
             status: "draft",
             sessionId: session.id,
             generatedAt: new Date().toISOString(),
-            model: payload.modelVersion ?? model,
+            model: response.model,
             primaryId: brief.primaryId,
             secondaryId: brief.secondaryId,
             jointPriority: brief.jointPriority,

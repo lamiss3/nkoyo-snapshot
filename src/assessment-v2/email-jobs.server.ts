@@ -11,6 +11,7 @@ import {
 } from "./email-job-policy.server";
 import { fixedTestEmailJourney } from "./email-journey-fixed";
 import { createGeminiEmailJourneyWriter } from "./email-journey.server";
+import { geminiConfigFromEnv } from "./gemini-client.server.ts";
 import { AssessmentTrace } from "./trace-runtime.server";
 import { supabaseTraceStore } from "./logging.server";
 import type { TraceDatabase } from "./trace-types";
@@ -145,14 +146,12 @@ async function processEmailJobWithWriter(id?: string, retry = false, fixedTestAc
       const trace = new AssessmentTrace(
         supabaseTraceStore(emailDb as unknown as SupabaseClient<TraceDatabase>),
         session,
-        ["GEMINI_API_KEY", "JEV_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "KIT_API_KEY"].map(
+        ["GEMINI_API_KEY", "OPENROUTER_API_KEY", "JEV_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "KIT_API_KEY"].map(
           (key) => process.env[key] ?? "",
         ),
       );
       const writer = createGeminiEmailJourneyWriter({
-        apiKey: process.env["GEMINI_API_KEY"] ?? "",
-        model:
-          process.env["EMAIL_GEMINI_MODEL"] || process.env["GEMINI_MODEL"] || "gemini-3.6-flash",
+        ...geminiConfigFromEnv("email"),
         trace: trace.recorder(job.lock_token!),
       });
       content = await writer.generate(session);

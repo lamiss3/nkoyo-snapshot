@@ -57,6 +57,6 @@ export function assessmentTrace(session: AssessmentSession): AssessmentTrace | u
     console.error("Assessment logging needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY on the server");
     throw new AssessmentLogError();
   }
-  const secrets = ["JEV_API_KEY", "GEMINI_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_PUBLISHABLE_KEY"].map((name) => process.env[name] ?? "");
+  const secrets = ["JEV_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_PUBLISHABLE_KEY"].map((name) => process.env[name] ?? "");
   return new AssessmentTrace(supabaseTraceStore(supabaseAdmin as unknown as SupabaseClient<TraceDatabase>), session, secrets);
 }

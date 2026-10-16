@@ -63,7 +63,7 @@ function questions(blocks: ReportBlock[], chosen: AssessmentQuestion[], input: S
     const number = session.questions.findIndex((item) => item.id === question.id) + 1;
     const answer = session.answers.find((item) => item.questionId === question.id);
     blocks.push(heading(`Q${number}. ${question.text}`));
-    blocks.push(p(question.source === "generated" ? `Written by Gemini (${question.model ?? "model not recorded"}).` : question.source === "fallback" ? "Fixed backup question; Gemini wording was not used." : "Fixed question from the assessment question bank."));
+    blocks.push(p(question.source === "generated" ? `Written by Gemini${question.model?.startsWith("google/") ? " via OpenRouter" : ""} (${question.model ?? "model not recorded"}).` : question.source === "fallback" ? "Fixed backup question; Gemini wording was not used." : "Fixed question from the assessment question bank."));
     if (question.problemId) blocks.push(p(`Topic explored: ${topic(question.problemId)}.`));
     if (question.answerMode === "scenario_match") blocks.push(p("Hypothetical scenario match: a self-reported similarity, not a verified event."));
     if (question.options?.length) blocks.push({ kind: "details", title: `Available choices (${question.options.length})`, blocks: [list(question.options.map((option) => option.text))] });
@@ -82,12 +82,14 @@ function reviewedAnswers(call: ModelCallRow): Record<string, unknown>[] {
   // The saved Gemini prompt has a JSON context followed by the writing instruction.
   const contents = Array.isArray(request['contents']) ? request['contents'] : [];
   const parts = object(contents[0])['parts'];
-  const text = Array.isArray(parts) ? object(parts[0])['text'] : null;
+  const messages = Array.isArray(request['messages']) ? request['messages'] : [];
+  const userMessage = messages.map(object).find(message => message['role'] === "user");
+  const text = userMessage?.['content'] ?? (Array.isArray(parts) ? object(parts[0])['text'] : null);
   if (typeof text !== "string") return [];
-  const prefix = "Assessment context (JSON): ";
+  const prefix = text.startsWith("Context: ") ? "Context: " : "Assessment context (JSON): ";
   if (!text.startsWith(prefix)) return [];
   try {
-    const context = object(JSON.parse(text.slice(prefix.length).split("\nWrite exactly")[0]!));
+    const context = object(JSON.parse(text.slice(prefix.length).split("\n")[0]!));
     return Array.isArray(context['responses']) ? context['responses'].map(object) : [];
   } catch { return []; }
 }
@@ -96,6 +98,8 @@ function modelSteps(blocks: ReportBlock[], calls: ModelCallRow[]) {
   for (let index = 0; index < calls.length; index++) {
     const call = calls[index]!;
     blocks.push(heading(`${call.provider === "jev" ? "Jev evaluation" : "Gemini question writing"}${calls.length > 1 ? ` — attempt ${index + 1}` : ""}`));
+    if (call.provider === "gemini" && Array.isArray(object(call.request)['messages']))
+      blocks.push(p("Connection: Gemini via OpenRouter. Token usage and any returned cost are retained in the technical log."));
     blocks.push(p(`Model: ${call.response_model ?? call.configured_model}. Started ${when(call.started_at)}. ${call.status === "succeeded" ? "Finished successfully." : call.status === "failed" ? "Failed; this attempt did not produce usable output." : "Started; no completed output saved yet."}${call.duration_ms !== null ? ` Time taken: ${(call.duration_ms / 1000).toFixed(1)} seconds.` : ""}`));
     blocks.push(p(call.provider === "jev" ? "Task: assess the evidence for each requested topic. The website's rules choose the next topics and calculate the result." : "Task: write neutral follow-up questions about the two selected topics. Gemini does not choose the topics or score the result."));
     const reviewed = reviewedAnswers(call);

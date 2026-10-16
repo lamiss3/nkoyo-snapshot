@@ -26,13 +26,14 @@ export const advanceAdaptiveAssessment = createServerFn({ method: "POST" })
     const { localRuleEvaluator } = await import("./local-evaluator.ts");
     const { createJevEvaluator } = await import("./jev.server.ts");
     const { createGeminiQuestionWriter } = await import("./gemini.server.ts");
+    const { geminiConfigFromEnv } = await import("./gemini-client.server.ts");
     const trace = assessmentTrace(data);
     if (trace) await trace.authorize();
     const attemptId = crypto.randomUUID();
     const recorder = trace?.recorder(attemptId);
     const jevKey = process.env['JEV_API_KEY'];
-    const geminiKey = process.env['GEMINI_API_KEY'];
-    const writer = geminiKey ? createGeminiQuestionWriter({ apiKey: geminiKey, model: process.env['GEMINI_MODEL'] || "gemini-3.6-flash", ...(recorder ? { trace: recorder } : {}) }) : undefined;
+    const geminiConfig = geminiConfigFromEnv();
+    const writer = geminiConfig.apiKey ? createGeminiQuestionWriter({ ...geminiConfig, ...(recorder ? { trace: recorder } : {}) }) : undefined;
     const evaluator = jevKey ? createJevEvaluator({ apiKey: jevKey, model: process.env['JEV_MODEL'] || "jev-latest", ...(recorder ? { trace: recorder } : {}) }) : localRuleEvaluator;
     try {
       if (!jevKey && !isDevelopment) {
