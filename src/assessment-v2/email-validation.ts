@@ -147,7 +147,9 @@ export function validateEmailJourneyOutput(raw: unknown, brief: EmailBrief) {
     const words = paragraphWordCount(email);
     const minimum = brief.sparseEvidence ? contract.sparseMinimum : contract.acceptedWords[0];
     if (words < minimum || words > contract.acceptedWords[1])
-      throw new Error("Gemini returned an email outside the draft length limits");
+      throw new Error(
+        `Gemini returned an email outside the draft length limits (email ${email.number}: ${words} paragraph words; expected ${minimum}–${contract.acceptedWords[1]}).`,
+      );
   }
   return parsed.emails;
 }

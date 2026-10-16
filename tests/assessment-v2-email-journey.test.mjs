@@ -136,6 +136,8 @@ test("one mocked Gemini call creates all five v3 emails and records actual reque
       const request = JSON.parse(init.body);
       const prompt = request.contents[0].parts[0].text;
       assert.ok(prompt.includes("supply request"));
+      assert.ok(prompt.includes('"minimumParagraphWords":80'));
+      assert.ok(prompt.includes('"targetParagraphWords":[180,280]'));
       assert.ok(!prompt.includes("private-capability"));
       assert.ok(!prompt.includes("threadQuestionId"));
       assert.ok(!request.systemInstruction.parts[0].text.includes("EVERY email"));
@@ -244,6 +246,12 @@ test("paragraph bounds are objective, separate from targets, and allow sparse ev
   const short = clone();
   emailV3Slots.forEach((slot, i) => setWords(short, i, slot.sparseMinimum));
   assert.equal(validateEmailJourneyOutput(short, sparse).length, 5);
+  const under = clone();
+  setWords(under, 2, 77);
+  assert.throws(
+    () => validateEmailJourneyOutput(under, brief),
+    /email 3: 77 paragraph words; expected 80–380/,
+  );
 });
 
 test("compact provider schema derives allowed values from the contract; runtime retains exact slot validation", () => {

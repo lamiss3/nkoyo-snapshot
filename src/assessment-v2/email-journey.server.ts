@@ -23,6 +23,7 @@ Each email has one main response/action request in mainAction. Sections can expl
 Return only the structured JSON format. Customer fields are plain prose: number, purpose and focusId are metadata; subject, preview, mainAction, and sections (heading, paragraphs, sourceQuestionIds) carry the writing. Ordered section roles describe each section's job, not literal headings. Do not print question/probe IDs, topic IDs, role names, prompt fragments, placeholders, staff annotations or JSON field names in customer fields. Do not embed greetings, signatures, HTML, Markdown, URLs, contact addresses, offers, booking links, urgency or follow-up promises. The renderer owns greeting, signature, report scope note, next-email previews, approved contact route and unsubscribe information. Email 5's single mainAction may conditionally invite discussion with Nkoyo; the website will link that action to the approved address without a second invitation.
 Writing targets guide depth, not padding. When evidence is sparse, shorter copy that states the uncertainty and gives a useful observation is better. Do not invent detail to fill a word count. No mandatory three-C section or percentages; relative topic emphasis is not a measured organizational score.
 ${slotInstructions}
+Before returning, privately check EACH email against its supplied paragraphWordRequirements. Count only words in sections[].paragraphs[], excluding headings, subject, preview and mainAction. Aim for the writing target, with a margin above the minimum; do not mistake a short mainAction or a heading for body words. If a draft is too short, make the existing observation/test more usable with grounded steps or a clearly conditional example, without inventing facts or adding competing homework. Sparse evidence has its own lower minimum: use that instead of padding. If a draft is too long, remove repetition. Do not return word counts or planning.
 Return all five slots in order, keeping focus IDs as supplied. Only existing unskipped sourceQuestionIds are permitted. Cite relevant evidence in each email when responses are available; references are staff metadata only. No planning, extra fields or commentary.`;
 
 /** Single shared validation path for provider output and local editorial fixtures. */
@@ -102,7 +103,13 @@ export function createGeminiEmailJourneyWriter(
           })),
         })),
       };
-      const prompt = `Assessment context (JSON): ${JSON.stringify(context)}\nWrite all five emails in one JSON response following the supplied slot definitions. Section roles are positional: use natural headings, not role names. Use the selected advisory guides and the relevant evidence to develop one evolving test and five distinct practical contributions. Do not expose planning. The only allowed sourceQuestionIds are ${JSON.stringify(allowedSourceIds)}. Do not print these IDs in customer copy. Respect sparseEvidence; never pad with invented detail. Use this valid JSON shape and replace every angle-bracket placeholder with plain copy: ${JSON.stringify(shape)}`;
+      const paragraphWordRequirements = emailV3Slots.map((slot, index) => ({
+        email: index + 1,
+        targetParagraphWords: slot.targetWords,
+        minimumParagraphWords: brief.sparseEvidence ? slot.sparseMinimum : slot.acceptedWords[0],
+        maximumParagraphWords: slot.acceptedWords[1],
+      }));
+      const prompt = `Assessment context (JSON): ${JSON.stringify(context)}\nWrite all five emails in one JSON response following the supplied slot definitions. Section roles are positional: use natural headings, not role names. Use the selected advisory guides and the relevant evidence to develop one evolving test and five distinct practical contributions. Do not expose planning. The only allowed sourceQuestionIds are ${JSON.stringify(allowedSourceIds)}. Do not print these IDs in customer copy. Respect sparseEvidence; never pad with invented detail. Mandatory paragraphWordRequirements (words in section paragraphs only; aim for targets and stay inside minimum/maximum): ${JSON.stringify(paragraphWordRequirements)}. Check all five before returning. Use this valid JSON shape and replace every angle-bracket placeholder with plain copy: ${JSON.stringify(shape)}`;
       const request = client.request(
         emailJourneySystemInstruction,
         prompt,

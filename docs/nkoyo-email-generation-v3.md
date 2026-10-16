@@ -20,6 +20,8 @@ All five emails are generated in **one request**, before any send. Every message
 
 Writing targets are editorial guidance, not an instruction to pad. Acceptance minima are deliberately lower. Sparse evidence means fewer than two usable answers, no primary finding, or usable answers consisting only of hypothetical matches. Maxima remain the normal maxima. Counts cover paragraph text, excluding headings, mainAction, previews and website framing.
 
+The request also supplies explicit per-email `paragraphWordRequirements`, derived from these same targets and the applicable normal/sparse bounds. The writer is instructed to check them privately before returning and develop a useful step rather than add filler. Runtime validation remains authoritative; a length failure reports the email number, actual paragraph word count and accepted range without exposing respondent text. Prompt self-checks do not guarantee model compliance.
+
 ## Topic and evidence input
 
 Topic selection is unchanged: retain saved `supported`/`possible` results, prioritize topics in the saved priority list, then sort by `prioritySignal`. The first two are the primary and secondary metadata; joint priorities retain their flag. No scores or priority order are re-evaluated by the writer.
