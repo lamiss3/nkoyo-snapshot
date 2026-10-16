@@ -67,6 +67,7 @@ export function createGeminiClient(config: GeminiClientConfig) {
               outputFormat === "json_object"
                 ? { type: "json_object" }
                 : { type: "json_schema", json_schema: { ...schema, strict: true } },
+            ...(outputFormat === "json_object" ? { plugins: [{ id: "response-healing" }] } : {}),
             provider: { require_parameters: true, allow_fallbacks: true },
             reasoning: { effort: "minimal", exclude: true },
             max_tokens: maxTokens,

@@ -242,6 +242,7 @@ test("five OpenRouter emails retain topics, actions and references; truncation c
         const body = JSON.parse(init.body);
         assert.equal(body.max_tokens, 7500);
         assert.deepEqual(body.response_format, { type: "json_object" });
+        assert.deepEqual(body.plugins, [{ id: "response-healing" }]);
         assert.ok(body.messages[1].content.includes("routine approvals"));
         return response(
           { emails },
