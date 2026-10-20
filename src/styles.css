@@ -157,6 +157,94 @@
   text-transform: uppercase;
 }
 
+/* Landing-only refinements; assessment and email rendering retain their styles. */
+.landing-page {
+  --landing-action: oklch(0.52 0.23 335.4);
+  --landing-action-hover: oklch(0.46 0.2 335.4);
+}
+
+.snapshot-cta {
+  display: inline-flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: 9999px;
+  padding: 0.875rem 1.75rem;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  font-weight: 700;
+  background: var(--landing-action);
+  color: var(--color-primary-foreground);
+  transition: background-color 150ms ease;
+}
+
+.snapshot-cta:hover,
+.landing-page .snapshot-header-cta:hover {
+  background: var(--landing-action-hover);
+}
+
+.landing-page .snapshot-header-cta {
+  background: var(--landing-action);
+}
+
+.landing-page header a[aria-label$=" home"] {
+  min-height: 2.75rem;
+}
+
+.landing-page :is(a, button):focus-visible {
+  outline: 3px solid var(--color-lime-foreground);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 6px var(--color-lime);
+}
+
+.landing-anchor {
+  scroll-margin-top: 8.5rem;
+}
+
+.landing-secondary-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.landing-skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 1rem;
+  z-index: 100;
+  transform: translateY(-200%);
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-lime);
+  color: var(--color-navy);
+  font-weight: 700;
+}
+
+.landing-skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (min-width: 640px) {
+  .landing-anchor {
+    scroll-margin-top: 6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page *,
+  .landing-page *::before,
+  .landing-page *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;

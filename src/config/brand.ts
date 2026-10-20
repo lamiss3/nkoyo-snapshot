@@ -21,7 +21,7 @@ export const brand = {
 
   /**
    * Replaceable portrait area. Set imageUrl to a real photo of Nkoyo when available.
-   * Until then a branded placeholder frame is shown (no stock photography).
+   * Until then the landing page uses a text-led brand panel (no stock photography).
    */
   portrait: {
     imageUrl: null as string | null,
@@ -35,8 +35,8 @@ export const brand = {
    */
   bookingUrl: null as string | null,
 
-  /** NOT CONFIGURED: replace with real contact + social links. */
-  contactEmail: null as string | null,
+  /** Owner-approved business contact; show social destinations only when supplied. */
+  contactEmail: "hello@nkoyoeffionglewis.com" as string | null,
   social: {
     instagram: null as string | null,
     linkedin: null as string | null,
@@ -48,9 +48,6 @@ export const brand = {
    * claims an email was sent — it only stores the request.
    */
   emailDeliveryConfigured: false,
-
-  legalReviewNotice:
-    "DRAFT — this text is a placeholder prepared for human legal review. It is not legal advice and must be reviewed and approved before launch.",
 } as const;
 
 export const bookingCopy = {

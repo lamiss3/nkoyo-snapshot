@@ -1,94 +1,97 @@
 import { Link } from "@tanstack/react-router";
 import { brand } from "@/config/brand";
+import { legal } from "@/config/legal";
 
-const socials: Array<[string, string | null]> = [
-  ["Instagram", brand.social.instagram],
-  ["LinkedIn", brand.social.linkedin],
-  ["YouTube", brand.social.youtube],
-];
+const socials = (
+  [
+    ["Instagram", brand.social.instagram],
+    ["LinkedIn", brand.social.linkedin],
+    ["YouTube", brand.social.youtube],
+  ] as Array<[string, string | null]>
+).filter((item): item is [string, string] => Boolean(item[1]));
+const linkClass = "inline-flex min-h-11 items-center hover:text-lime";
 
 export function SiteFooter() {
   return (
     <footer className="no-print bg-navy text-navy-foreground">
-      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_0.8fr_1.2fr]">
         <div>
           <p className="font-display text-xl font-extrabold">
             {brand.logo.wordmark}
             <span className="text-magenta-soft">®</span>
           </p>
-          <p className="mt-1 text-xs uppercase tracking-[0.3em] opacity-70">
+          <p className="mt-1 text-xs uppercase tracking-[0.3em] opacity-80">
             {brand.logo.wordmarkSub}
           </p>
-          <p className="mt-4 max-w-xs text-sm opacity-80">{brand.tagline}</p>
+          <p className="mt-4 max-w-xs text-sm text-navy-foreground/85">{brand.tagline}</p>
         </div>
-
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest opacity-70">Snapshot</h2>
-          <ul className="mt-4 space-y-2 text-sm">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-navy-foreground/80">
+            Snapshot
+          </h2>
+          <ul className="mt-3 text-sm">
             <li>
-              <Link to="/snapshot" className="hover:text-lime">
+              <Link to="/snapshot" className={linkClass}>
                 Start the Snapshot
               </Link>
             </li>
             <li>
-              <a href="/#how-it-works" className="hover:text-lime">
+              <a href="/#how-it-works" className={linkClass}>
                 How it works
               </a>
             </li>
             <li>
-              <a href="/#about" className="hover:text-lime">
+              <a href="/#about" className={linkClass}>
                 About Nkoyo
               </a>
             </li>
           </ul>
         </div>
-
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest opacity-70">Legal</h2>
-          <ul className="mt-4 space-y-2 text-sm">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-navy-foreground/80">
+            Legal
+          </h2>
+          <ul className="mt-3 text-sm">
             <li>
-              <Link to="/privacy" className="hover:text-lime">
-                Privacy (draft)
+              <Link to="/privacy" className={linkClass}>
+                Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/terms" className="hover:text-lime">
-                Terms (draft)
+              <Link to="/terms" className={linkClass}>
+                Terms of Use
               </Link>
             </li>
           </ul>
         </div>
-
-        <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest opacity-70">Contact</h2>
-          <ul className="mt-4 space-y-2 text-sm">
-            <li>
-              {brand.contactEmail ? (
-                <a href={`mailto:${brand.contactEmail}`} className="hover:text-lime">
-                  {brand.contactEmail}
-                </a>
-              ) : (
-                <span className="opacity-70">Contact email — not configured</span>
-              )}
-            </li>
-            {socials.map(([label, href]) => (
-              <li key={label}>
-                {href ? (
-                  <a href={href} target="_blank" rel="noreferrer" className="hover:text-lime">
-                    {label}
+        {(brand.contactEmail || socials.length > 0) && (
+          <div>
+            <h2 className="text-sm font-bold uppercase tracking-widest text-navy-foreground/80">
+              Contact
+            </h2>
+            <ul className="mt-3 text-sm">
+              {brand.contactEmail && (
+                <li>
+                  <a href={`mailto:${brand.contactEmail}`} className={`${linkClass} break-all`}>
+                    {brand.contactEmail}
                   </a>
-                ) : (
-                  <span className="opacity-70">{label} — link not configured</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+                </li>
+              )}
+              {socials.map(([label, href]) => (
+                <li key={label}>
+                  <a href={href} target="_blank" rel="noreferrer" className={linkClass}>
+                    {label}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-5 py-6 text-xs opacity-70">
-          © {new Date().getFullYear()} {brand.orgName}. All rights reserved.
+        <p className="mx-auto max-w-6xl px-5 py-6 text-xs text-navy-foreground/80">
+          © {new Date().getFullYear()} {legal.operatorName}. All rights reserved.
         </p>
       </div>
     </footer>

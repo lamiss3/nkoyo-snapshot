@@ -13,7 +13,6 @@ import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -83,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "A 10-minute reflection for nonprofit leaders on Culture, Capacity and Compliance.",
+          "A reflection for nonprofit leaders and boards on Culture, Capacity and Compliance, with possible priorities and useful next steps.",
       },
       { name: "author", content: "Iban Ison Solutions" },
       { property: "og:type", content: "website" },
