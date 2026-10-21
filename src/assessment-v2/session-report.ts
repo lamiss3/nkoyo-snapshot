@@ -139,7 +139,7 @@ export function buildSessionReport(input: SessionReportInput): SessionReport {
     `Last saved activity: ${when(input.session.updated_at)}`,
     `Finished: ${input.session.completed_at ? when(input.session.completed_at) : "Not finished"}`,
     `Version: ${session.version}`,
-  ]), p("Private report for Nkoyo. It reads the latest saved answers, provider calls and email requests. The open admin report refreshes every 10 seconds. A downloaded Markdown file is a copy at the time of download; it does not update itself.")];
+  ]), p("Private report for Nkoyo. It reads the latest saved answers, provider calls and email requests. Use the admin page's refresh controls to load newer records. A downloaded Markdown file is a copy at the time of download; it does not update itself.")];
   if (!input.contacts.length) info.push(p("Email: not provided. Name, organization and role: not provided. The current adaptive form asks only for an email after the result."));
   for (const contact of [...input.contacts].sort((a, b) => b.created_at.localeCompare(a.created_at))) info.push(list([
     `Email: ${contact.email}`,

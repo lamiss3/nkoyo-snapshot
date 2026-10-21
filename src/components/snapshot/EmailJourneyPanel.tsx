@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pagination, Status } from "@/admin/ui";
+import { useEmailJourneyEvents } from "@/admin/data";
 import {
   getEmailJourneys,
   manageEmailJourney,
@@ -27,6 +30,13 @@ export function EmailJourneyPanel() {
   const [testSession, setTestSession] = useState("");
   const [testEmail, setTestEmail] = useState("");
   const [testAgreed, setTestAgreed] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [timelineVisible, setTimelineVisible] = useState(25);
+  const [pendingAction, setPendingAction] = useState<{
+    id: string;
+    action: "generate" | "approve" | "kit_drafts";
+  } | null>(null);
   const query = useQuery({
     queryKey: ["admin-email-journeys"],
     queryFn: () => getEmailJourneys(),
@@ -34,7 +44,16 @@ export function EmailJourneyPanel() {
   });
   const jobs = query.data?.jobs ?? [];
   const job = jobs.find((item) => item.id === selected);
+  const timeline = useEmailJourneyEvents(job?.id ?? null);
+  const statuses = [...new Set(jobs.map((item) => item.kit_state.status || item.status))];
+  const filteredJobs = jobs.filter(
+    (item) =>
+      `${item.email} ${item.session_id}`.toLowerCase().includes(search.toLowerCase()) &&
+      (statusFilter === "all" || (item.kit_state.status || item.status) === statusFilter),
+  );
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filteredJobs.length / 20)));
   const act = async (id: string, action: "generate" | "approve" | "kit_drafts") => {
+    setPendingAction(null);
     setBusy(true);
     setError("");
     try {
@@ -78,12 +97,18 @@ export function EmailJourneyPanel() {
     }
   };
   return (
-    <section className="card-elevated mt-10 p-6 sm:p-9" aria-labelledby="email-journeys-title">
+    <section className="card-elevated min-w-0 p-5 sm:p-7" aria-labelledby="email-journeys-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="email-journeys-title" className="text-2xl font-black">
           Personalized email journeys
         </h2>
-        <button className={button} onClick={() => void query.refetch()}>
+        <button
+          className={button}
+          onClick={() => {
+            void query.refetch();
+            if (job) void timeline.refetch();
+          }}
+        >
           Refresh emails
         </button>
       </div>
@@ -173,10 +198,37 @@ export function EmailJourneyPanel() {
       <input
         id="email-journey-search"
         value={search}
-        onChange={(event) => setSearch(event.target.value)}
+        onChange={(event) => {
+          setSearch(event.target.value);
+          setPage(1);
+        }}
         className="mt-2 w-full rounded-xl border border-input bg-card p-3"
         placeholder="Email or assessment ID"
       />
+      <label className="mt-4 block text-sm font-semibold" htmlFor="email-journey-status">
+        Journey status
+      </label>
+      <select
+        id="email-journey-status"
+        className="mt-2 min-h-11 rounded-xl border border-input bg-card p-3 text-sm"
+        value={statusFilter}
+        onChange={(event) => {
+          setStatusFilter(event.target.value);
+          setPage(1);
+        }}
+      >
+        <option value="all">All statuses</option>
+        {statuses.map((status) => (
+          <option key={status} value={status}>
+            {status.replaceAll("_", " ")}
+          </option>
+        ))}
+      </select>
+      <p className="mt-3 text-xs text-muted-foreground">
+        This page refreshes saved status every 10 seconds while open. Viewing or refreshing does not
+        generate or send emails. Scheduled means scheduled in Kit; it does not confirm inbox
+        delivery.
+      </p>
       {!query.isPending && !query.isError && !jobs.length && (
         <p className="mt-4 text-muted-foreground">
           No email journeys yet. New report requests appear here. Earlier email captures have not
@@ -184,31 +236,33 @@ export function EmailJourneyPanel() {
         </p>
       )}
       <div className="mt-4 space-y-2">
-        {jobs
-          .filter((item) =>
-            `${item.email} ${item.session_id}`.toLowerCase().includes(search.toLowerCase()),
-          )
-          .map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setSelected(item.id);
-                setError("");
-              }}
-              className={`w-full rounded-xl border p-4 text-left ${selected === item.id ? "border-magenta bg-muted" : "border-border"}`}
-            >
-              <span className="block font-bold break-all">{item.email}</span>
-              <span className="mt-1 block text-sm">
-                {(item.kit_state.status || item.status).replaceAll("_", " ")} ·{" "}
-                {item.followup_consent ? "All five requested" : "Report only"} ·{" "}
-                {date(item.created_at)}
-              </span>
-              <span className="block text-xs text-muted-foreground break-all">
-                Assessment {item.session_id}
-              </span>
-            </button>
-          ))}
+        {filteredJobs.slice((currentPage - 1) * 20, currentPage * 20).map((item) => (
+          <button
+            key={item.id}
+            onClick={() => {
+              setSelected(item.id);
+              setTimelineVisible(25);
+              setPendingAction(null);
+              setError("");
+            }}
+            className={`w-full rounded-xl border p-4 text-left ${selected === item.id ? "border-magenta bg-muted" : "border-border"}`}
+          >
+            <span className="block font-bold break-all">{item.email}</span>
+            <span className="mt-1 block text-sm">
+              <Status>{item.kit_state.status || item.status}</Status> ·{" "}
+              {item.followup_consent ? "All five requested" : "Report only"} ·{" "}
+              {date(item.created_at)}
+            </span>
+            <span className="block text-xs text-muted-foreground break-all">
+              Assessment {item.session_id}
+            </span>
+          </button>
+        ))}
       </div>
+      {Boolean(jobs.length) && !filteredJobs.length && (
+        <p className="mt-5 text-sm text-muted-foreground">No journeys match these filters.</p>
+      )}
+      <Pagination page={currentPage} count={filteredJobs.length} onChange={setPage} />
       {job && (
         <div className="mt-7 rounded-2xl border border-border p-4 sm:p-6">
           <h3 className="text-xl font-black break-all">Email journey for {job.email}</h3>
@@ -217,7 +271,15 @@ export function EmailJourneyPanel() {
               Fixed template test — Gemini was not called.
             </p>
           )}
-          <p className="mt-2 text-sm">Assessment {job.session_id}</p>
+          <p className="mt-2 break-all text-sm">
+            <Link
+              className="font-bold underline"
+              to="/admin/assessments/$id"
+              params={{ id: job.session_id }}
+            >
+              Assessment {job.session_id}
+            </Link>
+          </p>
           <p className="mt-2 text-sm">
             {job.automation_enabled
               ? "Automatic delivery request — no staff approval needed after content validation."
@@ -239,7 +301,7 @@ export function EmailJourneyPanel() {
                 disabled={
                   busy || Boolean(job.locked_until && Date.parse(job.locked_until) > Date.now())
                 }
-                onClick={() => void act(job.id, "generate")}
+                onClick={() => setPendingAction({ id: job.id, action: "generate" })}
               >
                 {busy ? "Preparing…" : "Generate / retry drafts"}
               </button>
@@ -252,7 +314,7 @@ export function EmailJourneyPanel() {
                 <button
                   className={button}
                   disabled={busy || Boolean(job.approved_at) || job.automation_enabled}
-                  onClick={() => void act(job.id, "approve")}
+                  onClick={() => setPendingAction({ id: job.id, action: "approve" })}
                 >
                   {job.approved_at ? "Drafts approved" : "Approve reviewed drafts"}
                 </button>
@@ -265,7 +327,7 @@ export function EmailJourneyPanel() {
                     !query.data?.kitConfigured ||
                     Boolean(job.kit_state.status && job.kit_state.status !== "awaiting_recipient")
                   }
-                  onClick={() => void act(job.id, "kit_drafts")}
+                  onClick={() => setPendingAction({ id: job.id, action: "kit_drafts" })}
                 >
                   {job.kit_state.status === "awaiting_recipient"
                     ? "Retry Kit recipient verification"
@@ -274,6 +336,42 @@ export function EmailJourneyPanel() {
               </>
             )}
           </div>
+          {pendingAction?.id === job.id && (
+            <div
+              role="region"
+              aria-label="Confirm journey action"
+              className="mt-5 rounded-xl border border-border bg-blush p-4"
+            >
+              <p className="font-bold">
+                {pendingAction.action === "generate"
+                  ? "Generate or retry this journey?"
+                  : pendingAction.action === "approve"
+                    ? "Approve these reviewed drafts?"
+                    : "Create private Kit drafts?"}
+              </p>
+              <p className="mt-2 text-sm">
+                {pendingAction.action === "generate"
+                  ? job.automation_enabled
+                    ? "This automatic request may resume consented scheduling after successful validation. This is the existing recovery behavior."
+                    : "This calls the configured model to prepare a review-only journey. It is not automatically enrolled."
+                  : pendingAction.action === "approve"
+                    ? "Approval marks these drafts as reviewed. It does not send email."
+                    : "This uploads this journey’s eligible emails to Kit as private drafts. Nothing is sent by this action."}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  className={button}
+                  disabled={busy}
+                  onClick={() => void act(pendingAction.id, pendingAction.action)}
+                >
+                  Confirm action
+                </button>
+                <button className={button} disabled={busy} onClick={() => setPendingAction(null)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
           {job.approved_at && (
             <p className="mt-3 text-xs text-muted-foreground">
               Approved {date(job.approved_at)}. Approval does not send email.
@@ -316,6 +414,63 @@ export function EmailJourneyPanel() {
               </p>
             </div>
           )}
+          <details className="mt-5 rounded-xl border border-border p-4">
+            <summary className="cursor-pointer font-bold">Recorded journey timeline</summary>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Saved preparation, approval, scheduling and provider-check events. Use Refresh emails
+              for updates. Kit’s completed status is a provider status, not proof of inbox receipt.
+            </p>
+            {timeline.isPending && (
+              <p role="status" className="mt-3 text-sm">
+                Loading recorded events…
+              </p>
+            )}
+            {timeline.error && (
+              <p role="alert" className="mt-3 text-sm text-destructive">
+                Journey events could not be loaded. The emails and scheduling state remain available
+                above.
+              </p>
+            )}
+            {timeline.data?.length === 0 && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                No journey events have been recorded.
+              </p>
+            )}
+            <ol className="mt-4 space-y-3">
+              {[...(timeline.data ?? [])]
+                .reverse()
+                .slice(0, timelineVisible)
+                .map((event) => (
+                  <li key={event.id} className="rounded-xl bg-blush p-3">
+                    <p className="text-sm font-bold">{event.event_type.replaceAll("_", " ")}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{date(event.created_at)}</p>
+                    <details className="mt-2">
+                      <summary className="cursor-pointer text-xs font-semibold">
+                        Event details
+                      </summary>
+                      <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words text-xs">
+                        {JSON.stringify(event.details, null, 2)}
+                      </pre>
+                    </details>
+                  </li>
+                ))}
+            </ol>
+            {Boolean(timeline.data?.length) && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                Latest {Math.min(timelineVisible, timeline.data!.length)} of {timeline.data!.length}{" "}
+                recorded events.
+              </p>
+            )}
+            {(timeline.data?.length ?? 0) > timelineVisible && (
+              <button
+                type="button"
+                className={`${button} mt-3`}
+                onClick={() => setTimelineVisible(timelineVisible + 25)}
+              >
+                Show 25 older events
+              </button>
+            )}
+          </details>
           {job.content && (
             <>
               <p className="mt-6 text-sm">

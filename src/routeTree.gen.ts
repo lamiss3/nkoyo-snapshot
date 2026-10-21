@@ -17,8 +17,14 @@ import { Route as ReportRequestedRouteImport } from './routes/report-requested'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as SnapshotRouteImport } from './routes/snapshot'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as ApiEmailJobsRouteImport } from './routes/api.email-jobs'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminEmailJourneysRouteImport } from './routes/_authenticated/admin/email-journeys'
+import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin/leads'
+import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin/staff'
+import { Route as AuthenticatedAdminAssessmentsIndexRouteImport } from './routes/_authenticated/admin/assessments/index'
+import { Route as AuthenticatedAdminAssessmentsIdRouteImport } from './routes/_authenticated/admin/assessments/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -59,7 +65,7 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
@@ -69,6 +75,39 @@ const ApiEmailJobsRoute = ApiEmailJobsRouteImport.update({
   path: '/api/email-jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminEmailJourneysRoute =
+  AuthenticatedAdminEmailJourneysRouteImport.update({
+    id: '/email-journeys',
+    path: '/email-journeys',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminStaffRoute = AuthenticatedAdminStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminAssessmentsIndexRoute =
+  AuthenticatedAdminAssessmentsIndexRouteImport.update({
+    id: '/assessments/',
+    path: '/assessments/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAssessmentsIdRoute =
+  AuthenticatedAdminAssessmentsIdRouteImport.update({
+    id: '/assessments/$id',
+    path: '/assessments/$id',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -78,8 +117,14 @@ export interface FileRoutesByFullPath {
   '/results': typeof ResultsRoute
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/api/email-jobs': typeof ApiEmailJobsRoute
+  '/admin/email-journeys': typeof AuthenticatedAdminEmailJourneysRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
+  '/admin/assessments/': typeof AuthenticatedAdminAssessmentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -89,8 +134,13 @@ export interface FileRoutesByTo {
   '/results': typeof ResultsRoute
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/api/email-jobs': typeof ApiEmailJobsRoute
+  '/admin/email-journeys': typeof AuthenticatedAdminEmailJourneysRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
+  '/admin/assessments': typeof AuthenticatedAdminAssessmentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -102,8 +152,14 @@ export interface FileRoutesById {
   '/results': typeof ResultsRoute
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/api/email-jobs': typeof ApiEmailJobsRoute
+  '/_authenticated/admin/email-journeys': typeof AuthenticatedAdminEmailJourneysRoute
+  '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
+  '/_authenticated/admin/assessments/': typeof AuthenticatedAdminAssessmentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +173,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin'
     | '/api/email-jobs'
+    | '/admin/email-journeys'
+    | '/admin/leads'
+    | '/admin/staff'
+    | '/admin/'
+    | '/admin/assessments/$id'
+    | '/admin/assessments/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -126,8 +188,13 @@ export interface FileRouteTypes {
     | '/results'
     | '/snapshot'
     | '/terms'
-    | '/admin'
     | '/api/email-jobs'
+    | '/admin/email-journeys'
+    | '/admin/leads'
+    | '/admin/staff'
+    | '/admin'
+    | '/admin/assessments/$id'
+    | '/admin/assessments'
   id:
     | '__root__'
     | '/'
@@ -140,6 +207,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/admin'
     | '/api/email-jobs'
+    | '/_authenticated/admin/email-journeys'
+    | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/staff'
+    | '/_authenticated/admin/'
+    | '/_authenticated/admin/assessments/$id'
+    | '/_authenticated/admin/assessments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -216,7 +289,7 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/email-jobs': {
@@ -226,15 +299,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEmailJobsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/email-journeys': {
+      id: '/_authenticated/admin/email-journeys'
+      path: '/email-journeys'
+      fullPath: '/admin/email-journeys'
+      preLoaderRoute: typeof AuthenticatedAdminEmailJourneysRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/leads': {
+      id: '/_authenticated/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/staff': {
+      id: '/_authenticated/admin/staff'
+      path: '/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AuthenticatedAdminStaffRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/assessments/': {
+      id: '/_authenticated/admin/assessments/'
+      path: '/assessments'
+      fullPath: '/admin/assessments/'
+      preLoaderRoute: typeof AuthenticatedAdminAssessmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/assessments/$id': {
+      id: '/_authenticated/admin/assessments/$id'
+      path: '/assessments/$id'
+      fullPath: '/admin/assessments/$id'
+      preLoaderRoute: typeof AuthenticatedAdminAssessmentsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminEmailJourneysRoute: typeof AuthenticatedAdminEmailJourneysRoute
+  AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
+  AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminAssessmentsIdRoute: typeof AuthenticatedAdminAssessmentsIdRoute
+  AuthenticatedAdminAssessmentsIndexRoute: typeof AuthenticatedAdminAssessmentsIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminEmailJourneysRoute: AuthenticatedAdminEmailJourneysRoute,
+    AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+    AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminAssessmentsIdRoute: AuthenticatedAdminAssessmentsIdRoute,
+    AuthenticatedAdminAssessmentsIndexRoute:
+      AuthenticatedAdminAssessmentsIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

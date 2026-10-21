@@ -57,7 +57,7 @@ export function StaffAccountPanel({ currentUserId }: { currentUserId: string }) 
   return (
     <section
       id="staff-accounts"
-      className="card-elevated mt-10 p-6 sm:p-9"
+      className="card-elevated min-w-0 p-5 sm:p-7"
       aria-labelledby="staff-accounts-title"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -130,6 +130,9 @@ export function StaffAccountPanel({ currentUserId }: { currentUserId: string }) 
         </p>
       )}
       <div className="mt-6 space-y-3">
+        {!query.isPending && !query.error && query.data?.length === 0 && (
+          <p className="text-sm text-muted-foreground">No staff accounts were returned.</p>
+        )}
         {query.data?.map((account) => (
           <div
             key={account.id}
