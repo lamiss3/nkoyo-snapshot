@@ -1,0 +1,17 @@
+.cms-dialog > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  top: 6px;
+  right: 6px;
+  z-index: 60;
+}
+@media (max-width: 639px) {
+  .cms-dialog input,
+  .cms-dialog textarea,
+  .cms-dialog select {
+    font-size: 16px;
+  }
+}

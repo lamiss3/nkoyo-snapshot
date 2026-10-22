@@ -8,6 +8,15 @@
 .admin-sidebar {
   display: none;
 }
+.admin-mobile-nav > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  top: 6px;
+  right: 6px;
+}
 .admin-portal .admin-nav-link {
   display: flex;
   align-items: center;

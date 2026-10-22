@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { brand } from "@/config/brand";
+import type { LinkValue } from "@/cms/content";
 import { legal } from "@/config/legal";
 
 const socials = (
@@ -11,7 +12,13 @@ const socials = (
 ).filter((item): item is [string, string] => Boolean(item[1]));
 const linkClass = "inline-flex min-h-11 items-center hover:text-lime";
 
-export function SiteFooter() {
+export function SiteFooter({
+  footerLinks,
+  contactEmail = brand.contactEmail,
+}: {
+  footerLinks?: LinkValue[];
+  contactEmail?: string | null;
+}) {
   return (
     <footer className="no-print bg-navy text-navy-foreground">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_0.8fr_1.2fr]">
@@ -30,21 +37,19 @@ export function SiteFooter() {
             Snapshot
           </h2>
           <ul className="mt-3 text-sm">
-            <li>
-              <Link to="/snapshot" className={linkClass}>
-                Start the Snapshot
-              </Link>
-            </li>
-            <li>
-              <a href="/#how-it-works" className={linkClass}>
-                How it works
-              </a>
-            </li>
-            <li>
-              <a href="/#about" className={linkClass}>
-                About Nkoyo
-              </a>
-            </li>
+            {(
+              footerLinks ?? [
+                { label: "Start the Snapshot", href: "/snapshot" },
+                { label: "How it works", href: "/#how-it-works" },
+                { label: "About Nkoyo", href: "/#about" },
+              ]
+            ).map((item) => (
+              <li key={item.href}>
+                <a href={item.href} className={linkClass}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
@@ -64,16 +69,16 @@ export function SiteFooter() {
             </li>
           </ul>
         </div>
-        {(brand.contactEmail || socials.length > 0) && (
+        {(contactEmail || socials.length > 0) && (
           <div>
             <h2 className="text-sm font-bold uppercase tracking-widest text-navy-foreground/80">
               Contact
             </h2>
             <ul className="mt-3 text-sm">
-              {brand.contactEmail && (
+              {contactEmail && (
                 <li>
-                  <a href={`mailto:${brand.contactEmail}`} className={`${linkClass} break-all`}>
-                    {brand.contactEmail}
+                  <a href={`mailto:${contactEmail}`} className={`${linkClass} break-all`}>
+                    {contactEmail}
                   </a>
                 </li>
               )}

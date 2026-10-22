@@ -19,10 +19,22 @@ import { Route as SnapshotRouteImport } from './routes/snapshot'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as ApiEmailJobsRouteImport } from './routes/api.email-jobs'
+import { Route as InsightsIndexRouteImport } from './routes/insights/index'
+import { Route as ResourcesIndexRouteImport } from './routes/resources/index'
+import { Route as ResourcesSlugRouteImport } from './routes/resources/$slug'
+import { Route as VideosIndexRouteImport } from './routes/videos/index'
+import { Route as WebinarsIndexRouteImport } from './routes/webinars/index'
+import { Route as WebinarsSlugRouteImport } from './routes/webinars/$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin/blog'
 import { Route as AuthenticatedAdminEmailJourneysRouteImport } from './routes/_authenticated/admin/email-journeys'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin/leads'
+import { Route as AuthenticatedAdminPagesRouteImport } from './routes/_authenticated/admin/pages'
+import { Route as AuthenticatedAdminPopupsRouteImport } from './routes/_authenticated/admin/popups'
+import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authenticated/admin/resources'
 import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin/staff'
+import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
+import { Route as AuthenticatedAdminWebinarsRouteImport } from './routes/_authenticated/admin/webinars'
 import { Route as AuthenticatedAdminAssessmentsIndexRouteImport } from './routes/_authenticated/admin/assessments/index'
 import { Route as AuthenticatedAdminAssessmentsIdRouteImport } from './routes/_authenticated/admin/assessments/$id'
 
@@ -75,9 +87,44 @@ const ApiEmailJobsRoute = ApiEmailJobsRouteImport.update({
   path: '/api/email-jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/insights/',
+  path: '/insights/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesIndexRoute = ResourcesIndexRouteImport.update({
+  id: '/resources/',
+  path: '/resources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesSlugRoute = ResourcesSlugRouteImport.update({
+  id: '/resources/$slug',
+  path: '/resources/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VideosIndexRoute = VideosIndexRouteImport.update({
+  id: '/videos/',
+  path: '/videos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebinarsIndexRoute = WebinarsIndexRouteImport.update({
+  id: '/webinars/',
+  path: '/webinars/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebinarsSlugRoute = WebinarsSlugRouteImport.update({
+  id: '/webinars/$slug',
+  path: '/webinars/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
 const AuthenticatedAdminEmailJourneysRoute =
@@ -91,11 +138,40 @@ const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminPagesRoute = AuthenticatedAdminPagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminPopupsRoute =
+  AuthenticatedAdminPopupsRouteImport.update({
+    id: '/popups',
+    path: '/popups',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminResourcesRoute =
+  AuthenticatedAdminResourcesRouteImport.update({
+    id: '/resources',
+    path: '/resources',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminStaffRoute = AuthenticatedAdminStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminVideosRoute =
+  AuthenticatedAdminVideosRouteImport.update({
+    id: '/videos',
+    path: '/videos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminWebinarsRoute =
+  AuthenticatedAdminWebinarsRouteImport.update({
+    id: '/webinars',
+    path: '/webinars',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAssessmentsIndexRoute =
   AuthenticatedAdminAssessmentsIndexRouteImport.update({
     id: '/assessments/',
@@ -119,9 +195,21 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/api/email-jobs': typeof ApiEmailJobsRoute
+  '/resources/$slug': typeof ResourcesSlugRoute
+  '/webinars/$slug': typeof WebinarsSlugRoute
+  '/insights/': typeof InsightsIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
+  '/videos/': typeof VideosIndexRoute
+  '/webinars/': typeof WebinarsIndexRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/email-journeys': typeof AuthenticatedAdminEmailJourneysRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/popups': typeof AuthenticatedAdminPopupsRoute
+  '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/admin/webinars': typeof AuthenticatedAdminWebinarsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
   '/admin/assessments/': typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -135,9 +223,21 @@ export interface FileRoutesByTo {
   '/snapshot': typeof SnapshotRoute
   '/terms': typeof TermsRoute
   '/api/email-jobs': typeof ApiEmailJobsRoute
+  '/resources/$slug': typeof ResourcesSlugRoute
+  '/webinars/$slug': typeof WebinarsSlugRoute
+  '/insights': typeof InsightsIndexRoute
+  '/resources': typeof ResourcesIndexRoute
+  '/videos': typeof VideosIndexRoute
+  '/webinars': typeof WebinarsIndexRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/email-journeys': typeof AuthenticatedAdminEmailJourneysRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/admin/popups': typeof AuthenticatedAdminPopupsRoute
+  '/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/admin/webinars': typeof AuthenticatedAdminWebinarsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
   '/admin/assessments': typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -154,9 +254,21 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/api/email-jobs': typeof ApiEmailJobsRoute
+  '/resources/$slug': typeof ResourcesSlugRoute
+  '/webinars/$slug': typeof WebinarsSlugRoute
+  '/insights/': typeof InsightsIndexRoute
+  '/resources/': typeof ResourcesIndexRoute
+  '/videos/': typeof VideosIndexRoute
+  '/webinars/': typeof WebinarsIndexRoute
+  '/_authenticated/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin/email-journeys': typeof AuthenticatedAdminEmailJourneysRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/_authenticated/admin/pages': typeof AuthenticatedAdminPagesRoute
+  '/_authenticated/admin/popups': typeof AuthenticatedAdminPopupsRoute
+  '/_authenticated/admin/resources': typeof AuthenticatedAdminResourcesRoute
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
+  '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/_authenticated/admin/webinars': typeof AuthenticatedAdminWebinarsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
   '/_authenticated/admin/assessments/': typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -173,9 +285,21 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin'
     | '/api/email-jobs'
+    | '/resources/$slug'
+    | '/webinars/$slug'
+    | '/insights/'
+    | '/resources/'
+    | '/videos/'
+    | '/webinars/'
+    | '/admin/blog'
     | '/admin/email-journeys'
     | '/admin/leads'
+    | '/admin/pages'
+    | '/admin/popups'
+    | '/admin/resources'
     | '/admin/staff'
+    | '/admin/videos'
+    | '/admin/webinars'
     | '/admin/'
     | '/admin/assessments/$id'
     | '/admin/assessments/'
@@ -189,9 +313,21 @@ export interface FileRouteTypes {
     | '/snapshot'
     | '/terms'
     | '/api/email-jobs'
+    | '/resources/$slug'
+    | '/webinars/$slug'
+    | '/insights'
+    | '/resources'
+    | '/videos'
+    | '/webinars'
+    | '/admin/blog'
     | '/admin/email-journeys'
     | '/admin/leads'
+    | '/admin/pages'
+    | '/admin/popups'
+    | '/admin/resources'
     | '/admin/staff'
+    | '/admin/videos'
+    | '/admin/webinars'
     | '/admin'
     | '/admin/assessments/$id'
     | '/admin/assessments'
@@ -207,9 +343,21 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/admin'
     | '/api/email-jobs'
+    | '/resources/$slug'
+    | '/webinars/$slug'
+    | '/insights/'
+    | '/resources/'
+    | '/videos/'
+    | '/webinars/'
+    | '/_authenticated/admin/blog'
     | '/_authenticated/admin/email-journeys'
     | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/pages'
+    | '/_authenticated/admin/popups'
+    | '/_authenticated/admin/resources'
     | '/_authenticated/admin/staff'
+    | '/_authenticated/admin/videos'
+    | '/_authenticated/admin/webinars'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/assessments/$id'
     | '/_authenticated/admin/assessments/'
@@ -225,6 +373,12 @@ export interface RootRouteChildren {
   SnapshotRoute: typeof SnapshotRoute
   TermsRoute: typeof TermsRoute
   ApiEmailJobsRoute: typeof ApiEmailJobsRoute
+  ResourcesSlugRoute: typeof ResourcesSlugRoute
+  WebinarsSlugRoute: typeof WebinarsSlugRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
+  ResourcesIndexRoute: typeof ResourcesIndexRoute
+  VideosIndexRoute: typeof VideosIndexRoute
+  WebinarsIndexRoute: typeof WebinarsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -299,11 +453,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEmailJobsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/': {
+      id: '/insights/'
+      path: '/insights'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/': {
+      id: '/resources/'
+      path: '/resources'
+      fullPath: '/resources/'
+      preLoaderRoute: typeof ResourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/$slug': {
+      id: '/resources/$slug'
+      path: '/resources/$slug'
+      fullPath: '/resources/$slug'
+      preLoaderRoute: typeof ResourcesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/videos/': {
+      id: '/videos/'
+      path: '/videos'
+      fullPath: '/videos/'
+      preLoaderRoute: typeof VideosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/webinars/': {
+      id: '/webinars/'
+      path: '/webinars'
+      fullPath: '/webinars/'
+      preLoaderRoute: typeof WebinarsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/webinars/$slug': {
+      id: '/webinars/$slug'
+      path: '/webinars/$slug'
+      fullPath: '/webinars/$slug'
+      preLoaderRoute: typeof WebinarsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/blog': {
+      id: '/_authenticated/admin/blog'
+      path: '/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/email-journeys': {
@@ -320,11 +523,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/pages': {
+      id: '/_authenticated/admin/pages'
+      path: '/pages'
+      fullPath: '/admin/pages'
+      preLoaderRoute: typeof AuthenticatedAdminPagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/popups': {
+      id: '/_authenticated/admin/popups'
+      path: '/popups'
+      fullPath: '/admin/popups'
+      preLoaderRoute: typeof AuthenticatedAdminPopupsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/resources': {
+      id: '/_authenticated/admin/resources'
+      path: '/resources'
+      fullPath: '/admin/resources'
+      preLoaderRoute: typeof AuthenticatedAdminResourcesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/staff': {
       id: '/_authenticated/admin/staff'
       path: '/staff'
       fullPath: '/admin/staff'
       preLoaderRoute: typeof AuthenticatedAdminStaffRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/videos': {
+      id: '/_authenticated/admin/videos'
+      path: '/videos'
+      fullPath: '/admin/videos'
+      preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/webinars': {
+      id: '/_authenticated/admin/webinars'
+      path: '/webinars'
+      fullPath: '/admin/webinars'
+      preLoaderRoute: typeof AuthenticatedAdminWebinarsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/assessments/': {
@@ -345,9 +583,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminEmailJourneysRoute: typeof AuthenticatedAdminEmailJourneysRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
+  AuthenticatedAdminPagesRoute: typeof AuthenticatedAdminPagesRoute
+  AuthenticatedAdminPopupsRoute: typeof AuthenticatedAdminPopupsRoute
+  AuthenticatedAdminResourcesRoute: typeof AuthenticatedAdminResourcesRoute
   AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
+  AuthenticatedAdminVideosRoute: typeof AuthenticatedAdminVideosRoute
+  AuthenticatedAdminWebinarsRoute: typeof AuthenticatedAdminWebinarsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminAssessmentsIdRoute: typeof AuthenticatedAdminAssessmentsIdRoute
   AuthenticatedAdminAssessmentsIndexRoute: typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -355,9 +599,15 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
     AuthenticatedAdminEmailJourneysRoute: AuthenticatedAdminEmailJourneysRoute,
     AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+    AuthenticatedAdminPagesRoute: AuthenticatedAdminPagesRoute,
+    AuthenticatedAdminPopupsRoute: AuthenticatedAdminPopupsRoute,
+    AuthenticatedAdminResourcesRoute: AuthenticatedAdminResourcesRoute,
     AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
+    AuthenticatedAdminVideosRoute: AuthenticatedAdminVideosRoute,
+    AuthenticatedAdminWebinarsRoute: AuthenticatedAdminWebinarsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminAssessmentsIdRoute: AuthenticatedAdminAssessmentsIdRoute,
     AuthenticatedAdminAssessmentsIndexRoute:
@@ -390,6 +640,12 @@ const rootRouteChildren: RootRouteChildren = {
   SnapshotRoute: SnapshotRoute,
   TermsRoute: TermsRoute,
   ApiEmailJobsRoute: ApiEmailJobsRoute,
+  ResourcesSlugRoute: ResourcesSlugRoute,
+  WebinarsSlugRoute: WebinarsSlugRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
+  ResourcesIndexRoute: ResourcesIndexRoute,
+  VideosIndexRoute: VideosIndexRoute,
+  WebinarsIndexRoute: WebinarsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

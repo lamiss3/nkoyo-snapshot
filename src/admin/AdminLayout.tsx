@@ -1,5 +1,5 @@
 import { AdminAccess } from "./access";
-import { adminNavigation } from "./navigation";
+import { adminNavigation, adminGroups } from "./navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,39 +30,49 @@ function Navigation({
   const pathname = useLocation({ select: (location) => location.pathname }).replace(/\/$/, "");
   return (
     <nav aria-label="Admin pages">
-      <p
-        className={
-          collapsed
-            ? "sr-only"
-            : "px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground"
-        }
-      >
-        Snapshot workspace
-      </p>
-      <ul className="space-y-2">
-        {adminNavigation
-          .filter((item) => !("adminOnly" in item) || isAdmin)
-          .map((item) => {
-            const active =
-              item.to === "/admin"
-                ? pathname === item.to
-                : pathname === item.to || pathname.startsWith(`${item.to}/`);
-            return (
-              <li key={item.to}>
-                <Link
-                  to={item.to}
-                  onClick={close}
-                  aria-current={active ? "page" : undefined}
-                  title={collapsed ? item.label : undefined}
-                  className={`admin-nav-link ${active ? "admin-nav-active" : ""} ${collapsed ? "justify-center" : ""}`}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                  <span className={collapsed ? "sr-only" : ""}>{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-      </ul>
+      {adminGroups
+        .filter((group) =>
+          adminNavigation.some(
+            (item) => item.group === group && (!("adminOnly" in item) || isAdmin),
+          ),
+        )
+        .map((group) => (
+          <div key={group} className="mb-7">
+            <p
+              className={
+                collapsed
+                  ? "sr-only"
+                  : "px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground"
+              }
+            >
+              {group}
+            </p>
+            <ul className="space-y-2">
+              {adminNavigation
+                .filter((item) => item.group === group && (!("adminOnly" in item) || isAdmin))
+                .map((item) => {
+                  const active =
+                    item.to === "/admin"
+                      ? pathname === item.to
+                      : pathname === item.to || pathname.startsWith(`${item.to}/`);
+                  return (
+                    <li key={item.to}>
+                      <Link
+                        to={item.to}
+                        onClick={close}
+                        aria-current={active ? "page" : undefined}
+                        title={collapsed ? item.label : undefined}
+                        className={`admin-nav-link ${active ? "admin-nav-active" : ""} ${collapsed ? "justify-center" : ""}`}
+                      >
+                        <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                        <span className={collapsed ? "sr-only" : ""}>{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
+        ))}
     </nav>
   );
 }
@@ -167,14 +177,14 @@ export function AdminShell({
                   </SheetTrigger>
                   <SheetContent
                     side="left"
-                    className="admin-portal flex w-[min(88vw,320px)] flex-col"
+                    className="admin-portal admin-mobile-nav flex w-[min(88vw,320px)] flex-col"
                   >
                     <SheetTitle>Snapshot admin</SheetTitle>
                     <SheetDescription>Navigate your private workspace.</SheetDescription>
                     <div className="mt-5">
                       <Logo />
                     </div>
-                    <div className="mt-7">
+                    <div className="mt-7 min-h-0 flex-1 overflow-y-auto">
                       <Navigation isAdmin={isAdmin} close={() => setMobileOpen(false)} />
                     </div>
                   </SheetContent>
