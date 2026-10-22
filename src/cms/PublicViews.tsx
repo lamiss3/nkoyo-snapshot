@@ -59,53 +59,6 @@ function measure(
     /* Optional measurement never blocks content. */
   }
 }
-export function VideoPlayer({ item }: { item: PublicItem }) {
-  const [playing, setPlaying] = useState(false);
-  const id = youtubeId(text(item.content, "youtubeUrl"));
-  return (
-    <div className="mt-4">
-      {id ? (
-        playing ? (
-          <iframe
-            title={text(item.content, "title")}
-            src={`https://www.youtube-nocookie.com/embed/${id}`}
-            loading="lazy"
-            allow="fullscreen; picture-in-picture"
-            allowFullScreen
-            className="aspect-video w-full rounded-2xl border-0"
-          />
-        ) : (
-          <button
-            className="flex aspect-video w-full items-center justify-center rounded-2xl bg-navy p-5 text-white"
-            onClick={() => setPlaying(true)}
-          >
-            Load video player: {text(item.content, "title")}
-          </button>
-        )
-      ) : (
-        <p>Video player unavailable.</p>
-      )}
-      <a
-        href={id ? `https://www.youtube.com/watch?v=${id}` : "https://www.youtube.com/"}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-3 inline-flex min-h-11 items-center text-sm underline"
-      >
-        Watch on YouTube (opens in a new tab)
-      </a>
-      {text(item.content, "relatedResourceHref") && (
-        <p>
-          <a
-            className="inline-flex min-h-11 items-center underline"
-            href={text(item.content, "relatedResourceHref")}
-          >
-            Related resource
-          </a>
-        </p>
-      )}
-    </div>
-  );
-}
 export function ContentCard({
   item,
   preview = false,
@@ -116,26 +69,58 @@ export function ContentCard({
   headingLevel?: "h2" | "h4";
 }) {
   const c = item.content;
+  const videoId = item.kind === "video" ? youtubeId(text(c, "youtubeUrl")) : null;
+  const videoUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : null;
+  const videoLinkLabel = `Watch ${text(c, "title")} on YouTube (opens in a new tab)`;
   const href =
     item.kind === "blog" ? text(c, "externalUrl") : `${libraryPath[item.kind]}/${item.slug}`;
+  const cover = text(c, "coverUrl") ? (
+    <img
+      src={text(c, "coverUrl")}
+      alt={text(c, "coverAlt")}
+      className="aspect-[16/9] w-full object-cover"
+      loading="lazy"
+      onError={(event) => {
+        event.currentTarget.hidden = true;
+      }}
+    />
+  ) : null;
   return (
     <article
       className={`card-elevated min-w-0 overflow-hidden ${flag(c, "featured") ? "ring-1 ring-magenta/25" : ""}`}
     >
-      {text(c, "coverUrl") && (
-        <img
-          src={text(c, "coverUrl")}
-          alt={text(c, "coverAlt")}
-          className="aspect-[16/9] w-full object-cover"
-          loading="lazy"
-          onError={(event) => {
-            event.currentTarget.hidden = true;
-          }}
-        />
+      {cover && videoUrl ? (
+        <a
+          href={videoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={videoLinkLabel}
+          className="block focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-magenta"
+          onClick={() => measure(item, "cta_click")}
+        >
+          {cover}
+        </a>
+      ) : (
+        cover
       )}
       <div className="p-6">
         <p className="eyebrow text-navy/70">{text(c, "category") || item.kind}</p>
-        <Heading className="mt-3 text-2xl font-black break-words">{text(c, "title")}</Heading>
+        <Heading className="mt-3 text-2xl font-black break-words">
+          {videoUrl ? (
+            <a
+              href={videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={videoLinkLabel}
+              className="rounded-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-magenta"
+              onClick={() => measure(item, "cta_click")}
+            >
+              {text(c, "title")}
+            </a>
+          ) : (
+            text(c, "title")
+          )}
+        </Heading>
         {item.kind === "blog" && text(c, "date") && (
           <time className="mt-2 block text-sm text-muted-foreground" dateTime={text(c, "date")}>
             {new Date(text(c, "date")).toLocaleDateString("en-US", {
@@ -150,7 +135,14 @@ export function ContentCard({
           {text(c, "description")}
         </p>
         {item.kind === "video" ? (
-          <VideoPlayer item={item} />
+          text(c, "relatedResourceHref") && (
+            <a
+              className="mt-3 inline-flex min-h-11 items-center underline"
+              href={text(c, "relatedResourceHref")}
+            >
+              Related resource
+            </a>
+          )
         ) : preview ? (
           <p className="mt-5 text-sm font-bold">
             {item.kind === "blog" ? "Read article on Kit" : "Open detail page"} · preview only
