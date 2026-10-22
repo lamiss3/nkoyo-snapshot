@@ -122,7 +122,7 @@ function Manager({ kind }: { kind: ContentKind }) {
       <PageIntro
         description={
           kind === "page"
-            ? "Edit the existing Snapshot homepage’s copy and sections. Save a draft, preview it, then publish explicitly. Internal assessment pages are not editable here."
+            ? "Edit the Iban Ison homepage’s copy and sections. Save a draft, preview it, then publish explicitly. Existing drafts keep their saved copy. Internal assessment pages are not editable here."
             : kind === "blog"
               ? "Kit remains the article publisher. Sync public, free posts, then choose which ones appear here. These settings never change the original article."
               : kind === "popup"

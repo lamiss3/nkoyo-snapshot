@@ -13,6 +13,7 @@ import {
 } from "../src/cms/content.ts";
 import { eligiblePosts, kitContentClient } from "../src/cms/kit-content.server.ts";
 import { contentService } from "../src/cms/service.server.ts";
+import { homepageContentGroups } from "../src/cms/homepage-content.ts";
 const id = "10000000-0000-4000-8000-000000000001";
 const assetId = "20000000-0000-4000-8000-000000000001";
 const draft = (kind, extra = {}) => ({
@@ -487,4 +488,35 @@ test("CMS adds authenticated server functions and preserves CSRF and private mod
     readFileSync(new URL("../src/cms/kit-content.server.ts", import.meta.url), "utf8"),
     /subscribers|broadcasts|method:\s*["']POST/,
   );
+});
+
+test("Homepage library groups respect homepage opt-outs and hide empty categories", () => {
+  const item = (kind, id, content = {}) => ({
+    kind,
+    id,
+    content,
+    slug: id,
+    revision: 1,
+    date: "2026-10-01T00:00:00Z",
+  });
+  assert.deepEqual(homepageContentGroups([]), []);
+  const groups = homepageContentGroups([
+    item("blog", "article"),
+    item("video", "not-for-homepage", { homepage: false, featured: true }),
+    item("video", "selected-video", { homepage: true }),
+    item("popup", "campaign", { homepage: true }),
+    ...Array.from({ length: 6 }, (_, n) =>
+      item("resource", `resource-${n}`, { homepage: true, featured: n === 5, order: n }),
+    ),
+  ]);
+  assert.deepEqual(
+    groups.map((g) => g.kind),
+    ["blog", "video", "resource"],
+  );
+  assert.deepEqual(
+    groups[1].items.map((i) => i.id),
+    ["selected-video"],
+  );
+  assert.equal(groups[2].items.length, 4);
+  assert.equal(groups[2].items[0].id, "resource-5");
 });

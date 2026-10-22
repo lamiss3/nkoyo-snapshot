@@ -15,6 +15,7 @@ import {
 } from "./content";
 import type { PublicBundle, PublicItem } from "./service.server";
 import { contentEvent, resourceDownload } from "./actions";
+import { homepageContentGroups } from "./homepage-content";
 const button = "snapshot-cta mt-5";
 const libraryPath: Partial<Record<ContentKind, string>> = {
   blog: "/insights",
@@ -105,7 +106,15 @@ export function VideoPlayer({ item }: { item: PublicItem }) {
     </div>
   );
 }
-export function ContentCard({ item, preview = false }: { item: PublicItem; preview?: boolean }) {
+export function ContentCard({
+  item,
+  preview = false,
+  headingLevel: Heading = "h2",
+}: {
+  item: PublicItem;
+  preview?: boolean;
+  headingLevel?: "h2" | "h4";
+}) {
   const c = item.content;
   const href =
     item.kind === "blog" ? text(c, "externalUrl") : `${libraryPath[item.kind]}/${item.slug}`;
@@ -126,7 +135,7 @@ export function ContentCard({ item, preview = false }: { item: PublicItem; previ
       )}
       <div className="p-6">
         <p className="eyebrow text-navy/70">{text(c, "category") || item.kind}</p>
-        <h2 className="mt-3 text-2xl font-black break-words">{text(c, "title")}</h2>
+        <Heading className="mt-3 text-2xl font-black break-words">{text(c, "title")}</Heading>
         {item.kind === "blog" && text(c, "date") && (
           <time className="mt-2 block text-sm text-muted-foreground" dateTime={text(c, "date")}>
             {new Date(text(c, "date")).toLocaleDateString("en-US", {
@@ -164,25 +173,50 @@ export function ContentCard({ item, preview = false }: { item: PublicItem; previ
     </article>
   );
 }
-export function FeaturedContent({ items }: { items: PublicItem[] }) {
-  const selected = sorted(items)
-    .filter(
-      (i) => flag(i.content, "featured") && (flag(i.content, "homepage") || i.kind === "blog"),
-    )
-    .filter(
-      (i, n, all) =>
-        all.slice(0, n).filter((x) => x.kind === i.kind).length <
-        (i.kind === "resource" ? 4 : i.kind === "webinar" ? 1 : 3),
-    );
-  if (!selected.length) return null;
+export function FeaturedContent({
+  items,
+  title = "Insights & Resources",
+  description = "",
+}: {
+  items: PublicItem[];
+  title?: string;
+  description?: string;
+}) {
+  const groups = homepageContentGroups(items);
+  if (!groups.length) return null;
   return (
-    <section className="mx-auto max-w-6xl px-5 py-14">
-      <h2 className="text-3xl font-black">Explore further</h2>
-      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {selected.map((item) => (
-          <ContentCard key={item.id} item={item} />
-        ))}
-      </div>
+    <section
+      id="insights-resources"
+      aria-labelledby="insights-heading"
+      className="landing-anchor mx-auto max-w-6xl px-5 py-14 sm:py-20"
+    >
+      <p className="eyebrow text-navy/70">Keep exploring</p>
+      <h2 id="insights-heading" className="mt-4 text-3xl font-black sm:text-4xl">
+        {title}
+      </h2>
+      {description && (
+        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      )}
+      {groups.map((group) => (
+        <div key={group.kind} className="mt-10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-xl font-black">{group.label}</h3>
+            <a
+              href={group.path}
+              className="inline-flex min-h-11 items-center text-sm font-bold underline underline-offset-4"
+            >
+              Explore {group.label.toLowerCase()} →
+            </a>
+          </div>
+          <div className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {group.items.map((item) => (
+              <ContentCard key={item.id} item={item} headingLevel="h4" />
+            ))}
+          </div>
+        </div>
+      ))}
     </section>
   );
 }
@@ -202,12 +236,17 @@ export function MarketingShell({
       </a>
       <SiteHeader
         navItems={links(bundle.home, "navigationLinks")}
-        cta={{ label: text(bundle.home, "ctaLabel"), href: text(bundle.home, "ctaHref") }}
+        cta={
+          text(bundle.home, "bookingHref")
+            ? { label: text(bundle.home, "bookingLabel"), href: text(bundle.home, "bookingHref") }
+            : { label: text(bundle.home, "ctaLabel"), href: text(bundle.home, "ctaHref") }
+        }
       />
       <main id="main-content" tabIndex={-1} className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
         {children}
       </main>
       <SiteFooter
+        navigationHeading="Explore Iban Ison"
         footerLinks={links(bundle.home, "footerLinks")}
         contactEmail={text(bundle.home, "contactEmail")}
       />

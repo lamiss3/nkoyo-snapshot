@@ -15,9 +15,11 @@ const linkClass = "inline-flex min-h-11 items-center hover:text-lime";
 export function SiteFooter({
   footerLinks,
   contactEmail = brand.contactEmail,
+  navigationHeading = "Snapshot",
 }: {
   footerLinks?: LinkValue[];
   contactEmail?: string | null;
+  navigationHeading?: string;
 }) {
   return (
     <footer className="no-print bg-navy text-navy-foreground">
@@ -34,7 +36,7 @@ export function SiteFooter({
         </div>
         <div>
           <h2 className="text-sm font-bold uppercase tracking-widest text-navy-foreground/80">
-            Snapshot
+            {navigationHeading}
           </h2>
           <ul className="mt-3 text-sm">
             {(

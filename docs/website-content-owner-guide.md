@@ -21,14 +21,14 @@ Published slugs become fixed to preserve links. Titles and copy can still change
 
 ## Pages
 
-The homepage exposes its existing hero, audience, benefit cards, report explanation, Culture/Capacity/Compliance cards, founder section, booking CTA, closing CTA, navigation/footer and SEO. Its layout and branding remain controlled by the app.
+The homepage introduces Iban Ison’s organizational strategy and the Impact Triad™, with two primary actions: Take the Free Snapshot and Book a Conversation. Pages exposes the hero, approach, Snapshot stages and report explanation, Culture/Capacity/Compliance, Two Ways to Begin, founder, verified testimonials, resource introduction, closing CTAs, navigation/footer and SEO. Its layout and branding remain controlled by the app. It does not display a service catalog.
 
 - Hide eligible sections with their visibility switches. Check navigation links still point to visible sections.
 - Leave the portrait blank to retain the polished text layout. Use only an approved HTTPS image, with a useful portrait description.
-- A booking link is optional and is not shown until configured.
+- The default booking destination is the official 3C Discovery Call linked on ibanison.com/oha/. Review it before publishing. **Booking label** and **Booking destination** control the header, pathways, founder and closing links. Optional hero conversation overrides affect the hero only. Clearing the booking destination hides those conversation links and makes the header use the Snapshot.
 - To make new libraries easy to find, add their links to **Header navigation** / **Snapshot footer links**, then publish the homepage. Paths: `/insights`, `/videos`, `/webinars`, `/resources`.
-- **Show explicitly featured library items** adds genuine, published selections only. Select Featured + Show on homepage in a resource/video/webinar. Articles use their Featured setting. Supports four resources, three videos, three articles and one featured webinar.
-- If the CMS is unavailable or the homepage has never been published, the app retains its original homepage copy. No fake library content is seeded.
+- **Show Insights & Resources** displays published public articles and published resources/videos/webinars selected with **Show on homepage**. Featured items sort first, but need not be featured to appear. Empty categories are hidden. Supports four resources, three videos, three articles and one webinar. The navigation scrolls to this section when populated; otherwise it opens the working `/resources` library.
+- If the CMS is unavailable or the homepage has never been published, the app uses the reviewed homepage defaults. Saved drafts and published copy always remain intact; older full drafts retain their older values, so review them before publishing. New additive fields use the new defaults. No fake library content is seeded.
 
 ## Blog / Kit articles
 

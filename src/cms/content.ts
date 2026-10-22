@@ -197,51 +197,54 @@ const registration = [
 export const homeFields: Field[] = [
   f("ogTitle", "Social sharing title", "Search", {
     max: 100,
-    default: "Institutional Readiness Snapshot",
+    default: "Build a stronger organization behind your mission. | Iban Ison",
   }),
   f("ogDescription", "Social sharing description", "Search", {
     type: "textarea",
     max: 240,
     default:
-      "A clearer view of organizational pressures, with possible priorities and useful questions for your team or board.",
+      "Organizational strategy for nonprofit executives, boards and social impact leaders. Start with the free Smart Snapshot or a conversation with Nkoyo.",
   }),
   f("seoTitle", "SEO title", "Search", {
     max: 70,
     required: true,
-    default: "Institutional Readiness Snapshot | Iban Ison Solutions",
+    default: "Nonprofit Strategy & Governance | Iban Ison Solutions",
   }),
   f("seoDescription", "SEO description", "Search", {
     type: "textarea",
     max: 180,
     required: true,
     default:
-      "A reflection for nonprofit leaders and boards. Explore pressures across Culture, Capacity and Compliance, with possible priorities and a starting point for discussion.",
+      "Strengthen the organization behind your mission. Explore Culture, Capacity and Compliance with Iban Ison, take the free Smart Snapshot, or talk with Nkoyo.",
   }),
   f("heroEyebrow", "Hero eyebrow", "Hero", {
-    default: "Institutional Readiness Snapshot",
+    default: "Iban Ison Solutions",
     max: 80,
   }),
-  f("audience", "Audience", "Hero", { default: "For nonprofit leaders and boards", max: 160 }),
+  f("audience", "Audience", "Hero", {
+    default: "For nonprofit executives, boards and social impact leaders",
+    max: 160,
+  }),
   f("heroTitle", "Hero headline", "Hero", {
     required: true,
     max: 120,
-    default: "What’s making leadership",
+    default: "Build a stronger organization",
   }),
   f("heroHighlight", "Highlighted headline", "Hero", {
     max: 120,
-    default: "harder than it needs to be?",
+    default: "behind your mission.",
   }),
   f("heroDescription", "Hero supporting description", "Hero", {
     type: "textarea",
     required: true,
     max: 500,
     default:
-      "Get a clearer view of the pressures across your organization’s Culture, Capacity and Compliance, with possible priorities and a useful starting point for discussion.",
+      "Bold missions need more than committed people. They need clear decisions, capable teams, aligned governance, and systems that can support the work as demands grow.\n\nIban Ison partners with nonprofit executives, boards, and social impact leaders to strengthen the organizations behind their missions.",
   }),
   f("ctaLabel", "Primary CTA label", "Calls to action", {
     required: true,
     max: 60,
-    default: "Start the Snapshot",
+    default: "Take the Free Snapshot",
   }),
   f("ctaHref", "Primary CTA destination", "Calls to action", {
     type: "url",
@@ -251,45 +254,70 @@ export const homeFields: Field[] = [
   f("heroNote", "Supporting CTA note", "Hero", {
     type: "textarea",
     max: 240,
-    default: "Relevant follow-up questions.\nYour Snapshot results on screen.",
+    default:
+      "Choose the starting point that works for you. No assessment required to book a conversation.",
   }),
-  f("secondaryLabel", "Secondary CTA label", "Calls to action", { max: 60 }),
-  f("secondaryHref", "Secondary CTA destination", "Calls to action", { type: "url" }),
-  f("howVisible", "Show how it works", "How it works", { type: "toggle", default: true }),
+  f("secondaryLabel", "Hero conversation label override (optional)", "Calls to action", {
+    max: 60,
+  }),
+  f("secondaryHref", "Hero conversation destination override (optional)", "Calls to action", {
+    type: "url",
+  }),
+  f("approachTitle", "Approach heading", "Our approach", {
+    max: 180,
+    default: "A connected view of the organization behind the work.",
+  }),
+  f("approachBody", "Approach explanation", "Our approach", {
+    type: "textarea",
+    max: 900,
+    default:
+      "A delayed decision, a stretched team or an unclear responsibility rarely exists in isolation. Nkoyo brings practical organizational strategy, governance and leadership experience to understand how these pressures connect—and where thoughtful change can begin.",
+  }),
+  f("approachNote", "Approach supporting message", "Our approach", {
+    type: "textarea",
+    max: 500,
+    default:
+      "Start with your context. Look at the connections. Choose a practical path forward that your organization can sustain.",
+  }),
+  f("howVisible", "Show featured Smart Snapshot", "Smart Snapshot", {
+    type: "toggle",
+    default: true,
+  }),
   f("howTitle", "How it works heading", "How it works", {
     max: 160,
-    default: "Make the next conversation clearer.",
+    default: "Not sure what needs attention first?",
   }),
   f("howBody", "How it works explanation", "How it works", {
     type: "textarea",
     max: 800,
     default:
-      "Reflect on current pressures, answer follow-up questions relevant to your answers, then explore possible priorities and next steps.",
+      "When you're close to the day-to-day work, it isn't always easy to see which challenges deserve your attention first.\n\nThe Smart Snapshot helps nonprofit leaders reflect on their organizational experience, explore possible patterns, and identify a useful starting point for their next decision.",
   }),
   f("howNote", "Reflection note", "How it works", {
-    max: 240,
-    default: "A reflection, not a graded test. Your answers are a starting point for discussion.",
+    max: 400,
+    default:
+      "The free Snapshot is a guided reflection, not a formal organizational or legal assessment. It does not replace Nkoyo’s professional assessments or advisory engagements.",
   }),
   ...[0, 1, 2].flatMap((n) => [
     f(`benefit${n}Label`, `Card ${n + 1} label`, "Benefit cards", {
       max: 60,
-      default: ["Your focus", "Your next conversation", "Your optional report"][n]!,
+      default: ["01 · Your perspective", "02 · Your findings", "03 · Your starting point"][n]!,
     }),
     f(`benefit${n}Title`, `Card ${n + 1} takeaway`, "Benefit cards", {
       max: 120,
       default: [
-        "See possible priorities",
-        "Bring a useful starting point",
-        "Explore your answers further",
+        "Share what you’re experiencing",
+        "Explore possible patterns",
+        "Choose what to explore next",
       ][n]!,
     }),
     f(`benefit${n}Body`, `Card ${n + 1} explanation`, "Benefit cards", {
       type: "textarea",
       max: 500,
       default: [
-        "See which pressures your answers suggest are worth a closer look, across Culture, Capacity and Compliance.",
-        "Take discussion prompts and a practical first step to your team or board, grounded in what you shared.",
-        "Request a personalized email report that explains your findings in more detail, with examples and useful next steps.",
+        "Share your perspective through a guided assessment, with follow-up questions relevant to your answers.",
+        "Explore personalized findings and possible organizational patterns across Culture, Capacity and Compliance.",
+        "Identify a practical starting point for reflection or action, with useful questions for your team or board.",
       ][n]!,
     }),
   ]),
@@ -309,13 +337,13 @@ export const homeFields: Field[] = [
   }),
   f("dimensionsTitle", "Dimensions heading", "Three dimensions", {
     max: 180,
-    default: "Three lenses on the pressures behind the work.",
+    default: "The Impact Triad™",
   }),
   f("dimensionsBody", "Dimensions introduction", "Three dimensions", {
     type: "textarea",
     max: 500,
     default:
-      "Some pressures span more than one area. Use the connections as questions to explore with your team.",
+      "Culture, Capacity and Compliance shape one another. The Impact Triad™ brings these three dimensions together to support clear decisions and sustainable organizational progress.",
   }),
   ...[0, 1, 2].flatMap((n) => [
     f(
@@ -352,55 +380,137 @@ export const homeFields: Field[] = [
     type: "textarea",
     max: 2000,
     default:
-      "Nkoyo Effiong Lewis is the founder of Iban Ison Solutions. She has a background in nonprofit law, governance and organizational strategy, and works with mission-driven leaders to strengthen culture, capacity and compliance.",
+      "An educator at heart and attorney by training, Nkoyo Effiong Lewis is the founder and Chief Impact Strategist of Iban Ison Solutions. Her experience spans teaching, nonprofit work, nonprofit law and organizational strategy.\n\nShe combines an understanding of governance with practical management strategies to help leaders navigate complexity. Her approach considers your organization’s people, resources and responsibilities together, so the next step fits the context of your mission.",
   }),
-  f("portraitUrl", "Approved portrait URL", "About", { type: "url" }),
+  f("portraitUrl", "Approved portrait URL", "About", {
+    type: "url",
+    default: "https://ibanison.com/wp-content/uploads/nkoyo.webp",
+  }),
   f("portraitAlt", "Portrait description", "About", {
     max: 180,
     default: "Portrait of Nkoyo Effiong Lewis",
   }),
-  f("bookingHref", "Booking destination", "Calls to action", { type: "url" }),
+  f("bookingHref", "Booking destination", "Calls to action", {
+    type: "url",
+    default: "https://calendly.com/nkoyo/3cdiscoverycall",
+  }),
   f("bookingLabel", "Booking label", "Calls to action", {
     max: 80,
-    default: "Book Your Governance Review",
+    default: "Book a Conversation",
   }),
   f("bookingBody", "Booking explanation", "Calls to action", {
     type: "textarea",
     max: 500,
     default:
-      "Explore what your answers reveal, identify the decisions that matter now, and discuss practical next steps with Nkoyo.",
+      "Discuss your organization’s priorities, ask questions and explore what meaningful support could look like. You can book without taking the Snapshot.",
   }),
+  f("beginVisible", "Show Two Ways to Begin", "Two ways to begin", {
+    type: "toggle",
+    default: true,
+  }),
+  f("beginTitle", "Pathways heading", "Two ways to begin", {
+    max: 180,
+    default: "You don't have to figure it all out on your own.",
+  }),
+  f("beginBody", "Pathways introduction", "Two ways to begin", {
+    type: "textarea",
+    max: 700,
+    default:
+      "Whether you're trying to understand what's creating friction or you're ready to explore what needs to change, there's a place to begin.",
+  }),
+  f("snapshotPathTitle", "Snapshot pathway title", "Two ways to begin", {
+    max: 120,
+    default: "Take the Smart Snapshot",
+  }),
+  f("snapshotPathBody", "Snapshot pathway description", "Two ways to begin", {
+    type: "textarea",
+    max: 700,
+    default:
+      "Explore possible patterns affecting your organization and identify a practical starting point through our free guided assessment.",
+  }),
+  f("conversationPathTitle", "Conversation pathway title", "Two ways to begin", {
+    max: 120,
+    default: "Talk with Nkoyo",
+  }),
+  f("conversationPathBody", "Conversation pathway description", "Two ways to begin", {
+    type: "textarea",
+    max: 700,
+    default:
+      "Every organization has its own challenges, context, and ambitions. Schedule a conversation with Nkoyo to discuss your priorities, ask questions, and explore what meaningful support could look like.",
+  }),
+  f("testimonialsVisible", "Show verified client testimonials", "Testimonials", {
+    type: "toggle",
+    default: true,
+  }),
+  f("testimonialsTitle", "Testimonials heading", "Testimonials", {
+    max: 180,
+    default: "Thoughtful support. Clearer direction.",
+  }),
+  ...[0, 1].flatMap((n) => [
+    f(`testimonial${n}Quote`, `Testimonial ${n + 1} exact excerpt`, "Testimonials", {
+      type: "textarea",
+      max: 600,
+      default: [
+        "Warm, insightful, and has your best interest in heart all the way.",
+        "…a clear and actionable roadmap for my business.",
+      ][n]!,
+      help: "Use a verified verbatim quotation. Keep the source and attribution together; do not invent outcomes.",
+    }),
+    f(`testimonial${n}Attribution`, `Testimonial ${n + 1} attribution`, "Testimonials", {
+      max: 180,
+      default: ["J. Almond, Founder", "R. Tedder, CEO"][n]!,
+    }),
+    f(`testimonial${n}Source`, `Testimonial ${n + 1} source`, "Testimonials", {
+      type: "url",
+      default: "https://ibanison.com/#testimonials",
+    }),
+  ]),
   f("closingVisible", "Show closing Snapshot CTA", "Closing CTA", {
     type: "toggle",
     default: true,
   }),
   f("closingTitle", "Closing heading", "Closing CTA", {
     max: 180,
-    default: "Give your next conversation a starting point.",
+    default: "Your mission deserves a stronger foundation.",
   }),
   f("closingBody", "Closing explanation", "Closing CTA", {
     type: "textarea",
     max: 600,
     default:
-      "Bring the pressures you’re noticing. Leave with questions and a practical first step to explore with your team or board.",
+      "Take a moment to explore what's happening within your organization, or start a conversation with Nkoyo about where you want to go next.",
   }),
-  f("featuredVisible", "Show explicitly featured library items", "Featured libraries", {
+  f("featuredVisible", "Show Insights & Resources", "Featured libraries", {
     type: "toggle",
-    help: "Appears only after genuine library items are published and selected. Up to four resources, three videos/articles and one featured webinar.",
+    default: true,
+    help: "Displays published library content only. Empty categories are hidden. Featured items sort first. Up to four resources, three videos/articles and one webinar.",
+  }),
+  f("insightsTitle", "Insights heading", "Featured libraries", {
+    max: 180,
+    default: "Insights & Resources",
+  }),
+  f("insightsBody", "Insights introduction", "Featured libraries", {
+    type: "textarea",
+    max: 500,
+    default:
+      "Ideas and practical perspectives to support your next conversation, decision or step forward.",
   }),
   f("navigationLinks", "Header navigation", "Navigation and footer", {
     type: "links",
     default: [
-      { label: "How it works", href: "/#how-it-works" },
+      { label: "Home", href: "/" },
+      { label: "Our Approach", href: "/#approach" },
+      { label: "Smart Snapshot", href: "/#smart-snapshot" },
       { label: "About Nkoyo", href: "/#about" },
+      { label: "Insights & Resources", href: "/resources" },
     ],
   }),
   f("footerLinks", "Snapshot footer links", "Navigation and footer", {
     type: "links",
     default: [
-      { label: "Start the Snapshot", href: "/snapshot" },
-      { label: "How it works", href: "/#how-it-works" },
+      { label: "Take the Free Snapshot", href: "/snapshot" },
+      { label: "Our Approach", href: "/#approach" },
       { label: "About Nkoyo", href: "/#about" },
+      { label: "Insights & Resources", href: "/resources" },
     ],
   }),
   f("contactEmail", "Footer contact email", "Navigation and footer", {
