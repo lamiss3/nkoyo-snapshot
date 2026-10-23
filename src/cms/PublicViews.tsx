@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import "./cms.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -66,7 +66,7 @@ export function ContentCard({
 }: {
   item: PublicItem;
   preview?: boolean;
-  headingLevel?: "h2" | "h4";
+  headingLevel?: "h2" | "h3" | "h4";
 }) {
   const c = item.content;
   const videoId = item.kind === "video" ? youtubeId(text(c, "youtubeUrl")) : null;
@@ -175,40 +175,83 @@ export function FeaturedContent({
   description?: string;
 }) {
   const groups = homepageContentGroups(items);
-  if (!groups.length) return null;
+  const [selectedKind, setSelectedKind] = useState<ContentKind>("blog");
+  const tabId = useId();
+  const active = groups.find((group) => group.kind === selectedKind) ?? groups[0];
+  if (!active) return null;
   return (
     <section
       id="insights-resources"
       aria-labelledby="insights-heading"
-      className="landing-anchor mx-auto max-w-6xl px-5 py-14 sm:py-20"
+      className="home-section home-insights landing-anchor"
     >
-      <p className="eyebrow text-navy/70">Keep exploring</p>
-      <h2 id="insights-heading" className="mt-4 text-3xl font-black sm:text-4xl">
-        {title}
-      </h2>
-      {description && (
-        <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
-          {description}
-        </p>
-      )}
-      {groups.map((group) => (
-        <div key={group.kind} className="mt-10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-xl font-black">{group.label}</h3>
-            <a
-              href={group.path}
-              className="inline-flex min-h-11 items-center text-sm font-bold underline underline-offset-4"
-            >
-              Explore {group.label.toLowerCase()} →
-            </a>
+      <div className="home-shell">
+        <div className="home-insights-intro">
+          <div>
+            <p className="home-eyebrow">Keep exploring</p>
+            <h2 id="insights-heading">{title}</h2>
           </div>
-          <div className="mt-5 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {group.items.map((item) => (
-              <ContentCard key={item.id} item={item} headingLevel="h4" />
+          {description && <p className="home-body">{description}</p>}
+        </div>
+        <div
+          className="home-content-tabs"
+          role="tablist"
+          aria-label="Published insights and resources"
+        >
+          {groups.map((group, n) => (
+            <button
+              key={group.kind}
+              role="tab"
+              type="button"
+              id={`${tabId}-${group.kind}`}
+              aria-selected={group.kind === active.kind}
+              aria-controls={`${tabId}-panel`}
+              tabIndex={group.kind === active.kind ? 0 : -1}
+              onClick={() => setSelectedKind(group.kind)}
+              onKeyDown={(event) => {
+                const next =
+                  event.key === "ArrowRight"
+                    ? (n + 1) % groups.length
+                    : event.key === "ArrowLeft"
+                      ? (n + groups.length - 1) % groups.length
+                      : event.key === "Home"
+                        ? 0
+                        : event.key === "End"
+                          ? groups.length - 1
+                          : null;
+                if (next === null) return;
+                event.preventDefault();
+                setSelectedKind(groups[next]!.kind);
+                event.currentTarget.parentElement
+                  ?.querySelectorAll<HTMLButtonElement>("button")
+                  [next]?.focus();
+              }}
+            >
+              {group.label === "From the blog" ? "Articles" : group.label}
+            </button>
+          ))}
+        </div>
+        <div
+          id={`${tabId}-panel`}
+          role="tabpanel"
+          aria-labelledby={`${tabId}-${active.kind}`}
+          tabIndex={0}
+        >
+          <div className="home-editorial-grid">
+            {active.items.slice(0, 3).map((item) => (
+              <ContentCard key={item.id} item={item} headingLevel="h3" />
             ))}
           </div>
+          <div className="home-insights-footer">
+            <a className="home-text-link" href={active.path}>
+              {active.kind === "blog"
+                ? "Explore all articles"
+                : `Explore ${active.label.toLowerCase()}`}{" "}
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
-      ))}
+      </div>
     </section>
   );
 }

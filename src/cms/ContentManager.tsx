@@ -26,9 +26,10 @@ import {
   beginPdfUpload,
   finishPdfUpload,
   previewPdf,
+  publicWebsite,
 } from "./actions";
 import { HomepageView } from "./HomepageView";
-import { CampaignPreview, ContentCard, ContentDetail } from "./PublicViews";
+import { CampaignPreview, ContentCard, ContentDetail, FeaturedContent } from "./PublicViews";
 import type { KitPost } from "./kit-content.server";
 const names: Record<ContentKind, string> = {
   page: "Pages",
@@ -616,6 +617,12 @@ function Editor({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [preview, setPreview] = useState(false);
+  const publicPreview = useQuery({
+    queryKey: ["cms-public-homepage-preview"],
+    enabled: preview && doc.kind === "page",
+    queryFn: () => publicWebsite(),
+    staleTime: 30000,
+  });
   const [historyOpen, setHistoryOpen] = useState(false);
   const [confirmation, setConfirmation] = useState<{
     action: "publish" | "unpublish" | "archive" | "restore" | "discard";
@@ -917,7 +924,18 @@ function Editor({
                 </DialogDescription>
               </div>
               {doc.kind === "page" ? (
-                <HomepageView content={{ ...homeDefaults, ...doc.draft }} />
+                <HomepageView
+                  content={{ ...homeDefaults, ...doc.draft }}
+                  hasInsights={Boolean(publicPreview.data?.items.length)}
+                >
+                  {doc.draft["featuredVisible"] !== false && publicPreview.data && (
+                    <FeaturedContent
+                      items={publicPreview.data.items}
+                      title={text({ ...homeDefaults, ...doc.draft }, "insightsTitle")}
+                      description={text({ ...homeDefaults, ...doc.draft }, "insightsBody")}
+                    />
+                  )}
+                </HomepageView>
               ) : doc.kind === "popup" ? (
                 <div className="bg-blush p-5">
                   <CampaignPreview item={item} />

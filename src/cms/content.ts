@@ -117,6 +117,20 @@ export function youtubeId(value: string): string | null {
   }
 }
 
+// Bundled, reviewed brand assets can be selected in Pages without accepting arbitrary local paths.
+export function safeImageHref(value: string): boolean {
+  return /^\/brand\/[a-z0-9-]+\.(?:png|webp|jpe?g|svg)$/.test(value) || safeHref(value, true);
+}
+const imageFields = new Set([
+  "coverUrl",
+  "imageUrl",
+  "portraitUrl",
+  "heroImageUrl",
+  "approachImageUrl",
+  "snapshotImageUrl",
+  "snapshotDetailImageUrl",
+]);
+
 const f = (
   key: string,
   label: string,
@@ -218,7 +232,7 @@ export const homeFields: Field[] = [
       "Strengthen the organization behind your mission. Explore Culture, Capacity and Compliance with Iban Ison, take the free Smart Snapshot, or talk with Nkoyo.",
   }),
   f("heroEyebrow", "Hero eyebrow", "Hero", {
-    default: "Iban Ison Solutions",
+    default: "Nonprofit leadership · Strategy · Organizational readiness",
     max: 80,
   }),
   f("audience", "Audience", "Hero", {
@@ -239,7 +253,7 @@ export const homeFields: Field[] = [
     required: true,
     max: 500,
     default:
-      "Bold missions need more than committed people. They need clear decisions, capable teams, aligned governance, and systems that can support the work as demands grow.\n\nIban Ison partners with nonprofit executives, boards, and social impact leaders to strengthen the organizations behind their missions.",
+      "Bold missions need more than committed people. They need clear decisions, capable teams, aligned governance, and systems that support the work as demands grow.",
   }),
   f("ctaLabel", "Primary CTA label", "Calls to action", {
     required: true,
@@ -255,7 +269,7 @@ export const homeFields: Field[] = [
     type: "textarea",
     max: 240,
     default:
-      "Choose the starting point that works for you. No assessment required to book a conversation.",
+      "A free, guided reflection. See your findings on screen and choose whether to receive a detailed email report.",
   }),
   f("secondaryLabel", "Hero conversation label override (optional)", "Calls to action", {
     max: 60,
@@ -265,19 +279,18 @@ export const homeFields: Field[] = [
   }),
   f("approachTitle", "Approach heading", "Our approach", {
     max: 180,
-    default: "A connected view of the organization behind the work.",
+    default: "Big missions need strong foundations.",
   }),
   f("approachBody", "Approach explanation", "Our approach", {
     type: "textarea",
     max: 900,
     default:
-      "A delayed decision, a stretched team or an unclear responsibility rarely exists in isolation. Nkoyo brings practical organizational strategy, governance and leadership experience to understand how these pressures connect—and where thoughtful change can begin.",
+      "Unclear decisions. Stretched teams. Competing priorities. Sometimes the mission is growing faster than the systems behind it.\n\nThese pressures rarely exist in isolation. We help you see the connections—and find a practical place to begin.",
   }),
   f("approachNote", "Approach supporting message", "Our approach", {
     type: "textarea",
     max: 500,
-    default:
-      "Start with your context. Look at the connections. Choose a practical path forward that your organization can sustain.",
+    default: "The mission matters. So does the organization carrying it.",
   }),
   f("howVisible", "Show featured Smart Snapshot", "Smart Snapshot", {
     type: "toggle",
@@ -285,13 +298,13 @@ export const homeFields: Field[] = [
   }),
   f("howTitle", "How it works heading", "How it works", {
     max: 160,
-    default: "Not sure what needs attention first?",
+    default: "A thoughtful pause. A clearer starting point.",
   }),
   f("howBody", "How it works explanation", "How it works", {
     type: "textarea",
     max: 800,
     default:
-      "When you're close to the day-to-day work, it isn't always easy to see which challenges deserve your attention first.\n\nThe Smart Snapshot helps nonprofit leaders reflect on their organizational experience, explore possible patterns, and identify a useful starting point for their next decision.",
+      "The Smart Snapshot brings structure to what you're experiencing, one relevant question at a time.",
   }),
   f("howNote", "Reflection note", "How it works", {
     max: 400,
@@ -301,23 +314,19 @@ export const homeFields: Field[] = [
   ...[0, 1, 2].flatMap((n) => [
     f(`benefit${n}Label`, `Card ${n + 1} label`, "Benefit cards", {
       max: 60,
-      default: ["01 · Your perspective", "02 · Your findings", "03 · Your starting point"][n]!,
+      default: ["01", "02", "03"][n]!,
     }),
     f(`benefit${n}Title`, `Card ${n + 1} takeaway`, "Benefit cards", {
       max: 120,
-      default: [
-        "Share what you’re experiencing",
-        "Explore possible patterns",
-        "Choose what to explore next",
-      ][n]!,
+      default: ["Reflect", "Discover", "Move forward"][n]!,
     }),
     f(`benefit${n}Body`, `Card ${n + 1} explanation`, "Benefit cards", {
       type: "textarea",
       max: 500,
       default: [
-        "Share your perspective through a guided assessment, with follow-up questions relevant to your answers.",
-        "Explore personalized findings and possible organizational patterns across Culture, Capacity and Compliance.",
-        "Identify a practical starting point for reflection or action, with useful questions for your team or board.",
+        "Answer guided questions about your organization's current challenges.",
+        "Explore personalized findings and possible patterns across Culture, Capacity and Compliance.",
+        "Identify questions and practical next steps worth exploring with your team or board.",
       ][n]!,
     }),
   ]),
@@ -337,7 +346,7 @@ export const homeFields: Field[] = [
   }),
   f("dimensionsTitle", "Dimensions heading", "Three dimensions", {
     max: 180,
-    default: "The Impact Triad™",
+    default: "Three connected dimensions. One stronger organization.",
   }),
   f("dimensionsBody", "Dimensions introduction", "Three dimensions", {
     type: "textarea",
@@ -353,9 +362,9 @@ export const homeFields: Field[] = [
       {
         max: 160,
         default: [
-          "How decisions and responsibilities work.",
-          "How people and resources carry the work.",
-          "How responsibilities and safeguards work in practice.",
+          "How people work together.",
+          "What makes the work possible.",
+          "How responsible action takes shape.",
         ][n]!,
       },
     ),
@@ -367,15 +376,18 @@ export const homeFields: Field[] = [
         type: "textarea",
         max: 600,
         default: [
-          "Decision authority, board–staff boundaries, shared priorities and how stated values guide everyday choices.",
-          "Workload, funding, continuity and access to the knowledge and tools needed to deliver current commitments.",
-          "Ownership of requirements, reporting, partnership rules and the checks that support responsible decisions.",
+          "How people lead, collaborate, communicate and put values into practice.",
+          "Whether people, systems, resources and decision-making structures can support the work.",
+          "How governance, accountability and organizational obligations support responsible action.",
         ][n]!,
       },
     ),
   ]),
   f("aboutVisible", "Show About Nkoyo", "About", { type: "toggle", default: true }),
-  f("aboutTitle", "About heading", "About", { max: 160, default: "Nkoyo Effiong Lewis" }),
+  f("aboutTitle", "About heading", "About", {
+    max: 160,
+    default: "Educator at heart. Attorney by training. Strategist by experience.",
+  }),
   f("aboutBody", "About copy", "About", {
     type: "textarea",
     max: 2000,
@@ -384,11 +396,11 @@ export const homeFields: Field[] = [
   }),
   f("portraitUrl", "Approved portrait URL", "About", {
     type: "url",
-    default: "https://ibanison.com/wp-content/uploads/nkoyo.webp",
+    default: "/brand/nkoyo-founder-speaking.webp",
   }),
   f("portraitAlt", "Portrait description", "About", {
     max: 180,
-    default: "Portrait of Nkoyo Effiong Lewis",
+    default: "Nkoyo Effiong Lewis speaking into a microphone",
   }),
   f("bookingHref", "Booking destination", "Calls to action", {
     type: "url",
@@ -444,7 +456,7 @@ export const homeFields: Field[] = [
   }),
   f("testimonialsTitle", "Testimonials heading", "Testimonials", {
     max: 180,
-    default: "Thoughtful support. Clearer direction.",
+    default: "Real perspectives. Meaningful relationships.",
   }),
   ...[0, 1].flatMap((n) => [
     f(`testimonial${n}Quote`, `Testimonial ${n + 1} exact excerpt`, "Testimonials", {
@@ -477,12 +489,12 @@ export const homeFields: Field[] = [
     type: "textarea",
     max: 600,
     default:
-      "Take a moment to explore what's happening within your organization, or start a conversation with Nkoyo about where you want to go next.",
+      "Explore what may be creating friction, or have a conversation about where your organization wants to go next.",
   }),
   f("featuredVisible", "Show Insights & Resources", "Featured libraries", {
     type: "toggle",
     default: true,
-    help: "Displays published library content only. Empty categories are hidden. Featured items sort first. Up to four resources, three videos/articles and one webinar.",
+    help: "Displays published library content only. Empty categories are hidden. Featured items sort first; up to three items appear in each selected category.",
   }),
   f("insightsTitle", "Insights heading", "Featured libraries", {
     max: 180,
@@ -493,6 +505,153 @@ export const homeFields: Field[] = [
     max: 500,
     default:
       "Ideas and practical perspectives to support your next conversation, decision or step forward.",
+  }),
+  f("heroImageUrl", "Approved hero photograph", "Hero", {
+    type: "url",
+    default: "/brand/nkoyo-hero-smiling.webp",
+    help: "Genuine approved photograph only. The bundled brand portrait is used by default.",
+  }),
+  f("heroImageAlt", "Hero photograph description", "Hero", {
+    max: 180,
+    default: "Nkoyo Effiong Lewis, founder of Iban Ison Solutions",
+  }),
+  f("heroImageCaption", "Hero photograph caption", "Hero", {
+    max: 160,
+    default: "Nkoyo Effiong Lewis · Founder & Chief Impact Strategist",
+  }),
+  f("stripVisible", "Show the brand statement strip", "Brand statement", {
+    type: "toggle",
+    default: true,
+  }),
+  f("stripItems", "Brand statement phrases", "Brand statement", {
+    type: "list",
+    default: ["Culture", "Capacity", "Compliance", "Sustainable impact"],
+  }),
+  f("approachVisible", "Show the challenge section", "Our approach", {
+    type: "toggle",
+    default: true,
+  }),
+  f("approachEyebrow", "Challenge eyebrow", "Our approach", { max: 80, default: "The challenge" }),
+  f("approachImageUrl", "Approved collaboration photograph", "Our approach", {
+    type: "url",
+    default: "/brand/collaboration.webp",
+  }),
+  f("approachImageAlt", "Collaboration photograph description", "Our approach", {
+    max: 180,
+    default: "Three people sharing ideas and working together around laptops",
+  }),
+  f("dimensionsEyebrow", "Framework eyebrow", "Three dimensions", {
+    max: 100,
+    default: "Our perspective · The Impact Triad™",
+  }),
+  f("showcaseVisible", "Show the Snapshot product showcase", "Snapshot showcase", {
+    type: "toggle",
+    default: true,
+  }),
+  f("showcaseEyebrow", "Showcase eyebrow", "Snapshot showcase", {
+    max: 80,
+    default: "The free Smart Snapshot",
+  }),
+  f("showcaseTitle", "Showcase headline", "Snapshot showcase", {
+    max: 160,
+    default: "Clarity starts with better questions.",
+  }),
+  f("showcaseBody", "Showcase explanation", "Snapshot showcase", {
+    type: "textarea",
+    max: 700,
+    default:
+      "When you're close to the day-to-day work, it can be difficult to see which pressures deserve attention first. The Smart Snapshot helps you explore the patterns behind those challenges.",
+  }),
+  f("showcaseCtaLabel", "Showcase Snapshot button", "Snapshot showcase", {
+    max: 60,
+    default: "Start Your Snapshot",
+  }),
+  f("snapshotImageUrl", "Real Snapshot interface screenshot", "Snapshot showcase", {
+    type: "url",
+    default: "/brand/snapshot-question.png",
+    help: "Use an actual interface capture with no personal information or real assessment answers.",
+  }),
+  f("snapshotImageAlt", "Snapshot screenshot description", "Snapshot showcase", {
+    max: 220,
+    default:
+      "The Snapshot asks where getting work moving becomes difficult, with five choice-based answers.",
+  }),
+  f("snapshotDetailImageUrl", "Second real Snapshot screenshot", "Snapshot showcase", {
+    type: "url",
+    default: "/brand/snapshot-pressures.png",
+  }),
+  f("snapshotDetailImageAlt", "Second screenshot description", "Snapshot showcase", {
+    max: 220,
+    default: "A follow-up Snapshot question explores pressures on people and resources.",
+  }),
+  f("snapshotImageCaption", "Product screenshot caption", "Snapshot showcase", {
+    max: 180,
+    default: "A look inside the Snapshot. Actual questions, shown without personal answers.",
+  }),
+  f("aboutName", "Founder name", "About", { max: 100, default: "Nkoyo Effiong Lewis" }),
+  f("aboutEyebrow", "Founder eyebrow", "About", { max: 80, default: "Meet the founder" }),
+  f("aboutCredentials", "Verified areas of practice", "About", {
+    type: "list",
+    default: ["Nonprofit strategy", "Governance & accountability", "Leadership & change"],
+  }),
+  f("faqVisible", "Show frequently asked questions", "Frequently asked questions", {
+    type: "toggle",
+    default: true,
+  }),
+  f("faqEyebrow", "FAQ eyebrow", "Frequently asked questions", {
+    max: 80,
+    default: "A little more clarity",
+  }),
+  f("faqTitle", "FAQ heading", "Frequently asked questions", {
+    max: 180,
+    default: "Good questions. Clear answers.",
+  }),
+  f("faqBody", "FAQ supporting text", "Frequently asked questions", {
+    type: "textarea",
+    max: 500,
+    default:
+      "Start where you are. Here's what to expect from the Snapshot—and how to begin a conversation.",
+  }),
+  ...[
+    [
+      "Who is the Smart Snapshot designed for?",
+      "The Snapshot is for nonprofit executives, board members and social impact leaders who want to reflect on pressures across Culture, Capacity and Compliance. You can use it as a starting point for a conversation with your team or board.",
+    ],
+    [
+      "How long does it take?",
+      "It depends on your pace and the follow-up questions relevant to your answers. Most of the flow uses choices rather than written responses, and the final written reflection is optional. There is no time limit.",
+    ],
+    [
+      "Will I receive my results immediately?",
+      "Your Snapshot findings appear on screen after you complete the assessment. If you request a detailed email report, it is prepared separately from your answers. It usually takes about five minutes; processing times can vary.",
+    ],
+    [
+      "Is this a formal organizational assessment?",
+      "No. The free Snapshot is a guided reflection, not a formal organizational or legal assessment. It identifies possible patterns to explore and does not replace Nkoyo's professional assessments, legal advice or an advisory engagement.",
+    ],
+    [
+      "Can I speak with Nkoyo without taking the Snapshot?",
+      "Yes. Book a conversation directly to share your priorities, ask questions and explore what support might be useful. Taking the Snapshot is not a requirement.",
+    ],
+    [
+      "What happens when I request email follow-up?",
+      "You can request a detailed report by email after viewing your on-screen results. Four personalized follow-up emails are a separate, optional choice, scheduled for days 2, 4, 7 and 10. You can unsubscribe at any time.",
+    ],
+  ].flatMap(([question, answer], n) => [
+    f(`faq${n}Question`, `Question ${n + 1}`, "Frequently asked questions", {
+      max: 180,
+      default: question!,
+    }),
+    f(`faq${n}Answer`, `Answer ${n + 1}`, "Frequently asked questions", {
+      type: "textarea",
+      max: 900,
+      default: answer!,
+    }),
+  ]),
+  f("footerStatement", "Footer positioning statement", "Navigation and footer", {
+    max: 300,
+    default:
+      "Stronger organizations. Sustainable impact. Strategy and support for the people moving missions forward.",
   }),
   f("navigationLinks", "Header navigation", "Navigation and footer", {
     type: "links",
@@ -510,7 +669,9 @@ export const homeFields: Field[] = [
       { label: "Take the Free Snapshot", href: "/snapshot" },
       { label: "Our Approach", href: "/#approach" },
       { label: "About Nkoyo", href: "/#about" },
-      { label: "Insights & Resources", href: "/resources" },
+      { label: "Blog", href: "/insights" },
+      { label: "Videos", href: "/videos" },
+      { label: "Resources", href: "/resources" },
     ],
   }),
   f("contactEmail", "Footer contact email", "Navigation and footer", {
@@ -697,7 +858,8 @@ export function validateContent(kind: ContentKind, input: unknown, publishing = 
                 : plain(field.max ?? (field.type === "url" ? 2048 : 200));
     if (field.type === "url")
       schema = schema.refine(
-        (value: string) => !value || safeHref(value),
+        (value: string) =>
+          !value || (imageFields.has(field.key) ? safeImageHref(value) : safeHref(value)),
         "Use an approved public path or HTTPS URL.",
       );
     if (publishing && field.required && !["toggle", "number"].includes(field.type ?? ""))
@@ -715,12 +877,12 @@ export function validateContent(kind: ContentKind, input: unknown, publishing = 
     "formUrl",
     "followupFormUrl",
     "thankYouUrl",
-    "coverUrl",
-    "imageUrl",
-    "portraitUrl",
   ])
     if (text(result, key) && !safeHref(text(result, key), true))
       throw new Error(`${key} requires a public HTTPS URL.`);
+  for (const key of imageFields)
+    if (text(result, key) && !safeImageHref(text(result, key)))
+      throw new Error(`${key} requires an approved brand asset path or public HTTPS image URL.`);
   if (
     publishing &&
     kind === "page" &&

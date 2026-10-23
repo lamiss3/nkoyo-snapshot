@@ -16,10 +16,14 @@ export function SiteFooter({
   footerLinks,
   contactEmail = brand.contactEmail,
   navigationHeading = "Snapshot",
+  statement = brand.tagline,
+  booking,
 }: {
   footerLinks?: LinkValue[];
   contactEmail?: string | null;
   navigationHeading?: string;
+  statement?: string;
+  booking?: LinkValue | undefined;
 }) {
   return (
     <footer className="no-print bg-navy text-navy-foreground">
@@ -32,7 +36,9 @@ export function SiteFooter({
           <p className="mt-1 text-xs uppercase tracking-[0.3em] opacity-80">
             {brand.logo.wordmarkSub}
           </p>
-          <p className="mt-4 max-w-xs text-sm text-navy-foreground/85">{brand.tagline}</p>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-navy-foreground/85">
+            {statement}
+          </p>
         </div>
         <div>
           <h2 className="text-sm font-bold uppercase tracking-widest text-navy-foreground/80">
@@ -81,6 +87,13 @@ export function SiteFooter({
                 <li>
                   <a href={`mailto:${contactEmail}`} className={`${linkClass} break-all`}>
                     {contactEmail}
+                  </a>
+                </li>
+              )}
+              {booking && (
+                <li>
+                  <a href={booking.href} className={linkClass}>
+                    {booking.label} ↗
                   </a>
                 </li>
               )}

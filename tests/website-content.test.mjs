@@ -6,6 +6,7 @@ import {
   validateContent,
   publicContent,
   safeHref,
+  safeImageHref,
   youtubeId,
   campaignEligible,
   HOME_ID,
@@ -16,6 +17,42 @@ import { contentService } from "../src/cms/service.server.ts";
 import { homepageContentGroups } from "../src/cms/homepage-content.ts";
 const id = "10000000-0000-4000-8000-000000000001";
 const assetId = "20000000-0000-4000-8000-000000000001";
+
+test("Homepage image configuration accepts reviewed assets without opening arbitrary local paths", () => {
+  for (const value of [
+    "/brand/nkoyo-hero.webp",
+    "/brand/snapshot-question.png",
+    "https://example.com/portrait.webp",
+  ])
+    assert.equal(safeImageHref(value), true, value);
+  for (const value of [
+    "/brand/../private.png",
+    "/brand/%2e%2e/private.png",
+    "/admin/private.png",
+    "file:///private.png",
+    "http://localhost/photo.png",
+    "https://127.0.0.1/photo.png",
+    "data:image/svg+xml,x",
+  ])
+    assert.equal(safeImageHref(value), false, value);
+  const saved = validateContent(
+    "page",
+    {
+      ...homeDefaults,
+      heroTitle: "Saved editorial headline",
+      faq0Answer: "Saved answer.",
+      faqVisible: false,
+    },
+    true,
+  );
+  assert.equal(saved.heroTitle, "Saved editorial headline");
+  assert.equal(saved.faq0Answer, "Saved answer.");
+  assert.equal(saved.faqVisible, false);
+  assert.equal(saved.heroImageUrl, "/brand/nkoyo-hero-smiling.webp");
+  assert.throws(() =>
+    validateContent("page", { ...homeDefaults, heroImageUrl: "/admin/private.png" }, true),
+  );
+});
 const draft = (kind, extra = {}) => ({
   ...defaultContent(kind),
   title: "Real guidance",
