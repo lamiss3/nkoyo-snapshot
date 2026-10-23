@@ -283,19 +283,18 @@
 .premium-home .home-strip-group {
   display: flex;
   flex: 0 0 auto;
-  justify-content: space-between;
   align-items: center;
-  gap: 52px;
-  min-width: calc(100vw - 44px);
+  min-width: 0;
   list-style: none;
   min-height: 44px;
   margin: 0;
-  padding: 0 28px;
+  padding: 0;
 }
 .premium-home .home-brand-strip li {
   display: flex;
   align-items: center;
-  gap: 42px;
+  gap: 32px;
+  padding-right: 32px;
   white-space: nowrap;
   font-weight: 700;
   font-size: 0.72rem;
@@ -337,6 +336,7 @@
     padding: 10px 20px;
   }
   .premium-home .home-strip-group[aria-hidden="true"],
+  .premium-home .home-strip-group li[aria-hidden="true"],
   .premium-home .home-strip-control {
     display: none;
   }
@@ -1092,7 +1092,6 @@
     gap: 52px;
   }
   .premium-home .home-brand-strip li {
-    gap: 24px;
     font-size: 0.65rem;
   }
   .premium-home .home-triad-grid article {
@@ -1171,7 +1170,6 @@
   }
   .premium-home .home-brand-strip li {
     font-size: 0.58rem;
-    gap: 18px;
   }
   .premium-home .home-brand-strip li > span:last-child {
     font-size: 22px;
@@ -1400,7 +1398,6 @@
     justify-content: center;
   }
   .premium-home .home-brand-strip li {
-    gap: 28px;
     font-size: 0.65rem;
   }
   .premium-home .home-challenge-grid {

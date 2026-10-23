@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, ArrowUpRight, Pause, Play } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -7,18 +7,51 @@ import "./homepage.css";
 
 function BrandStrip({ items }: { items: string[] }) {
   const [paused, setPaused] = useState(false);
+  const [repetitions, setRepetitions] = useState(1);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const groupRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    const group = groupRef.current;
+    if (!viewport || !group) return;
+    const resize = () => {
+      const patternWidth = Array.from(group.children)
+        .slice(0, items.length)
+        .reduce((width, item) => width + item.getBoundingClientRect().width, 0);
+      if (patternWidth > 0) {
+        setRepetitions(Math.max(1, Math.ceil(viewport.clientWidth / patternWidth)));
+      }
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(viewport);
+    observer.observe(group);
+    resize();
+    return () => observer.disconnect();
+  }, [items, repetitions]);
+
   return (
     <div className="home-brand-strip" role="region" aria-label="Our connected perspective">
-      <div className="home-strip-viewport">
+      <div className="home-strip-viewport" ref={viewportRef}>
         <div className="home-strip-track" data-paused={paused}>
           {[0, 1].map((copy) => (
-            <ul className="home-strip-group" key={copy} aria-hidden={copy === 1 || undefined}>
-              {items.map((phrase, n) => (
-                <li key={`${n}-${phrase}`}>
-                  <span>{phrase}</span>
-                  <span aria-hidden="true">✳</span>
-                </li>
-              ))}
+            <ul
+              className="home-strip-group"
+              key={copy}
+              ref={copy === 0 ? groupRef : undefined}
+              aria-hidden={copy === 1 || undefined}
+            >
+              {Array.from({ length: repetitions }, (_, repetition) =>
+                items.map((phrase, n) => (
+                  <li
+                    key={`${repetition}-${n}-${phrase}`}
+                    aria-hidden={repetition > 0 || undefined}
+                  >
+                    <span>{phrase}</span>
+                    <span aria-hidden="true">✳</span>
+                  </li>
+                )),
+              )}
             </ul>
           ))}
         </div>
