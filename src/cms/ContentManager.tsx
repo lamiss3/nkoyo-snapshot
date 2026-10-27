@@ -144,7 +144,7 @@ function Manager({ kind }: { kind: ContentKind }) {
         )}
       </PageIntro>
       {kind === "blog" && (
-        <Card className="mb-6">
+        <Card className="cms-connection mb-5">
           <h2 className="font-black">Kit article connection</h2>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             <div>
@@ -180,19 +180,23 @@ function Manager({ kind }: { kind: ContentKind }) {
         </Card>
       )}
       {(kind === "webinar" || kind === "resource") && (
-        <Card className="mb-6">
-          <h2 className="font-black">Delivery setup</h2>
-          <p className="mt-3 text-sm leading-relaxed">
-            Use a dedicated Kit form and its incentive email to deliver this item. Configure and
-            test the confirmation, file/recording link, thank-you page and any form automation in
-            Kit. The CMS validates the active form and URL before publication. It does not create
-            subscribers or trigger emails while you edit.
-          </p>
-          <p className="mt-3 text-sm leading-relaxed">
-            Optional five-day nurture uses a separate signup form. Registrations and subscriber
-            totals are managed in Kit; local registration counts are not tracked. Changing the
-            featured item does not change earlier Kit registrations or delivery links.
-          </p>
+        <Card className="mb-5">
+          <details className="cms-delivery-help">
+            <summary className="cursor-pointer font-semibold">
+              Delivery setup and publication requirements
+            </summary>
+            <p className="mt-3 text-sm leading-relaxed">
+              Use a dedicated Kit form and its incentive email to deliver this item. Configure and
+              test the confirmation, file/recording link, thank-you page and any form automation in
+              Kit. The CMS validates the active form and URL before publication. It does not create
+              subscribers or trigger emails while you edit.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed">
+              Optional five-day nurture uses a separate signup form. Registrations and subscriber
+              totals are managed in Kit; local registration counts are not tracked. Changing the
+              featured item does not change earlier Kit registrations or delivery links.
+            </p>
+          </details>
         </Card>
       )}
       {notice && (
@@ -218,9 +222,11 @@ function Manager({ kind }: { kind: ContentKind }) {
           </button>
         </Card>
       ) : (
-        <Card>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-xl font-black">{names[kind]}</h2>
+        <Card className="cms-content-list">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="admin-panel-heading">
+              {shown.length} {kind === "page" ? "editable page" : "items"}
+            </h2>
             {kind !== "page" && (
               <label className="flex min-h-11 items-center gap-2 text-sm">
                 <input
@@ -246,7 +252,7 @@ function Manager({ kind }: { kind: ContentKind }) {
                 return (
                   <li
                     key={doc.id}
-                    className="flex flex-wrap items-start justify-between gap-4 py-5"
+                    className="cms-content-row flex flex-wrap items-start justify-between gap-3"
                   >
                     <div className="min-w-0 flex-1">
                       <h3 className="break-words font-bold">
@@ -266,7 +272,7 @@ function Manager({ kind }: { kind: ContentKind }) {
                         <>
                           {post.thumbnail && (
                             <img
-                              className="mt-3 h-20 w-32 rounded-xl object-cover"
+                              className="cms-list-thumbnail rounded-lg object-cover"
                               loading="lazy"
                               src={post.thumbnail}
                               alt={post.alt}
@@ -278,7 +284,7 @@ function Manager({ kind }: { kind: ContentKind }) {
                             {doc.draft["visible"] ? "Visible when published" : "Hidden"}
                           </p>
                           <a
-                            className="mt-2 inline-flex min-h-11 items-center text-sm underline"
+                            className="mt-1 inline-flex min-h-8 items-center text-xs underline"
                             href={post.url}
                             target="_blank"
                             rel="noreferrer"
@@ -723,8 +729,8 @@ function Editor({
         if (!open) close();
       }}
     >
-      <DialogContent className="cms-dialog admin-portal flex max-h-[94dvh] w-[96vw] max-w-5xl flex-col gap-0 overflow-hidden p-0">
-        <header className="border-b p-5 pr-12">
+      <DialogContent className="cms-dialog cms-editor admin-portal flex flex-col gap-0 overflow-hidden p-0">
+        <header className="cms-editor-header border-b pr-12">
           <DialogTitle>Edit {doc.kind === "page" ? "homepage" : doc.kind}</DialogTitle>
           <DialogDescription className="mt-2">
             {doc.published ? `Published revision ${doc.published_revision}. ` : "Not published. "}
@@ -732,7 +738,7 @@ function Editor({
             {dirty ? " · Unsaved changes" : ""}. Required fields are checked before publication.
           </DialogDescription>
         </header>
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-5 sm:p-7">
+        <div className="cms-editor-body min-h-0 flex-1 overflow-y-auto">
           {error && (
             <p
               className="rounded-xl border border-destructive p-4 text-sm text-destructive whitespace-pre-wrap break-words"
@@ -783,9 +789,9 @@ function Editor({
             </label>
           </div>
           {groups.map((group, n) => (
-            <details key={group} open={n === 0} className="rounded-2xl border p-4">
+            <details key={group} open={n === 0} className="cms-field-group border">
               <summary className="min-h-8 cursor-pointer font-black">{group}</summary>
-              <div className="mt-5 grid gap-6">
+              <div className="cms-field-grid">
                 {contentFields[doc.kind]
                   .filter((f) => f.group === group)
                   .map((field) => (
@@ -840,7 +846,7 @@ function Editor({
             </section>
           )}
         </div>
-        <footer className="flex flex-wrap items-center gap-2 border-t bg-white p-4">
+        <footer className="cms-editor-footer flex flex-wrap items-center gap-2 border-t bg-white">
           <button className={adminButton} disabled={busy} onClick={() => void run("save")}>
             Save draft
           </button>

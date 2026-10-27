@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getStaffAccounts, createStaffAccount, deleteStaffAccount } from "@/staff/account-actions";
+import { adminButton, adminInput } from "@/admin/ui";
 
-const button =
-  "rounded-full border border-border px-4 py-2 text-sm font-bold disabled:opacity-50 hover:bg-muted";
-const input = "mt-2 w-full rounded-xl border border-input bg-card px-4 py-3";
+const button = adminButton;
+const input = `${adminInput} mt-1`;
 export function StaffAccountPanel({ currentUserId }: { currentUserId: string }) {
   const query = useQuery({
     queryKey: ["staff-accounts", currentUserId],
@@ -57,18 +57,18 @@ export function StaffAccountPanel({ currentUserId }: { currentUserId: string }) 
   return (
     <section
       id="staff-accounts"
-      className="card-elevated min-w-0 p-5 sm:p-7"
+      className="admin-card min-w-0"
       aria-labelledby="staff-accounts-title"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="staff-accounts-title" className="text-2xl font-black">
-          Staff accounts
+        <h2 id="staff-accounts-title" className="admin-panel-heading">
+          Workspace access
         </h2>
         <button className={button} onClick={() => void query.refetch()}>
           Refresh accounts
         </button>
       </div>
-      <p className="mt-3 text-muted-foreground">
+      <p className="admin-panel-description">
         Administrators manage accounts here. Staff can read private assessment records, captured
         emails and model logs.
       </p>
@@ -82,37 +82,37 @@ export function StaffAccountPanel({ currentUserId }: { currentUserId: string }) 
           {notice}
         </p>
       )}
-      <form onSubmit={create} className="mt-6 rounded-xl border border-border p-5">
+      <form onSubmit={create} className="admin-staff-create">
         <h3 className="font-bold">Create a staff account</h3>
-        <label htmlFor="staff-name" className="mt-4 block text-sm font-semibold">
+        <label htmlFor="staff-name">
           Name (optional)
+          <input
+            id="staff-name"
+            className={input}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            maxLength={100}
+          />
         </label>
-        <input
-          id="staff-name"
-          className={input}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          maxLength={100}
-        />
-        <label htmlFor="staff-email" className="mt-4 block text-sm font-semibold">
+        <label htmlFor="staff-email">
           Staff email
+          <input
+            id="staff-email"
+            type="email"
+            required
+            className={input}
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            maxLength={255}
+          />
         </label>
-        <input
-          id="staff-email"
-          type="email"
-          required
-          className={input}
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          maxLength={255}
-        />
+        <button type="submit" className={button} disabled={busy}>
+          {busy ? "Working…" : "Create staff account"}
+        </button>
         <p className="mt-3 text-sm text-muted-foreground">
           A random password is shown once after creation. Share it privately with the intended staff
           member.
         </p>
-        <button type="submit" className={`${button} mt-4`} disabled={busy}>
-          {busy ? "Working…" : "Create staff account"}
-        </button>
       </form>
       {created && (
         <div role="status" className="mt-5 rounded-xl bg-muted p-5">
@@ -129,15 +129,13 @@ export function StaffAccountPanel({ currentUserId }: { currentUserId: string }) 
           Loading accounts…
         </p>
       )}
-      <div className="mt-6 space-y-3">
+      <div className="admin-staff-list">
+        <h3 className="font-semibold">Existing accounts</h3>
         {!query.isPending && !query.error && query.data?.length === 0 && (
           <p className="text-sm text-muted-foreground">No staff accounts were returned.</p>
         )}
         {query.data?.map((account) => (
-          <div
-            key={account.id}
-            className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border p-4"
-          >
+          <div key={account.id} className="admin-staff-row">
             <div className="min-w-0">
               <p className="font-bold break-all">{account.email}</p>
               <p className="mt-1 text-sm">

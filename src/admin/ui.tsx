@@ -2,11 +2,10 @@ import type { ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 
 export const adminButton =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-bold transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50";
-export const adminInput =
-  "min-h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 py-2 text-sm";
+  "admin-button inline-flex items-center justify-center gap-2 border border-border bg-card font-semibold transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50";
+export const adminInput = "admin-input w-full min-w-0 border border-input bg-card";
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`card-elevated min-w-0 p-5 sm:p-6 ${className}`}>{children}</section>;
+  return <section className={`admin-card min-w-0 ${className}`}>{children}</section>;
 }
 export function PageIntro({
   description,
@@ -16,8 +15,8 @@ export function PageIntro({
   children?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-      <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{description}</p>
+    <div className="admin-page-intro">
+      <p className="max-w-3xl text-muted-foreground">{description}</p>
       {children}
     </div>
   );
@@ -57,12 +56,12 @@ export function QueryState({
   return <>{children}</>;
 }
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="py-8 text-sm text-muted-foreground">{children}</p>;
+  return <p className="admin-empty text-muted-foreground">{children}</p>;
 }
 export function Status({ children }: { children: string }) {
   return (
     <span
-      className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${/failed|error|reconcile/.test(children) ? "bg-destructive/10 text-destructive" : /completed/.test(children) ? "bg-lime text-lime-foreground" : "bg-secondary text-navy"}`}
+      className={`admin-status inline-block font-semibold ${/failed|error|reconcile/.test(children) ? "bg-destructive/10 text-destructive" : /completed/.test(children) ? "bg-lime text-lime-foreground" : "bg-secondary text-navy"}`}
     >
       {children.replaceAll("_", " ")}
     </span>
@@ -83,7 +82,7 @@ export function Pagination({
   return (
     <nav
       aria-label="Pagination"
-      className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4"
+      className="admin-pagination flex flex-wrap items-center justify-between gap-3 border-t border-border"
     >
       <p className="text-sm text-muted-foreground">
         {count

@@ -72,14 +72,9 @@ export function DashboardPage() {
     .slice(0, 4);
   return (
     <>
-      <PageIntro description="An overview of recorded assessments and follow-up activity. Counts describe saved records, not unique visitors.">
-        <button className={adminButton} onClick={refresh}>
-          <RefreshCw className="h-4 w-4" />
-          Refresh overview
-        </button>
-      </PageIntro>
-      <Card className="mb-6">
-        <div className="flex flex-wrap items-end gap-4">
+      <PageIntro description="Recorded assessments and follow-up activity. Counts describe saved records, not unique visitors." />
+      <div className="admin-filter-toolbar" aria-label="Dashboard filters">
+        <div className="admin-filter-controls">
           <DateFilters from={from} to={to} onFrom={setFrom} onTo={setTo} />
           <button
             className={adminButton}
@@ -90,38 +85,41 @@ export function DashboardPage() {
           >
             All dates
           </button>
-        </div>
-        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-          Assessment counts use the date each assessment started; completed means completed as of
-          now. Event and opt-in counts use their own recorded dates. Calendar dates follow your
-          browser’s timezone.
-        </p>
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-bold">
-            Exclude known internal or test submissions
-          </summary>
-          <label className="mt-3 block text-sm">
-            Exact email addresses or assessment IDs
+          <label className="admin-exclusion-field text-xs font-bold">
+            Exclude test emails / IDs
             <input
-              className={`${adminInput} mt-2`}
+              className={`${adminInput} mt-1`}
               value={excluded}
               onChange={(event) => setExcluded(event.target.value)}
-              placeholder="Separate values with commas"
+              placeholder="Exact values, comma-separated"
+              aria-describedby="dashboard-exclusion-help"
             />
           </label>
-          <p className="mt-2 text-xs text-muted-foreground">
-            This view only. Email matches exclude their linked assessment IDs and identifiable
-            events. Unlinked activity cannot be classified. No records are deleted or changed.
+          <button className={adminButton} onClick={refresh}>
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </button>
+        </div>
+        <details className="admin-context-help">
+          <summary>How dates and exclusions affect counts</summary>
+          <p>
+            Assessment counts use the date each assessment started; completed means completed as of
+            now. Event and opt-in counts use their own recorded dates. Calendar dates follow your
+            browser’s timezone.
+          </p>
+          <p id="dashboard-exclusion-help">
+            Exclusions apply to this view only. Email matches exclude linked assessment IDs and
+            identifiable events. Unlinked activity cannot be classified. No records are changed.
           </p>
         </details>
-      </Card>
+      </div>
       <QueryState queries={[saved, traces, leads, events]}>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="admin-kpi-grid">
           {stats.map((stat) => (
-            <Card key={stat.label}>
-              <p className="text-sm font-bold text-muted-foreground">{stat.label}</p>
-              <p className="mt-3 font-display text-4xl font-black">{stat.value}</p>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{stat.note}</p>
+            <Card key={stat.label} className="admin-kpi">
+              <p className="admin-kpi-label text-muted-foreground">{stat.label}</p>
+              <p className="admin-kpi-value font-display">{stat.value}</p>
+              <p className="admin-kpi-note text-muted-foreground">{stat.note}</p>
             </Card>
           ))}
         </div>
@@ -130,7 +128,7 @@ export function DashboardPage() {
           are not added to saved assessment counts because events may repeat or lack an assessment
           record.
         </p>
-        <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <div className="admin-dashboard-panels">
           <Card>
             <h2 className="text-lg font-black">Most common patterns</h2>
             <p className="mt-2 text-xs text-muted-foreground">
@@ -140,16 +138,16 @@ export function DashboardPage() {
             {!metrics.patterns.length ? (
               <Empty>No recorded patterns in this view yet.</Empty>
             ) : (
-              <ul className="mt-6 space-y-5">
+              <ul className="admin-pattern-list">
                 {metrics.patterns.map(([key, count]) => (
                   <li key={key}>
-                    <div className="mb-2 flex justify-between gap-4 text-sm">
+                    <div className="mb-1 flex justify-between gap-4 text-sm">
                       <span className="font-semibold">{patternLabel(key)}</span>
                       <span className="shrink-0 font-bold">{count}</span>
                     </div>
-                    <div className="h-2 rounded-full bg-secondary" aria-hidden="true">
+                    <div className="h-1 rounded-full bg-secondary" aria-hidden="true">
                       <div
-                        className="h-2 rounded-full bg-navy"
+                        className="h-1 rounded-full bg-navy"
                         style={{ width: `${(count / Math.max(1, metrics.completed)) * 100}%` }}
                       />
                     </div>
@@ -168,9 +166,9 @@ export function DashboardPage() {
             {!metrics.cohort.length ? (
               <Empty>No saved assessments in this view yet.</Empty>
             ) : (
-              <ul className="mt-4 divide-y divide-border">
+              <ul className="admin-activity-list divide-y divide-border">
                 {metrics.cohort.slice(0, 6).map((row) => (
-                  <li key={row.id} className="py-4">
+                  <li key={row.id}>
                     <Link
                       to="/admin/assessments/$id"
                       params={{ id: row.id }}
@@ -192,7 +190,7 @@ export function DashboardPage() {
           </Card>
         </div>
       </QueryState>
-      <Card className="mt-6">
+      <Card className="admin-warnings">
         <div className="flex flex-wrap justify-between gap-3">
           <h2 className="text-lg font-black">Email failures & system warnings</h2>
           <Link to="/admin/email-journeys" className="text-sm font-bold underline">
@@ -213,7 +211,7 @@ export function DashboardPage() {
         ) : (
           <>
             {!jobs.data?.kitConfigured && (
-              <p className="mt-4 rounded-xl bg-blush p-4 text-sm">
+              <p className="admin-alert-row bg-blush">
                 Kit is not configured for this environment.
               </p>
             )}
@@ -221,9 +219,9 @@ export function DashboardPage() {
               <p className="mt-4 text-sm">Automatic sending is disabled in this environment.</p>
             )}
             {failures.length ? (
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-3 space-y-2">
                 {failures.map((job) => (
-                  <li key={job.id} className="rounded-xl border border-border p-4">
+                  <li key={job.id} className="admin-alert-row border border-border">
                     <p className="break-all text-sm font-bold">{job.email}</p>
                     <p className="mt-1 break-words text-sm text-destructive">
                       {job.last_error ?? job.kit_state.error ?? "This journey needs review."}

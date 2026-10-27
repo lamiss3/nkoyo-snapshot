@@ -8,6 +8,91 @@
   right: 6px;
   z-index: 60;
 }
+.cms-editor {
+  width: min(960px, calc(100vw - 48px));
+  max-width: 960px;
+  max-height: 90dvh;
+  border-radius: 16px;
+}
+.cms-editor-header {
+  padding: 16px 52px 16px 20px;
+}
+.cms-editor-header h2 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+.cms-editor-header p {
+  font-size: 12px;
+  margin-top: 4px;
+}
+.cms-editor-body {
+  padding: 20px;
+  overscroll-behavior: contain;
+}
+.cms-editor-body > * + * {
+  margin-top: 16px;
+}
+.cms-field-group {
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.cms-field-group > summary {
+  font-size: 14px;
+  min-height: 28px;
+}
+.cms-field-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 12px;
+}
+.cms-editor-footer {
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+.cms-editor .admin-input {
+  margin-top: 4px;
+}
+.cms-editor textarea.admin-input {
+  min-height: 104px;
+}
+.cms-content-row {
+  padding-block: 14px;
+}
+.cms-list-thumbnail {
+  float: left;
+  width: 96px;
+  height: 60px;
+  margin: 8px 12px 4px 0;
+}
+.cms-connection dl {
+  margin-top: 12px;
+  gap: 12px;
+}
+.cms-connection > p {
+  margin-top: 12px;
+  font-size: 12px;
+}
+.cms-delivery-help {
+  font-size: 13px;
+}
+@media (max-width: 639px) {
+  .cms-editor {
+    width: calc(100vw - 16px);
+    max-height: 94dvh;
+  }
+  .cms-editor-body {
+    padding: 16px;
+  }
+  .cms-editor-header {
+    padding-left: 16px;
+  }
+  .cms-editor-footer {
+    padding: 12px 16px;
+  }
+  .cms-field-group {
+    padding: 12px;
+  }
+}
 @media (max-width: 639px) {
   .cms-dialog input,
   .cms-dialog textarea,

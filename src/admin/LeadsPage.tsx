@@ -81,7 +81,7 @@ export function LeadsPage() {
     <>
       <PageIntro description="Contacts and individual report requests. Unique contacts groups email addresses for display only; original submissions remain intact." />
       <Card>
-        <div className="flex flex-wrap items-end gap-3">
+        <div className="admin-list-toolbar !mt-0">
           <label className="min-w-48 flex-1 text-xs font-bold">
             Search
             <input
@@ -127,26 +127,26 @@ export function LeadsPage() {
               <option value="name">Name A–Z</option>
             </select>
           </label>
+          <button className={adminButton} disabled={!rows.length} onClick={exportRows}>
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
         </div>
-        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-          Consent is the choice saved on each submission, not a live Kit subscription check. Unique
-          contacts shows the latest recorded choice; history retains earlier choices. A contact can
-          match a search through an earlier submission.
-        </p>
+        <details className="admin-context-help">
+          <summary>Consent, search and export details</summary>
+          <p>
+            Consent is the choice saved on each submission, not a live Kit subscription check.
+            Unique contacts shows the latest recorded choice; history retains earlier choices. A
+            contact can match a search through an earlier submission. Exports include every matching{" "}
+            {mode === "contacts" ? "unique contact" : "individual submission"}, across all pages.
+          </p>
+        </details>
         <QueryState queries={[leads, saved]}>
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-4">
             <h2 className="text-lg font-black">
               {rows.length} {mode === "contacts" ? "unique contacts" : "individual submissions"}
             </h2>
-            <button className={adminButton} disabled={!rows.length} onClick={exportRows}>
-              <Download className="h-4 w-4" />
-              Export {mode === "contacts" ? "contacts" : "submissions"} CSV
-            </button>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Exports all matching{" "}
-            {mode === "contacts" ? "unique contacts" : "individual submissions"}, across every page.
-          </p>
           {!rows.length ? (
             <Empty>No matching contacts. Try a different search or filter.</Empty>
           ) : (
@@ -175,7 +175,7 @@ export function LeadsPage() {
                 <tbody>
                   {rows.slice((current - 1) * 20, current * 20).map(({ latest, history }) => (
                     <tr key={mode === "contacts" ? latest.email.toLowerCase() : latest.id}>
-                      <td>
+                      <td className="min-w-48">
                         <p className="font-bold">{latest.first_name || "Name not supplied"}</p>
                         <p className="mt-1 break-all">{latest.email}</p>
                       </td>

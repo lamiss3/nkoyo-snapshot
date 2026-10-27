@@ -72,7 +72,7 @@ export function AssessmentsPage() {
           Refresh assessments
         </button>
       </PageIntro>
-      <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Assessment views">
+      <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Assessment views">
         {[
           ["all", "All Assessments"],
           ["completed", "Completed Reports"],
@@ -92,7 +92,7 @@ export function AssessmentsPage() {
         ))}
       </div>
       <Card>
-        <div className="flex flex-wrap items-end gap-3">
+        <div className="admin-list-toolbar !mt-0">
           <label className="min-w-44 flex-1 text-xs font-bold">
             Assessment ID
             <input
@@ -130,28 +130,31 @@ export function AssessmentsPage() {
           >
             Clear filters
           </button>
+          <button
+            className={adminButton}
+            onClick={exportSaved}
+            disabled={!rows.some((row) => row.saved)}
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </button>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Dates filter when an assessment started. Activity & Logs includes recorded traces; full
-          logs load only when you open a detail page. Use Refresh for updates.
-        </p>
-        <QueryState queries={[saved, traces]}>
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-black">{rows.length} matching assessments</h2>
-            <button
-              className={adminButton}
-              onClick={exportSaved}
-              disabled={!rows.some((row) => row.saved)}
-            >
-              <Download className="h-4 w-4" />
-              Export saved snapshots CSV
-            </button>
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
+        <details className="admin-context-help">
+          <summary>Dates, activity and export details</summary>
+          <p>
+            Dates filter when an assessment started. Activity & Logs includes recorded traces; full
+            logs load only when you open a detail page. Use Refresh for updates.
+          </p>
+          <p>
             CSV keeps the original session, completion, summary and pattern fields for all matching
             saved snapshots, across every page. Trace-only records have Markdown and JSON exports in
             their detail page.
           </p>
+        </details>
+        <QueryState queries={[saved, traces]}>
+          <div className="mt-4">
+            <h2 className="text-lg font-black">{rows.length} matching assessments</h2>
+          </div>
           {!rows.length ? (
             <Empty>No matching assessments. Try another ID, status or date range.</Empty>
           ) : (

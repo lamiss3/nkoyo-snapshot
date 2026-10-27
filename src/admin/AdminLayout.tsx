@@ -37,17 +37,11 @@ function Navigation({
           ),
         )
         .map((group) => (
-          <div key={group} className="mb-7">
-            <p
-              className={
-                collapsed
-                  ? "sr-only"
-                  : "px-3 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground"
-              }
-            >
+          <div key={group} className="admin-nav-group">
+            <p className={collapsed ? "sr-only" : "admin-nav-heading text-muted-foreground"}>
               {group}
             </p>
-            <ul className="space-y-2">
+            <ul className="admin-nav-items">
               {adminNavigation
                 .filter((item) => item.group === group && (!("adminOnly" in item) || isAdmin))
                 .map((item) => {
@@ -124,7 +118,7 @@ export function AdminShell({
         Skip to page content
       </a>
       <aside className="admin-sidebar" aria-label="Workspace sidebar">
-        <div className="flex min-h-24 items-center justify-center border-b border-border px-4">
+        <div className="admin-sidebar-brand flex items-center justify-center border-b border-border">
           {collapsed ? (
             <Link
               to="/admin"
@@ -137,10 +131,10 @@ export function AdminShell({
             <Logo />
           )}
         </div>
-        <div className="flex-1 overflow-y-auto px-3 py-7">
+        <div className="admin-sidebar-scroll min-h-0 flex-1 overflow-y-auto">
           <Navigation isAdmin={isAdmin} collapsed={collapsed} />
         </div>
-        <div className="space-y-2 border-t border-border p-3">
+        <div className="admin-sidebar-footer border-t border-border">
           <a
             href="/"
             title={collapsed ? "View website" : undefined}
@@ -165,7 +159,7 @@ export function AdminShell({
         </div>
       </aside>
       <div className="admin-workspace min-w-0">
-        <header className="sticky top-0 z-30 border-b border-border/70 bg-card/95 px-4 py-4 backdrop-blur sm:px-7">
+        <header className="admin-header sticky top-0 z-30 border-b border-border/70 bg-card/95 backdrop-blur">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <div className="lg:hidden">
@@ -180,21 +174,27 @@ export function AdminShell({
                     className="admin-portal admin-mobile-nav flex w-[min(88vw,320px)] flex-col"
                   >
                     <SheetTitle>Snapshot admin</SheetTitle>
-                    <SheetDescription>Navigate your private workspace.</SheetDescription>
+                    <SheetDescription>
+                      {name} · {isAdmin ? "Administrator" : "Staff"}
+                    </SheetDescription>
                     <div className="mt-5">
                       <Logo />
                     </div>
                     <div className="mt-7 min-h-0 flex-1 overflow-y-auto">
                       <Navigation isAdmin={isAdmin} close={() => setMobileOpen(false)} />
                     </div>
+                    <a href="/" className="admin-nav-link border-t border-border">
+                      <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
+                      View website
+                    </a>
                   </SheetContent>
                 </Sheet>
               </div>
               <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-muted-foreground sm:text-[10px]">
+                <p className="admin-header-eyebrow text-muted-foreground">
                   Iban Ison · Admin portal
                 </p>
-                <h1 className="text-xl font-black sm:text-2xl">{title}</h1>
+                <h1 className="admin-page-title">{title}</h1>
               </div>
             </div>
             <div className="flex min-w-0 items-center gap-3">
@@ -217,7 +217,7 @@ export function AdminShell({
         <main
           id="admin-content"
           tabIndex={-1}
-          className="mx-auto w-full max-w-[1500px] p-4 outline-none sm:p-7 lg:p-9"
+          className="admin-main mx-auto w-full max-w-[1680px] outline-none"
         >
           {children}
         </main>

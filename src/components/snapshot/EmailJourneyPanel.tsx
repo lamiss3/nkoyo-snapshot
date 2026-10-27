@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pagination, Status } from "@/admin/ui";
+import { Pagination, Status, adminButton, adminInput } from "@/admin/ui";
 import { useEmailJourneyEvents } from "@/admin/data";
 import {
   getEmailJourneys,
@@ -18,8 +18,7 @@ import { emailSlotsForVersion } from "@/assessment-v2/email-contract";
 import { problemById } from "@/assessment-v2/problem-bank";
 import type { EmailJobView } from "@/assessment-v2/email-job-types";
 
-const button =
-  "rounded-full border border-border px-4 py-2 text-sm font-bold disabled:opacity-50 hover:bg-muted";
+const button = adminButton;
 const date = (value: string) => new Date(value).toLocaleString();
 export function EmailJourneyPanel() {
   const cache = useQueryClient();
@@ -97,10 +96,10 @@ export function EmailJourneyPanel() {
     }
   };
   return (
-    <section className="card-elevated min-w-0 p-5 sm:p-7" aria-labelledby="email-journeys-title">
+    <section className="admin-card min-w-0" aria-labelledby="email-journeys-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="email-journeys-title" className="text-2xl font-black">
-          Personalized email journeys
+        <h2 id="email-journeys-title" className="admin-panel-heading">
+          Journey requests
         </h2>
         <button
           className={button}
@@ -112,22 +111,25 @@ export function EmailJourneyPanel() {
           Refresh emails
         </button>
       </div>
-      <p className="mt-3 text-muted-foreground">
+      <p className="admin-panel-description">
         Review five emails based on each person’s saved answers. Planned timing: report, then days
         2, 4, 7 and 10.{" "}
         {query.data?.deliveryEnabled
           ? "New requests are automatically prepared and scheduled according to consent. Earlier review drafts are not enrolled."
           : "Sending is not activated."}
       </p>
-      <p className="mt-2 text-sm text-muted-foreground">
-        New journeys: finding and first check → locate the obstacle → bounded test → interpret
-        possible results → next decision.
-      </p>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {query.data?.kitConfigured
-          ? `Kit connected in ${query.data.kitMode} mode. ${query.data.deliveryEnabled ? "Automatic emails remain private and target one verified contact." : "Uploads create private, unscheduled drafts."}`
-          : "Kit credentials are not connected yet. You can generate, review and export drafts here."}
-      </p>
+      <details className="admin-context-help">
+        <summary>Sequence and connection details</summary>
+        <p>
+          New journeys: finding and first check → locate the obstacle → bounded test → interpret
+          possible results → next decision.
+        </p>
+        <p>
+          {query.data?.kitConfigured
+            ? `Kit connected in ${query.data.kitMode} mode. ${query.data.deliveryEnabled ? "Automatic emails remain private and target one verified contact." : "Uploads create private, unscheduled drafts."}`
+            : "Kit credentials are not connected yet. You can generate, review and export drafts here."}
+        </p>
+      </details>
       {query.isPending && (
         <p role="status" className="mt-4">
           Loading email journeys…
@@ -192,38 +194,40 @@ export function EmailJourneyPanel() {
           </button>
         </details>
       )}
-      <label className="mt-5 block text-sm font-semibold" htmlFor="email-journey-search">
-        Find by email or assessment ID (latest 100 requests)
-      </label>
-      <input
-        id="email-journey-search"
-        value={search}
-        onChange={(event) => {
-          setSearch(event.target.value);
-          setPage(1);
-        }}
-        className="mt-2 w-full rounded-xl border border-input bg-card p-3"
-        placeholder="Email or assessment ID"
-      />
-      <label className="mt-4 block text-sm font-semibold" htmlFor="email-journey-status">
-        Journey status
-      </label>
-      <select
-        id="email-journey-status"
-        className="mt-2 min-h-11 rounded-xl border border-input bg-card p-3 text-sm"
-        value={statusFilter}
-        onChange={(event) => {
-          setStatusFilter(event.target.value);
-          setPage(1);
-        }}
-      >
-        <option value="all">All statuses</option>
-        {statuses.map((status) => (
-          <option key={status} value={status}>
-            {status.replaceAll("_", " ")}
-          </option>
-        ))}
-      </select>
+      <div className="admin-list-toolbar">
+        <label htmlFor="email-journey-search">
+          Search latest 100 requests
+          <input
+            id="email-journey-search"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+            className={adminInput}
+            placeholder="Email or assessment ID"
+          />
+        </label>
+        <label htmlFor="email-journey-status">
+          Journey status
+          <select
+            id="email-journey-status"
+            className={adminInput}
+            value={statusFilter}
+            onChange={(event) => {
+              setStatusFilter(event.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="all">All statuses</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+                {status.replaceAll("_", " ")}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <p className="mt-3 text-xs text-muted-foreground">
         This page refreshes saved status every 10 seconds while open. Viewing or refreshing does not
         generate or send emails. Scheduled means scheduled in Kit; it does not confirm inbox
@@ -235,37 +239,70 @@ export function EmailJourneyPanel() {
           been enrolled in this sequence.
         </p>
       )}
-      <div className="mt-4 space-y-2">
-        {filteredJobs.slice((currentPage - 1) * 20, currentPage * 20).map((item) => (
-          <button
-            key={item.id}
-            onClick={() => {
-              setSelected(item.id);
-              setTimelineVisible(25);
-              setPendingAction(null);
-              setError("");
-            }}
-            className={`w-full rounded-xl border p-4 text-left ${selected === item.id ? "border-magenta bg-muted" : "border-border"}`}
-          >
-            <span className="block font-bold break-all">{item.email}</span>
-            <span className="mt-1 block text-sm">
-              <Status>{item.kit_state.status || item.status}</Status> ·{" "}
-              {item.followup_consent ? "All five requested" : "Report only"} ·{" "}
-              {date(item.created_at)}
-            </span>
-            <span className="block text-xs text-muted-foreground break-all">
-              Assessment {item.session_id}
-            </span>
-          </button>
-        ))}
+      <div className="admin-table-wrap mt-4">
+        <table className="admin-table admin-journey-table">
+          <caption className="sr-only">Email journey requests and saved delivery status</caption>
+          <thead>
+            <tr>
+              <th scope="col">Contact</th>
+              <th scope="col">Assessment</th>
+              <th scope="col">Status</th>
+              <th scope="col">Created</th>
+              <th scope="col">
+                <span className="sr-only">Details</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredJobs.slice((currentPage - 1) * 20, currentPage * 20).map((item) => (
+              <tr key={item.id} className={selected === item.id ? "admin-journey-selected" : ""}>
+                <td className="min-w-48">
+                  <p className="font-semibold break-all">{item.email}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.followup_consent ? "All five requested" : "Report only"}
+                  </p>
+                </td>
+                <td className="min-w-44 max-w-56">
+                  <Link
+                    className="text-xs underline break-all"
+                    to="/admin/assessments/$id"
+                    params={{ id: item.session_id }}
+                  >
+                    {item.session_id}
+                  </Link>
+                </td>
+                <td>
+                  <Status>{item.kit_state.status || item.status}</Status>
+                </td>
+                <td className="min-w-36 text-xs">{date(item.created_at)}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      setSelected(item.id);
+                      setTimelineVisible(25);
+                      setPendingAction(null);
+                      setError("");
+                    }}
+                    className={button}
+                    aria-label={`View journey for ${item.email}`}
+                    aria-expanded={selected === item.id}
+                    aria-controls={selected === item.id ? "email-journey-detail" : undefined}
+                  >
+                    View details
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
       {Boolean(jobs.length) && !filteredJobs.length && (
         <p className="mt-5 text-sm text-muted-foreground">No journeys match these filters.</p>
       )}
       <Pagination page={currentPage} count={filteredJobs.length} onChange={setPage} />
       {job && (
-        <div className="mt-7 rounded-2xl border border-border p-4 sm:p-6">
-          <h3 className="text-xl font-black break-all">Email journey for {job.email}</h3>
+        <div id="email-journey-detail" className="admin-journey-detail">
+          <h3 className="admin-panel-heading break-all">Email journey for {job.email}</h3>
           {job.content?.source === "fixed_test" && (
             <p className="mt-3 rounded-xl bg-muted p-3 font-bold">
               Fixed template test — Gemini was not called.
