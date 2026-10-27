@@ -105,6 +105,104 @@
 .admin-header > div {
   min-height: 47px;
 }
+.admin-header:has(.admin-credit-control) .admin-header-user {
+  max-width: 160px;
+}
+.admin-credit-control {
+  flex-shrink: 0;
+}
+.admin-credit-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.admin-credit-trigger:hover {
+  filter: brightness(0.97);
+}
+.admin-credit--healthy {
+  color: #116149;
+}
+.admin-credit--low {
+  color: #795008;
+  background: #fff7e0;
+  border-color: #e8cc84;
+}
+.admin-credit--critical {
+  color: #a11c3a;
+  background: #fff0f4;
+  border-color: #edb6c4;
+}
+.admin-credit--unavailable {
+  color: var(--color-muted-foreground);
+}
+.admin-credit-popover {
+  width: min(336px, calc(100vw - 24px));
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--color-card);
+  box-shadow: 0 8px 24px rgb(20 30 70 / 10%);
+}
+.admin-credit-popover-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.admin-credit-popover-heading h2 {
+  font-size: 15px;
+  font-weight: 700;
+}
+.admin-credit-state {
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.admin-credit-notice {
+  margin-top: 12px;
+  font-size: 12px;
+}
+.admin-credit-totals {
+  margin-top: 12px;
+  font-size: 12px;
+}
+.admin-credit-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.admin-credit-totals dt {
+  color: var(--color-muted-foreground);
+}
+.admin-credit-totals dd {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.admin-credit-popover-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+.admin-credit-footnote {
+  color: var(--color-muted-foreground);
+  font-size: 11px;
+  margin-top: 8px;
+}
 .admin-header-eyebrow {
   font-size: 9px;
   font-weight: 700;
@@ -403,6 +501,42 @@
   }
   .admin-header-eyebrow {
     font-size: 8px;
+  }
+  .admin-header:has(.admin-credit-control) .admin-header-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 8px;
+  }
+  .admin-header:has(.admin-credit-control) .admin-header-actions {
+    display: contents;
+  }
+  .admin-header:has(.admin-credit-control) .admin-header-content > div:first-child {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    padding-right: 56px;
+  }
+  .admin-header:has(.admin-credit-control) .admin-header-user {
+    display: block;
+    grid-row: 2;
+    grid-column: 1;
+    text-align: left;
+    max-width: 100%;
+  }
+  .admin-header:has(.admin-credit-control) .admin-header-user > p:last-child {
+    margin-top: 0;
+  }
+  .admin-credit-control {
+    grid-row: 2;
+    grid-column: 2;
+    justify-self: end;
+  }
+  .admin-header:has(.admin-credit-control) .admin-signout {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+  }
+  .admin-credit-trigger {
+    min-height: 44px;
   }
   .admin-portal .admin-input {
     font-size: 16px;

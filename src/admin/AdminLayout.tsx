@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { legacyAdminPath } from "./model";
 import { adminButton, Card } from "./ui";
+import { OpenRouterCredits } from "./OpenRouterCredits";
 import "./admin.css";
 
 function Navigation({
@@ -160,7 +161,7 @@ export function AdminShell({
       </aside>
       <div className="admin-workspace min-w-0">
         <header className="admin-header sticky top-0 z-30 border-b border-border/70 bg-card/95 backdrop-blur">
-          <div className="flex items-center justify-between gap-3">
+          <div className="admin-header-content flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <div className="lg:hidden">
                 <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -197,8 +198,8 @@ export function AdminShell({
                 <h1 className="admin-page-title">{title}</h1>
               </div>
             </div>
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="hidden max-w-64 text-right sm:block">
+            <div className="admin-header-actions flex min-w-0 items-center gap-3">
+              <div className="admin-header-user hidden max-w-64 text-right sm:block">
                 <p className="truncate text-sm font-bold" title={name}>
                   {name}
                 </p>
@@ -206,7 +207,8 @@ export function AdminShell({
                   {isAdmin ? "Administrator" : "Staff"}
                 </p>
               </div>
-              <button className={adminButton} onClick={onSignOut}>
+              {isAdmin && <OpenRouterCredits userId={user.id} />}
+              <button className={`${adminButton} admin-signout`} onClick={onSignOut}>
                 <LogOut className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Sign out</span>
                 <span className="sr-only sm:hidden">Sign out</span>

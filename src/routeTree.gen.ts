@@ -35,6 +35,7 @@ import { Route as AuthenticatedAdminResourcesRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin/staff'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedAdminWebinarsRouteImport } from './routes/_authenticated/admin/webinars'
+import { Route as ApiAdminOpenrouterCreditsRouteImport } from './routes/api.admin.openrouter-credits'
 import { Route as AuthenticatedAdminAssessmentsIndexRouteImport } from './routes/_authenticated/admin/assessments/index'
 import { Route as AuthenticatedAdminAssessmentsIdRouteImport } from './routes/_authenticated/admin/assessments/$id'
 
@@ -172,6 +173,12 @@ const AuthenticatedAdminWebinarsRoute =
     path: '/webinars',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const ApiAdminOpenrouterCreditsRoute =
+  ApiAdminOpenrouterCreditsRouteImport.update({
+    id: '/api/admin/openrouter-credits',
+    path: '/api/admin/openrouter-credits',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminAssessmentsIndexRoute =
   AuthenticatedAdminAssessmentsIndexRouteImport.update({
     id: '/assessments/',
@@ -210,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/admin/webinars': typeof AuthenticatedAdminWebinarsRoute
+  '/api/admin/openrouter-credits': typeof ApiAdminOpenrouterCreditsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
   '/admin/assessments/': typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -238,6 +246,7 @@ export interface FileRoutesByTo {
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/admin/webinars': typeof AuthenticatedAdminWebinarsRoute
+  '/api/admin/openrouter-credits': typeof ApiAdminOpenrouterCreditsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
   '/admin/assessments': typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -269,6 +278,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/_authenticated/admin/webinars': typeof AuthenticatedAdminWebinarsRoute
+  '/api/admin/openrouter-credits': typeof ApiAdminOpenrouterCreditsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/assessments/$id': typeof AuthenticatedAdminAssessmentsIdRoute
   '/_authenticated/admin/assessments/': typeof AuthenticatedAdminAssessmentsIndexRoute
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/videos'
     | '/admin/webinars'
+    | '/api/admin/openrouter-credits'
     | '/admin/'
     | '/admin/assessments/$id'
     | '/admin/assessments/'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/videos'
     | '/admin/webinars'
+    | '/api/admin/openrouter-credits'
     | '/admin'
     | '/admin/assessments/$id'
     | '/admin/assessments'
@@ -358,6 +370,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/staff'
     | '/_authenticated/admin/videos'
     | '/_authenticated/admin/webinars'
+    | '/api/admin/openrouter-credits'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/assessments/$id'
     | '/_authenticated/admin/assessments/'
@@ -379,6 +392,7 @@ export interface RootRouteChildren {
   ResourcesIndexRoute: typeof ResourcesIndexRoute
   VideosIndexRoute: typeof VideosIndexRoute
   WebinarsIndexRoute: typeof WebinarsIndexRoute
+  ApiAdminOpenrouterCreditsRoute: typeof ApiAdminOpenrouterCreditsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -565,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWebinarsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/api/admin/openrouter-credits': {
+      id: '/api/admin/openrouter-credits'
+      path: '/api/admin/openrouter-credits'
+      fullPath: '/api/admin/openrouter-credits'
+      preLoaderRoute: typeof ApiAdminOpenrouterCreditsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/assessments/': {
       id: '/_authenticated/admin/assessments/'
       path: '/assessments'
@@ -646,6 +667,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesIndexRoute: ResourcesIndexRoute,
   VideosIndexRoute: VideosIndexRoute,
   WebinarsIndexRoute: WebinarsIndexRoute,
+  ApiAdminOpenrouterCreditsRoute: ApiAdminOpenrouterCreditsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
