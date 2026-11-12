@@ -133,7 +133,9 @@ const sections: LegalSection[] = [
             <strong>Supabase</strong> for database storage and staff authentication.
           </li>
           <li>
-            <strong>Jev, provided by TypeSafe AI,</strong> for assessment evaluation.
+            <strong>Jev, provided by TypeSafe AI,</strong> for assessment evaluation. The service
+            sends relevant assessment answers to TypeSafe directly or through OpenRouter, depending
+            on configuration.
           </li>
           <li>
             <strong>

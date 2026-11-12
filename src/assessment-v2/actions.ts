@@ -24,25 +24,26 @@ export const advanceAdaptiveAssessment = createServerFn({ method: "POST" })
     const { runTracedAdvance } = await import("./trace-runtime.server.ts");
     const { assessmentTrace } = await import("./logging.server.ts");
     const { localRuleEvaluator } = await import("./local-evaluator.ts");
-    const { createJevEvaluator } = await import("./jev.server.ts");
+    const { createJevEvaluator, jevConfigFromEnv } = await import("./jev.server.ts");
     const { createGeminiQuestionWriter } = await import("./gemini.server.ts");
     const { geminiConfigFromEnv } = await import("./gemini-client.server.ts");
     const trace = assessmentTrace(data);
     if (trace) await trace.authorize();
     const attemptId = crypto.randomUUID();
     const recorder = trace?.recorder(attemptId);
-    const jevKey = process.env['JEV_API_KEY'];
+    const jevConfig = jevConfigFromEnv();
     const geminiConfig = geminiConfigFromEnv();
     const writer = geminiConfig.apiKey ? createGeminiQuestionWriter({ ...geminiConfig, ...(recorder ? { trace: recorder } : {}) }) : undefined;
-    const evaluator = jevKey ? createJevEvaluator({ apiKey: jevKey, model: process.env['JEV_MODEL'] || "jev-latest", ...(recorder ? { trace: recorder } : {}) }) : localRuleEvaluator;
+    const evaluator = jevConfig.apiKey ? createJevEvaluator({ ...jevConfig, ...(recorder ? { trace: recorder } : {}) }) : localRuleEvaluator;
     try {
-      if (!jevKey && !isDevelopment) {
-        if (trace) await trace.event("configuration_error", { message: "JEV_API_KEY is required" }, { attemptId });
-        throw new Error("JEV_API_KEY is required for the public assessment");
+      if (!jevConfig.apiKey && !isDevelopment) {
+        const message = `${jevConfig.keyName} is required for the public assessment`;
+        if (trace) await trace.event("configuration_error", { message }, { attemptId });
+        throw new Error(message);
       }
       return await runTracedAdvance(data, { evaluator, ...(writer ? { writer } : {}) }, trace, attemptId);
     } catch (error) {
-      if (!jevKey || !isDevelopment || (error instanceof Error && error.name === "AssessmentLogError")) throw error;
+      if (!jevConfig.apiKey || !isDevelopment || (error instanceof Error && error.name === "AssessmentLogError")) throw error;
       if (trace) await trace.event("local_evaluator_fallback", { reason: "Jev failed; using local rules in development", previousAttemptId: attemptId });
       return runTracedAdvance(data, { evaluator: localRuleEvaluator, ...(writer ? { writer } : {}) }, trace, crypto.randomUUID());
     }
